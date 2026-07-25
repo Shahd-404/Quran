@@ -49,6 +49,9 @@ The UI may present `upcoming`, `available`, or `missed` derived from persisted s
 ## One-active-plan and one-active-khatma rules
 
 - Enforced via partial unique indexes on `reading_plans` (status = 'active') and `khatmas` (status = 'active').
+- Atomic plan creation uses a trusted RPC with `SECURITY DEFINER` so the client may create related rows without broad insert policies on every table.
+- Ownership is derived from `auth.uid()` inside the function, not from any client-supplied `user_id`.
+- A transaction-scoped advisory lock is used per user to serialize concurrent plan creation and avoid duplicate active plans or duplicate khatma cycle numbers.
 
 ## Session page-range overlap protection
 

@@ -64,6 +64,7 @@ Environment files
 Database migrations
 
 - Will be introduced in future tasks. Migration files must be committed and applied via documented tooling.
+- Trusted database functions that perform multi-table writes may use `SECURITY DEFINER` and advisory locking to preserve RLS and ensure atomicity.
 
 Documentation
 

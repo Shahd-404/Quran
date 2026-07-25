@@ -17,6 +17,8 @@ This architecture document describes the high-level structure and design princip
 - Database migrations are the source of truth for structural changes and live under `supabase/migrations`.
 - Generated TypeScript database types will be produced from the migrations when a local Supabase stack is available and saved to `src/types/database.generated.ts`.
 - Server-authoritative progress changes (e.g., recording a session completion and advancing unread page) will be implemented as trusted database operations in later tasks to ensure atomicity.
+- Trusted database functions may use `SECURITY DEFINER` when needed to permit strict RLS enforcement while allowing a single controlled write entry point for multi-table operations.
+- The `create_reading_plan` RPC uses `SECURITY DEFINER`, `auth.uid()`, and advisory locking instead of broad insert policies or service-role keys.
 
 
 ## High-level layers
