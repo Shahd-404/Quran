@@ -21,6 +21,9 @@
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "@quranjs/api/server": [
+        "node_modules/@quranjs/api/dist/server.d.ts"
       ]
     },
     "incremental": true,
@@ -39,6 +42,7 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "supabase/functions"
   ]
 }

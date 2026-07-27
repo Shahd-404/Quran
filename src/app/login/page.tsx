@@ -16,6 +16,7 @@ export default function LoginPage() {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim(), password })
       })
@@ -36,14 +37,14 @@ export default function LoginPage() {
         <p className="mb-4">تسجيل الدخول</p>
 
         <label className="block mb-2">البريد الإلكتروني
-          <input className="w-full mt-1 p-2 border rounded" value={email} onChange={e=>setEmail(e.target.value)} aria-label="email" />
+          <input name="email" type="email" autoComplete="email" required className="w-full mt-1 p-2 border rounded" value={email} onChange={e=>setEmail(e.target.value)} aria-label="email" aria-invalid={Boolean(error)} aria-describedby={error ? 'login-error' : undefined} />
         </label>
 
         <label className="block mb-2">كلمة المرور
-          <input type="password" className="w-full mt-1 p-2 border rounded" value={password} onChange={e=>setPassword(e.target.value)} aria-label="password" />
+          <input name="password" type="password" autoComplete="current-password" required className="w-full mt-1 p-2 border rounded" value={password} onChange={e=>setPassword(e.target.value)} aria-label="password" aria-invalid={Boolean(error)} aria-describedby={error ? 'login-error' : undefined} />
         </label>
 
-        {error && <div role="alert" className="text-red-600 mb-2">{error}</div>}
+        {error && <div id="login-error" role="alert" className="text-red-600 mb-2">{error}</div>}
 
         <button type="submit" disabled={loading} className="w-full p-2 bg-blue-600 text-white rounded">
           {loading ? 'جارٍ...' : 'تسجيل الدخول'}

@@ -1,7 +1,10 @@
 export const dbCodeToMachineCode = (dbMessage: string | null | undefined) => {
   if (!dbMessage) return 'INTERNAL_ERROR';
-  if (dbMessage.includes('ACTIVE_PLAN_EXISTS')) return 'ACTIVE_PLAN_EXISTS';
-  if (dbMessage.includes('UNAUTHENTICATED')) return 'UNAUTHENTICATED';
+  const normalizedMessage = dbMessage.toLowerCase();
+  if (normalizedMessage.includes('active_plan_exists')) return 'ACTIVE_PLAN_EXISTS';
+  if (normalizedMessage.includes('idx_khatmas_unique_active_per_user')) return 'ACTIVE_PLAN_EXISTS';
+  if (normalizedMessage.includes('duplicate key value violates unique constraint')) return 'ACTIVE_PLAN_EXISTS';
+  if (normalizedMessage.includes('unauthenticated')) return 'UNAUTHENTICATED';
   if (dbMessage.includes('PROFILE_NOT_FOUND')) return 'PROFILE_NOT_FOUND';
   if (dbMessage.includes('INVALID_START_PAGE')) return 'INVALID_START_PAGE';
   if (dbMessage.includes('INVALID_DAILY_PAGES')) return 'INVALID_DAILY_PAGES';

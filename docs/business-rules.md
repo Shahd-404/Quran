@@ -118,6 +118,18 @@ Khatma rules
 - BR-KHATMA-003: Completing a khatma does not automatically start a new khatma; user must explicitly start a new khatma.
   - Reason: Respect user agency.
 
+- BR-KHATMA-004: After completion, the dashboard shows the completed khatma as a dedicated state with its completion date, cycle number, starting page, and completed page count; it must not generate another daily assignment.
+  - Reason: Completion is a stable historical state, not an ordinary empty or daily-reading state.
+
+- BR-KHATMA-005: Starting a new khatma from a previous plan always creates a new active plan and a new active khatma beginning at page 1, while preserving the completed plan and khatma unchanged.
+  - Reason: Each cycle must retain independent configuration and history.
+
+- BR-KHATMA-006: Reusing the previous plan copies daily pages, sessions per day, timezone, and the complete ordered schedule. The new cycle number is one greater than the user's highest existing cycle number.
+  - Edge: An incomplete or invalid previous configuration must be rejected rather than partially copied.
+
+- BR-KHATMA-007: A new khatma may start today or on a future date in the saved plan timezone. Before a future effective date, the dashboard shows a calm scheduled-start state and creates no daily assignment.
+  - Reason: Date boundaries follow the saved reading schedule rather than the device timezone.
+
 Timezone rules
 
 - BR-TIME-001: The timezone should be detected from the browser during onboarding; if detection fails the timezone defaults to `Africa/Cairo`.
@@ -139,16 +151,33 @@ Notification rules (behavioural; implementation later)
 
 - BR-NOTIF-004: No notification should be sent if the session is already completed.
 
+- BR-NOTIF-005: Reminders are opt-in per device. Permission is requested only
+  after the user presses the enable button, and disabling one device does not
+  disable another.
+
+- BR-NOTIF-006: `reading_sessions.scheduled_for` is the authoritative reminder
+  time. A reminder is eligible for 30 minutes, is delivered at most once per
+  session and subscription, and never completes or advances a session.
+
 Plan editing rules
 
-- BR-EDIT-001: Changes to daily pages, session counts, or session times apply from the next local calendar day.
-  - Reason: Avoid changing the current day's assignments unexpectedly.
+- BR-EDIT-001: Changes to daily pages, session counts, or session times apply to the first daily assignment created after the save. Every assignment and session that already exists remains unchanged, including page ranges, scheduled timestamps, and statuses.
+  - Reason: Allow useful plan changes without rewriting the current or historical reading record.
 
 - BR-EDIT-002: Pausing a plan takes effect immediately and prevents future daily assignments from being generated.
 
 - BR-EDIT-003: Replacing a plan preserves khatma history and does not delete past completion records.
 
 - BR-EDIT-004: Changing the starting page requires an explicit warning and confirmation because it can alter the current unread page.
+
+- BR-EDIT-005: Ordinary plan editing must not expose or modify the current unread page, completed progress, active khatma, existing assignments, or existing sessions.
+  - Reason: Those values represent authoritative reading progress rather than preferences.
+
+- BR-EDIT-006: Saving plan settings requires reviewing the previous and proposed daily pages, session count, and schedule, with explicit notice that the current assignment will not change.
+  - Reason: Make the timing and impact of configuration changes clear before confirmation.
+
+- BR-EDIT-007: Ordinary active-plan settings cannot change the starting page, timezone, effective date, plan status, or completion timestamp.
+  - Reason: These fields affect progress continuity or plan lifecycle and require separate, explicitly warned flows.
 
 Data integrity rules
 

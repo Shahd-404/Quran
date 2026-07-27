@@ -18,7 +18,7 @@ export async function createReadingPlan(client: SupabaseClient, input: CreatePla
   const rpcParams = {
     p_start_page: input.startPage,
     p_daily_pages: input.dailyPages,
-    p_sessions: JSON.stringify(input.sessions),
+    p_sessions: input.sessions,
     p_timezone: input.timezone,
     p_effective_from: input.effectiveFrom,
   } as const;
@@ -26,6 +26,7 @@ export async function createReadingPlan(client: SupabaseClient, input: CreatePla
   const { data, error } = await client.rpc('create_reading_plan', rpcParams) as any;
 
   if (error) {
+    console.error('[createReadingPlan] RPC failed', { code: error.code || 'UNKNOWN' });
     const code = dbCodeToMachineCode(error.message || error.details || '');
     return { success: false, code, message: codeToArabic(code) };
   }

@@ -11,24 +11,34 @@ export async function createServerClient(req: NextRequest | Request, res: NextRe
   }
 
   // Adapter for cookie getAll/setAll expected by @supabase/ssr
-  const getAll = () => {
+  const getAll = async () => {
     try {
       // NextRequest cookies has getAll()
       // @ts-ignore
       if ((req as NextRequest).cookies && typeof (req as NextRequest).cookies.getAll === 'function') {
         // @ts-ignore
-        return (req as NextRequest).cookies.getAll().map((c: any) => `${c.name}=${c.value}`)
+        return (req as NextRequest).cookies.getAll().map((c: any) => ({ name: c.name, value: c.value }))
       }
     } catch (e) {}
+
     const header = (req as Request).headers?.get?.('cookie') || ''
     if (!header) return []
-    return header.split(';').map(s => s.trim())
+    return header
+      .split(';')
+      .map(s => s.trim())
+      .filter(Boolean)
+      .map(cookie => {
+        const [name, ...rest] = cookie.split('=')
+        return { name: name.trim(), value: rest.join('=').trim() }
+      })
   }
 
-  const setAll = (cookies: string[]) => {
-    // Set 'set-cookie' header(s) on the response
+  const setAll = async (cookies: Array<{ name: string; value: string; options?: any }>) => {
     for (const c of cookies) {
-      res.headers.append('set-cookie', c)
+      const headerValue = c.options
+        ? require('cookie').serialize(c.name, c.value, c.options)
+        : `${c.name}=${c.value}`
+      res.headers.append('set-cookie', headerValue)
     }
   }
 

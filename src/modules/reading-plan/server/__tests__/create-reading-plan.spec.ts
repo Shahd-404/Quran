@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createReadingPlan } from '../create-reading-plan';
+import { codeToArabic } from '../error-mapping';
 import { CreatePlanInput } from '../types';
 
 const mockClient = () => ({
@@ -40,6 +41,9 @@ describe('createReadingPlan server', () => {
       expect(res.khatmaId).toBe(fakeRes[0].khatma_id);
     }
     expect(client.rpc).toHaveBeenCalledTimes(1);
+    expect(client.rpc).toHaveBeenCalledWith('create_reading_plan', expect.objectContaining({
+      p_sessions: input.sessions,
+    }));
   });
 
   it('rejects page 0', async () => {
@@ -246,6 +250,22 @@ describe('createReadingPlan server', () => {
     expectFailure(res, 'UNAUTHENTICATED');
   });
 
+  it('maps active-khatma-constraint failures to ACTIVE_PLAN_EXISTS', async () => {
+    const client = mockClient();
+    (client.rpc as any).mockResolvedValue({ data: null, error: { message: 'duplicate key value violates unique constraint "idx_khatmas_unique_active_per_user"' } });
+
+    const input: CreatePlanInput = {
+      startPage: 1,
+      dailyPages: 1,
+      sessions: [ { sessionOrder: 1, scheduledTime: '08:00' } ],
+      timezone: 'Africa/Cairo',
+      effectiveFrom: '2026-07-25'
+    };
+
+    const res = await createReadingPlan(client as any, input);
+    expectFailure(res, 'ACTIVE_PLAN_EXISTS');
+  });
+
   it('maps PROFILE_NOT_FOUND error', async () => {
     const client = mockClient();
     (client.rpc as any).mockResolvedValue({ data: null, error: { message: 'PROFILE_NOT_FOUND' } });
@@ -260,6 +280,10 @@ describe('createReadingPlan server', () => {
 
     const res = await createReadingPlan(client as any, input);
     expectFailure(res, 'PROFILE_NOT_FOUND');
+  });
+
+  it('maps PROFILE_NOT_FOUND to the Arabic message', () => {
+    expect(codeToArabic('PROFILE_NOT_FOUND')).toContain('الملف الشخصي');
   });
 
   it('maps INVALID_START_PAGE error', async () => {

@@ -18,7 +18,7 @@ export async function refreshSession(req: NextRequest | Request, res: NextRespon
   let profile = null
   if (user) {
     try {
-      const p = await client.from('public.profiles').select('display_name').eq('id', user.id).maybeSingle()
+      const p = await client.from('profiles').select('display_name').eq('id', user.id).maybeSingle()
       profile = p?.data || null
     } catch (e) {
       profile = null

@@ -16,7 +16,7 @@
 - Arabic RTL interface and mobile-first responsive layout.
 - Basic loading, empty, offline, and error states.
 - PWA foundation (manifest/service-worker ready for later enhancement; no platform-specific packaging).
-- Reminder notification foundation and permission flow (behaviour documented; full push infrastructure deferred).
+- Opt-in Web Push reminders and explicit notification permission flow.
 - Basic automated tests for core business rules.
 
 ## Explicitly excluded from MVP
@@ -61,7 +61,7 @@
 - [ ] Plan editing applies changes as specified (next-day for times/counts, immediate for pause).
 - [ ] Missed-session policy maintained (no automatic page advancement).
 - [ ] Arabic RTL layout across screens and accessible text sizes.
-- [ ] Notification permission flow implemented without prompting on first load.
+- [x] Notification permission flow implemented without prompting on first load.
 - [ ] Basic automated tests cover critical business rules and flows.
 
 ## Operational notes

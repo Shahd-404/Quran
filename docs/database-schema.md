@@ -53,6 +53,24 @@ The UI may present `upcoming`, `available`, or `missed` derived from persisted s
 - Ownership is derived from `auth.uid()` inside the function, not from any client-supplied `user_id`.
 - A transaction-scoped advisory lock is used per user to serialize concurrent plan creation and avoid duplicate active plans or duplicate khatma cycle numbers.
 
+## Explicit new-khatma operation
+
+- `public.start_new_khatma_from_previous_plan(p_effective_from date)` is a `SECURITY DEFINER` RPC with a fixed safe `search_path`.
+- The function derives ownership from `auth.uid()`, acquires a transaction-scoped per-user advisory lock, and locks the relevant profile, plan, khatma, and schedule rows before writing.
+- It selects the most recent completed plan and its completed khatma, validates the saved timezone and complete ordered schedule, and accepts only today or a future effective date in that timezone.
+- It creates new plan, schedule, and khatma rows beginning at page 1; the completed source rows are never mutated. The new cycle number is `max(cycle_number) + 1`.
+- The operation creates no `daily_assignments` or `reading_sessions`. Those remain subject to normal effective-date-aware assignment generation.
+- Execute permission is revoked from `PUBLIC` and `anon` and granted only to `authenticated`.
+
+## Active-plan configuration update
+
+- `public.update_active_reading_plan(p_daily_pages smallint, p_sessions jsonb)` updates only the authenticated user's active plan preferences.
+- Ownership and the plan id are derived from `auth.uid()`; the client cannot supply a user id, plan id, timezone, unread page, khatma id, or progress value.
+- The function uses the same transaction-scoped per-user advisory lock as assignment generation and locks the profile, active plan, and existing schedule rows before replacing the configuration atomically.
+- Existing `daily_assignments`, `reading_sessions`, `reading_progress_events`, and `khatmas` are not updated. A later assignment reads the new plan values when it is created.
+- Validation and schedule replacement run in one transaction. A conflict or failed schedule insert rolls back both the plan fields and removal of the previous schedule.
+- Execute permission is revoked from `PUBLIC` and `anon` and granted only to `authenticated`.
+
 ## Session page-range overlap protection
 
 - Implemented via a BEFORE INSERT OR UPDATE trigger `check_session_page_overlap` which rejects overlapping inclusive page ranges within the same `daily_assignment`.
@@ -76,9 +94,9 @@ The UI may present `upcoming`, `available`, or `missed` derived from persisted s
 - Deleting a `profile` cascades to most application data for that user (plans, assignments, sessions, progress events, subscriptions).
 - Deleting a `reading_plan` DOES NOT delete khatma history; `khatmas.reading_plan_id` is `ON DELETE SET NULL`.
 
-## Deferred operations
+## Trusted completion operation
 
-- Atomic session-completion operation is intentionally deferred to a later task; it will record progress events and update related state atomically.
+- `public.complete_reading_session(p_session_id uuid)` atomically records explicit completion, advances only the contiguous owned frontier, and completes the plan and khatma at page 604 without storing page 605.
 
 ## Local development commands
 

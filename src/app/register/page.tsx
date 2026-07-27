@@ -20,6 +20,7 @@ export default function RegisterPage() {
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ display_name: displayName.trim(), email: email.trim(), password })
       })
@@ -43,22 +44,22 @@ export default function RegisterPage() {
         <p className="mb-4">التسجيل</p>
 
         <label className="block mb-2">الاسم (اختياري)
-          <input className="w-full mt-1 p-2 border rounded" value={displayName} onChange={e=>setDisplayName(e.target.value)} aria-label="display_name" />
+          <input name="display_name" autoComplete="name" className="w-full mt-1 p-2 border rounded" value={displayName} onChange={e=>setDisplayName(e.target.value)} aria-label="display_name" />
         </label>
 
         <label className="block mb-2">البريد الإلكتروني
-          <input className="w-full mt-1 p-2 border rounded" value={email} onChange={e=>setEmail(e.target.value)} aria-label="email" />
+          <input name="email" type="email" autoComplete="email" required className="w-full mt-1 p-2 border rounded" value={email} onChange={e=>setEmail(e.target.value)} aria-label="email" aria-invalid={Boolean(error)} aria-describedby={error ? 'register-error' : undefined} />
         </label>
 
         <label className="block mb-2">كلمة المرور
-          <input type="password" className="w-full mt-1 p-2 border rounded" value={password} onChange={e=>setPassword(e.target.value)} aria-label="password" />
+          <input name="password" type="password" autoComplete="new-password" minLength={8} required className="w-full mt-1 p-2 border rounded" value={password} onChange={e=>setPassword(e.target.value)} aria-label="password" aria-invalid={Boolean(error)} aria-describedby={error ? 'register-error' : undefined} />
         </label>
 
         <label className="block mb-2">تأكيد كلمة المرور
-          <input type="password" className="w-full mt-1 p-2 border rounded" value={confirm} onChange={e=>setConfirm(e.target.value)} aria-label="confirm" />
+          <input name="confirm_password" type="password" autoComplete="new-password" minLength={8} required className="w-full mt-1 p-2 border rounded" value={confirm} onChange={e=>setConfirm(e.target.value)} aria-label="confirm" aria-invalid={Boolean(error)} aria-describedby={error ? 'register-error' : undefined} />
         </label>
 
-        {error && <div role="alert" className="text-red-600 mb-2">{error}</div>}
+        {error && <div id="register-error" role="alert" className="text-red-600 mb-2">{error}</div>}
 
         <button type="submit" disabled={loading} className="w-full p-2 bg-blue-600 text-white rounded">
           {loading ? 'جارٍ...' : 'إنشاء حساب'}

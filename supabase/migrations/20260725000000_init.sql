@@ -291,43 +291,52 @@ CREATE TRIGGER trg_updated_at_daily_assignments BEFORE UPDATE ON public.daily_as
 CREATE TRIGGER trg_updated_at_reading_sessions BEFORE UPDATE ON public.reading_sessions FOR EACH ROW EXECUTE FUNCTION public.set_updated_at_column();
 CREATE TRIGGER trg_updated_at_push_subscriptions BEFORE UPDATE ON public.push_subscriptions FOR EACH ROW EXECUTE FUNCTION public.set_updated_at_column();
 
--- New-auth-user trigger: create profile when auth.users inserted
--- This function is defensive: it uses coalesce on metadata, ignores missing metadata, and sets defaults.
-CREATE OR REPLACE FUNCTION auth.create_profile_for_new_user() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER AS $$
+-- New-auth-user trigger: create profile when auth.users inserted.
+CREATE OR REPLACE FUNCTION public.create_profile_for_new_user()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
 BEGIN
-  PERFORM 1 FROM public.profiles WHERE id = NEW.id;
-  IF FOUND THEN
-    RETURN NEW;
-  END IF;
-
-  INSERT INTO public.profiles(id, display_name, timezone, locale, created_at, updated_at)
+  INSERT INTO public.profiles (
+    id,
+    display_name,
+    timezone,
+    locale,
+    created_at,
+    updated_at
+  )
   VALUES (
     NEW.id,
-    (CASE WHEN NEW.raw_user_meta_data IS NOT NULL AND (NEW.raw_user_meta_data->>'display_name') IS NOT NULL AND char_length(NEW.raw_user_meta_data->>'display_name')>0 THEN NEW.raw_user_meta_data->>'display_name' ELSE NULL END),
-    (CASE WHEN NEW.raw_user_meta_data IS NOT NULL AND (NEW.raw_user_meta_data->>'timezone') IS NOT NULL AND char_length(NEW.raw_user_meta_data->>'timezone')>0 THEN NEW.raw_user_meta_data->>'timezone' ELSE 'Africa/Cairo' END),
-    (CASE WHEN NEW.raw_user_meta_data IS NOT NULL AND (NEW.raw_user_meta_data->>'locale') IS NOT NULL AND char_length(NEW.raw_user_meta_data->>'locale')>0 THEN NEW.raw_user_meta_data->>'locale' ELSE 'ar' END),
-    now(), now()
-  );
+    CASE
+      WHEN NULLIF(BTRIM(NEW.raw_user_meta_data ->> 'display_name'), '') IS NOT NULL
+        THEN BTRIM(NEW.raw_user_meta_data ->> 'display_name')
+      ELSE NULL
+    END,
+    COALESCE(
+      NULLIF(BTRIM(NEW.raw_user_meta_data ->> 'timezone'), ''),
+      'Africa/Cairo'
+    ),
+    COALESCE(
+      NULLIF(BTRIM(NEW.raw_user_meta_data ->> 'locale'), ''),
+      'ar'
+    ),
+    NOW(),
+    NOW()
+  )
+  ON CONFLICT (id) DO NOTHING;
 
-  RETURN NEW;
-EXCEPTION WHEN others THEN
-  -- Do not prevent user creation if profile insert fails for some reason
   RETURN NEW;
 END;
 $$;
 
--- Create trigger on auth.users if the table exists (in Supabase auth schema)
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_catalog.pg_namespace n JOIN pg_catalog.pg_class c ON c.relnamespace = n.oid WHERE n.nspname = 'auth' AND c.relname = 'users') THEN
-    -- Create trigger only if not exists
-    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_create_profile_on_auth_user') THEN
-      CREATE TRIGGER trg_create_profile_on_auth_user
-      AFTER INSERT ON auth.users
-      FOR EACH ROW EXECUTE FUNCTION auth.create_profile_for_new_user();
-    END IF;
-  END IF;
-END$$;
+DROP TRIGGER IF EXISTS trg_create_profile_on_auth_user ON auth.users;
+
+CREATE TRIGGER trg_create_profile_on_auth_user
+AFTER INSERT ON auth.users
+FOR EACH ROW
+EXECUTE FUNCTION public.create_profile_for_new_user();
 
 -- Row Level Security: enable on application tables
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;

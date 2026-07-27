@@ -23,7 +23,7 @@ This architecture document describes the high-level structure and design princip
 
 ## High-level layers
 - Presentation: Next.js routes and Server/Client components in `src/app` and `src/components`.
-- Domain modules: `src/modules/*` (auth, quran, reading-plan, daily-assignment, reading-session, notifications, khatma, settings).
+- Domain modules: `src/modules/*` (auth, quran, reading-plan, daily-assignment, reading-session, history, notifications, khatma, settings).
 - Libraries/helpers: `src/lib` for non-domain shared utilities.
 - Config: `src/config` for constants and environment-agnostic values.
 
@@ -47,6 +47,7 @@ This architecture document describes the high-level structure and design princip
 - `src/modules/reading-plan`
 - `src/modules/daily-assignment`
 - `src/modules/reading-session`
+- `src/modules/history`
 - `src/modules/notifications`
 - `src/modules/khatma`
 - `src/modules/settings`
@@ -55,6 +56,13 @@ Notes:
 - Quran provider access will be behind a provider interface to allow replacement.
 - Reading-plan calculations will be implemented in a module separate from UI to allow unit testing.
 - Database access and migrations are reserved for future tasks and must be implemented on trusted server boundaries.
+- Reading history is server-rendered from authenticated Supabase clients. Its
+  aggregate read models are `SECURITY INVOKER`, derive ownership from
+  `auth.uid()`, and keep RLS active.
+- `reading_progress_events` remains append-only and authoritative. History event
+  queries are bounded to 20 rows, ordered by completion timestamp plus event ID,
+  and joined only to owned assignments, sessions, plans, and khatmas for
+  historical display context.
 
 ## State management approach (initial)
 
@@ -65,6 +73,12 @@ Notes:
 
 - Surface friendly error messages to users.
 - Log operational errors to an observability system in later tasks.
+- The root `public/sw.js` has shared Web Push and PWA responsibilities. It
+  caches only public static assets and a dedicated offline document. Navigation
+  is network-first and authenticated HTML is never written to Cache Storage.
+- Quran pages, Supabase traffic, application APIs, mutations, credentials,
+  subscription material, assignments, and progress data are excluded from
+  offline caching.
 
 ## Testing strategy
 
@@ -81,6 +95,12 @@ Notes:
 
 - Never store secrets in the repository.
 - Keep data access on trusted server boundaries.
+- Web Push subscriptions are written through authenticated RPCs that derive
+  ownership from `auth.uid()`. Delivery claiming and status updates are
+  service-role-only operations used by the scheduled Edge Function.
+- The reminder sender uses VAPID and an invocation token stored as Supabase Edge
+  Function secrets. Cron resolves its project URL and invocation token from
+  Vault; no private key or service-role credential is stored in migrations.
 
 ## Decisions deferred
 

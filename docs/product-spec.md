@@ -31,7 +31,7 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 
 1. Arabic-first and RTL interface.
 2. Mobile browsers are the primary target platform.
-3. PWA-installable behaviour is supported in the future.
+3. The application is installable as a PWA with a safe public offline shell.
 4. Calm, non-manipulative user experience.
 5. Quran text comes from a trusted, reviewable source (provider pluggable later).
 6. Explicit user confirmation is required to mark sessions completed.
@@ -63,7 +63,10 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 - Explicit session completion with confirmation and timestamp.
 - Persistent current unread page and khatma progress.
 - Basic dashboard showing today’s progress and sessions.
-- Reminder notification foundation (permission flow documented — implementation later).
+- Read-only Arabic reading history with completed-session timelines and current
+  and completed khatma archives.
+- Opt-in Web Push reminders for scheduled reading sessions on each subscribed device.
+- Installable PWA metadata, local icons, connectivity feedback, and a private-data-safe offline fallback.
 
 ## Functional requirements
 
@@ -75,12 +78,19 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 - A session becomes `in_progress` when opened; only explicit user confirmation marks it `completed`.
 - Completion stores a timestamp (presentation uses user timezone) and advances the current unread page only for explicitly completed pages.
 - Completing page 604 completes the khatma and records start and completion dates.
+- `reading_progress_events` is the authoritative append-only source for reading
+  history. History pages never regenerate events or infer completion from mutable
+  session state alone.
+- History groups events by the saved assignment local date and formats times in
+  the historical assignment or plan timezone. Event lists use stable, bounded
+  server-side pagination.
 
 ## Non-functional requirements
 
 - Responsive design optimized for mobile viewports.
 - RTL layout correctness throughout.
--- Offline-friendly read caching where possible (no syncing guarantees offline).
+- Public application assets and the offline shell may be cached. Authenticated
+  pages, assignments, progress, API responses, and Quran text are not cached.
 - Deterministic behaviour across devices; server-authoritative state ensures consistency.
 - Minimal latency for opening assigned pages and marking completion.
 
@@ -102,6 +112,9 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 - User accounts required; minimal personal data collected (email/identifier, timezone preference).
 - Reading progress and khatma history are personal data and must be stored securely.
 - Notifications require explicit permission and are not requested on first load.
+- Reminder delivery uses the stored `scheduled_for` timestamp, remains optional,
+  and never changes session or reading progress. Browser and operating-system
+  scheduling may delay display slightly.
 - No sharing of progress to external services by default.
 
 ## Success criteria for the MVP

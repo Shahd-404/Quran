@@ -35,6 +35,8 @@ For each flow we document: Preconditions, User actions, System responses, Succes
 - System responses: Display today's date, total assigned pages, completed count, progress %, list of sessions with scheduled times and states, current unread page, khatma progress.
 - Success: User sees clear action to begin next session.
 - Edge: If offline, show cached state and indicate offline; if plan paused, show paused state.
+- Offline navigation never replays cached authenticated Dashboard HTML; it shows
+  the public Arabic offline page until connectivity returns.
 
 5) Opening a scheduled session
 
@@ -86,61 +88,84 @@ For each flow we document: Preconditions, User actions, System responses, Succes
 
 - Preconditions: User completes a session that includes page 604.
 - User actions: Finish session and confirm completion.
-- System responses: Record completion timestamp and detect khatma completion; create a khatma record with start and completion dates.
+- System responses: Record completion timestamp, mark the existing active khatma and plan completed, and keep `current_unread_page` explicitly at 604.
 - Success: Dashboard shows khatma completed state; user offered calm congratulatory state and option to start a new khatma.
 
 12) Completing a khatma
 
 - Preconditions: Page 604 is completed.
 - User actions: View completion state; optionally start new khatma.
-- System responses: Persist khatma completion record; do not change current unread page until user chooses to start a new khatma.
-- Success: Historical khatma visible; if user starts new khatma, create new cycle and reset unread page to page 1.
+- System responses: Persist khatma completion record; keep `current_unread_page` at 604; do not create another plan, khatma, or daily assignment automatically.
+- Success: A dedicated Arabic completion state shows the completion date, cycle number, starting page, completed page count, and the explicit `ابدأ ختمة جديدة` action.
 
 13) Starting a new khatma
 
-- Preconditions: User completed previous khatma or is starting manually.
-- User actions: Choose `Start New Khatma`, confirm starting page (default 1) and confirm.
-- System responses: Create new khatma cycle, set active plan start page as chosen (if user chooses to replace plan), or create a new plan if required.
-- Success: New khatma cycle begins with unread page set to page 1.
+- Preconditions: The authenticated user has no active plan or khatma and has a completed plan linked to a completed khatma with a complete schedule.
+- User actions: Choose `ابدأ ختمة جديدة`; review the previous daily pages, session count, schedule, and timezone; then choose `ابدأ بنفس الخطة` or `إنشاء خطة مختلفة`. Reusing the plan requires a second explicit confirmation and an effective date.
+- System responses: For reuse, atomically create a new active plan and active khatma from page 1, copy the complete previous configuration into new rows, and assign the next cycle number. Never mutate the completed records. For a different plan, open the existing onboarding flow without creating anything first.
+- Success: If effective today, the dashboard may create the first assignment normally. If effective in the future, the dashboard shows `الخطة ستبدأ في…` and creates no assignment until that local date.
+- Edge: A repeated or concurrent confirmation returns `ACTIVE_PLAN_EXISTS` after the first succeeds and creates no duplicates.
 
 14) Editing a reading plan
 
 - Preconditions: Active plan exists.
-- User actions: Open `Edit Plan`, change daily pages / sessions / times / starting page / pause, then save.
-- System responses: Validate edits. For changes to counts/times, apply from next local calendar day; for pause, apply immediately. Do not modify existing sessions for the current day unless user explicitly replaces the reading start.
-- Success: New plan parameters take effect as specified.
-- Edge: Changing starting page requires explicit confirmation and warning because it changes unread page; replacing plan does not delete khatma history.
+- User actions: Choose the visible `إعدادات الخطة` action from the active-plan summary, open `/app/plan/settings`, change daily pages, session count, or session times, preview the new page distribution, review old and new settings, and confirm with `حفظ تعديلات الخطة`.
+- System responses: Atomically update only the active plan configuration and schedule. Preserve all previously created assignments and sessions, including their page ranges, times, and statuses. Apply the new values to the first assignment generated after the save.
+- Success: Return to `/app`, show `تم حفظ تعديلات الخطة`, and display the updated plan summary while the current assignment cards retain their original page ranges and scheduled timestamps.
+- Edge: The settings flow cannot change unread page, completed progress, active khatma, existing assignments, or existing sessions. Changing the starting page or resetting progress requires a separate warned operation.
 
-15) Pausing a reading plan
+15) Viewing reading history and the khatma archive
+
+- Preconditions: Authenticated user; history may be empty.
+- User actions: Choose `سجل القراءة` from the Dashboard, browse paginated completed sessions, and optionally choose `عرض تفاصيل الختمة`.
+- System responses: Read append-only `reading_progress_events` as the authoritative history source, group events by the saved assignment local date, format completion times in the historical assignment or plan timezone, and show current and completed khatmas without mutating any record.
+- Success: The user sees total pages, completed sessions, completed khatmas, daily session groups, and a khatma-specific chronological timeline.
+- Edge: Invalid pages fall back to page 1. A malformed or foreign khatma ID returns the same not-found state and reveals no ownership information. Empty history shows a calm Arabic state.
+
+16) Pausing a reading plan
 
 - Preconditions: Active plan exists.
 - User actions: Tap `Pause Plan`, confirm.
 - System responses: Mark plan `paused` immediately; existing progress and history preserved; daily assignments for future days are not created while paused.
 - Success: Dashboard shows paused state and option to resume.
 
-16) Notification permission accepted
+17) Notification permission accepted
 
 - Preconditions: User has interacted with an action (e.g., `Enable reminders`).
 - User actions: Tap `Enable reminders`, accept browser notification permission.
-- System responses: Register notification subscriptions where supported; schedule reminder behaviour (implementation detail later); show success state.
+- System responses: Register this device securely, persist its subscription, and
+  send one reminder per due session within the allowed delivery window.
 - Success: Notifications may be delivered at scheduled times; tapping a notification opens the correct session.
 - Edge: If permission granted but push endpoint fails, show a non-blocking error and continue core functionality.
+- Edge: Disabling reminders deactivates only the current browser subscription;
+  subscriptions on the user's other devices remain active.
 
-17) Notification permission denied
+18) Notification permission denied
 
 - Preconditions: User triggers `Enable reminders` flow and denies permission.
 - User actions: Deny permission.
 - System responses: Store preference; do not attempt to send notifications; offer non-intrusive instructions for enabling later.
 - Success: Core reading features work without reminders.
 
-18) Recovering from a Quran page loading error
+19) Recovering from a Quran page loading error
 
 - Preconditions: Reader fails to load assigned page(s).
 - User actions: Tap retry, or open network status.
 - System responses: Show error state and explanatory message; provide retry; if offline, show cached pages if available and a clear offline indicator; if page permanently missing from provider, show fallback message and contact support.
 - Success: User recovers by retrying or using cached content.
+- Quran text is not claimed as offline content. A connectivity failure displays
+  a safe Arabic error and retry action without recording position or completion.
 
-19) Signing out and returning on another device
+20) Installing and updating the PWA
+
+- Preconditions: A supporting browser exposes its install prompt.
+- User actions: Choose `تثبيت تطبيق ورد`, then confirm through the browser.
+- System responses: Show the prompt only after the explicit click and hide it
+  after acceptance or dismissal. Installed standalone mode shows no install action.
+- Update: A waiting Service Worker shows `يتوفر تحديث جديد`; activation and
+  reload occur only after choosing `تحديث التطبيق`, never automatically while reading.
+
+20) Signing out and returning on another device
 
 - Preconditions: User has account with progress saved.
 - User actions: Sign out on device A. On device B, sign in with same account.

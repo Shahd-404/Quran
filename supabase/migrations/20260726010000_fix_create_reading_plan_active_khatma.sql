@@ -1,9 +1,5 @@
--- Migration: create_reading_plan function
--- Timestamped: 2026-07-25T01:00:00
+-- Update create_reading_plan to handle active-khatma collisions explicitly.
 
-SET search_path = public, pg_catalog;
-
--- Create a secure function that atomically creates a reading plan, its schedule times, and the next khatma.
 CREATE OR REPLACE FUNCTION public.create_reading_plan(
   p_start_page smallint,
   p_daily_pages smallint,
@@ -29,15 +25,12 @@ DECLARE
   v_order int;
   v_time_text text;
 BEGIN
-  -- Ensure called by authenticated user
   IF v_uid IS NULL THEN
     RAISE EXCEPTION 'UNAUTHENTICATED' USING ERRCODE = 'P0001';
   END IF;
 
-  -- Acquire a transaction-scoped advisory lock for the authenticated user.
   PERFORM pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtext(v_uid::text)::bigint);
 
-  -- Basic scalar validations
   IF p_start_page IS NULL OR p_start_page < 1 OR p_start_page > 604 THEN
     RAISE EXCEPTION 'INVALID_START_PAGE' USING ERRCODE = 'P0001';
   END IF;
@@ -54,7 +47,6 @@ BEGIN
     RAISE EXCEPTION 'INVALID_EFFECTIVE_DATE' USING ERRCODE = 'P0001';
   END IF;
 
-  -- Sessions must be an array
   IF pg_catalog.jsonb_typeof(p_sessions) IS DISTINCT FROM 'array' THEN
     RAISE EXCEPTION 'INVALID_SESSIONS' USING ERRCODE = 'P0001';
   END IF;
@@ -68,19 +60,21 @@ BEGIN
     RAISE EXCEPTION 'INVALID_SESSIONS' USING ERRCODE = 'P0001';
   END IF;
 
-  -- Ensure profile exists
   SELECT id INTO v_exists FROM public.profiles WHERE id = v_uid;
   IF v_exists IS NULL THEN
     RAISE EXCEPTION 'PROFILE_NOT_FOUND' USING ERRCODE = 'P0001';
   END IF;
 
-  -- Ensure no active plan exists
   SELECT id INTO v_exists FROM public.reading_plans WHERE user_id = v_uid AND status = 'active' LIMIT 1;
   IF v_exists IS NOT NULL THEN
     RAISE EXCEPTION 'ACTIVE_PLAN_EXISTS' USING ERRCODE = 'P0001';
   END IF;
 
-  -- Validate session items: must have sessionOrder (integer) and scheduledTime (HH:MM)
+  SELECT id INTO v_exists FROM public.khatmas WHERE user_id = v_uid AND status = 'active' LIMIT 1;
+  IF v_exists IS NOT NULL THEN
+    RAISE EXCEPTION 'ACTIVE_PLAN_EXISTS' USING ERRCODE = 'P0001';
+  END IF;
+
   v_prev_time := NULL;
   FOR v_i IN 0 .. pg_catalog.jsonb_array_length(p_sessions)-1 LOOP
     v_item := p_sessions->v_i;
@@ -138,6 +132,8 @@ EXCEPTION WHEN others THEN
   ELSIF SQLERRM LIKE '%PROFILE_NOT_FOUND%' THEN
     RAISE EXCEPTION 'PROFILE_NOT_FOUND' USING ERRCODE = 'P0001';
   ELSIF SQLERRM LIKE '%ACTIVE_PLAN_EXISTS%' THEN
+    RAISE EXCEPTION 'ACTIVE_PLAN_EXISTS' USING ERRCODE = 'P0001';
+  ELSIF SQLERRM LIKE '%idx_khatmas_unique_active_per_user%' THEN
     RAISE EXCEPTION 'ACTIVE_PLAN_EXISTS' USING ERRCODE = 'P0001';
   ELSIF SQLERRM LIKE '%INVALID_START_PAGE%' THEN
     RAISE EXCEPTION 'INVALID_START_PAGE' USING ERRCODE = 'P0001';
