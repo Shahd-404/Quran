@@ -1,7 +1,13 @@
-import React from 'react'
+'use client'
+
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { formatArabicNumber } from '../formatting'
+import { deriveSessionState } from '../session-state'
 import { DashboardSession, SessionPresentationState } from '../types'
+
+const CLOCK_INTERVAL_MS = 15_000
+const MAX_TIMEOUT_MS = 2_147_483_647
 
 const STATE_LABELS: Record<SessionPresentationState, string> = {
   upcoming: 'قادمة',
@@ -29,11 +35,59 @@ const ACTION_LABELS: Record<SessionPresentationState, string> = {
 
 export function SessionCard({
   session,
+  assignmentLocalDate,
+  timezone,
   compact = false,
 }: {
   session: DashboardSession
+  assignmentLocalDate: string
+  timezone: string
   compact?: boolean
 }) {
+  const [presentationState, setPresentationState] = useState(
+    session.presentationState,
+  )
+
+  useEffect(() => {
+    const updatePresentationState = () => {
+      setPresentationState(
+        deriveSessionState({
+          persistedStatus: session.persistedStatus,
+          assignmentLocalDate,
+          scheduledFor: session.scheduledFor,
+          timezone,
+          now: new Date(),
+        }),
+      )
+    }
+
+    updatePresentationState()
+    const intervalId = window.setInterval(updatePresentationState, CLOCK_INTERVAL_MS)
+    const scheduledAt = new Date(session.scheduledFor).getTime()
+    const delayUntilScheduled = scheduledAt - Date.now()
+    const boundaryTimeoutId =
+      session.persistedStatus === 'pending' &&
+      delayUntilScheduled > 0 &&
+      delayUntilScheduled <= MAX_TIMEOUT_MS
+        ? window.setTimeout(updatePresentationState, delayUntilScheduled)
+        : null
+
+    window.addEventListener('focus', updatePresentationState)
+    document.addEventListener('visibilitychange', updatePresentationState)
+
+    return () => {
+      window.clearInterval(intervalId)
+      if (boundaryTimeoutId !== null) window.clearTimeout(boundaryTimeoutId)
+      window.removeEventListener('focus', updatePresentationState)
+      document.removeEventListener('visibilitychange', updatePresentationState)
+    }
+  }, [
+    assignmentLocalDate,
+    session.persistedStatus,
+    session.scheduledFor,
+    timezone,
+  ])
+
   const pageRange =
     session.startPage === session.endPage
       ? `صفحة ${formatArabicNumber(session.startPage)}`
@@ -43,7 +97,7 @@ export function SessionCard({
     <article
       className={[
         'rounded-2xl border p-4 sm:p-5',
-        session.presentationState === 'completed'
+        presentationState === 'completed'
           ? 'border-stone-200 bg-stone-50'
           : 'border-stone-200 bg-white shadow-[0_4px_20px_rgba(28,25,23,0.035)]',
         compact ? '' : 'ring-1 ring-amber-100',
@@ -62,9 +116,9 @@ export function SessionCard({
           </p>
         </div>
         <span
-          className={`rounded-full px-3 py-1.5 text-sm font-bold ${STATE_STYLES[session.presentationState]}`}
+          className={`rounded-full px-3 py-1.5 text-sm font-bold ${STATE_STYLES[presentationState]}`}
         >
-          {STATE_LABELS[session.presentationState]}
+          {STATE_LABELS[presentationState]}
         </span>
       </div>
       <div className="mt-4 flex items-center gap-2 border-t border-stone-100 pt-4 text-base text-stone-600">
@@ -78,12 +132,12 @@ export function SessionCard({
         href={`/app/read/${session.id}`}
         className={[
           'mt-4 inline-flex min-h-[3rem] w-full items-center justify-center rounded-2xl px-4 py-3 text-base font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800',
-          session.presentationState === 'completed'
+          presentationState === 'completed'
             ? 'bg-stone-200 text-stone-700 hover:bg-stone-300'
             : 'bg-emerald-900 text-white hover:bg-emerald-950',
         ].join(' ')}
       >
-        {ACTION_LABELS[session.presentationState]}
+        {ACTION_LABELS[presentationState]}
       </Link>
     </article>
   )

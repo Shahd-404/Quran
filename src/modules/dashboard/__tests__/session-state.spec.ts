@@ -22,6 +22,49 @@ function session(
 }
 
 describe('deriveSessionState', () => {
+  it('changes at the exact scheduled instant using absolute timestamps', () => {
+    const input = {
+      persistedStatus: 'pending' as const,
+      assignmentLocalDate: '2026-07-26',
+      scheduledFor: '2026-07-26T12:00:00.000Z',
+      timezone: 'UTC',
+    }
+
+    expect(deriveSessionState({ ...input, now: new Date('2026-07-26T11:59:59.000Z') })).toBe(
+      'upcoming',
+    )
+    expect(deriveSessionState({ ...input, now: new Date('2026-07-26T12:00:00.000Z') })).toBe(
+      'available',
+    )
+    expect(deriveSessionState({ ...input, now: new Date('2026-07-26T12:00:01.000Z') })).toBe(
+      'available',
+    )
+  })
+
+  it('compares the same ISO instant independently of the display timezone', () => {
+    const scheduledFor = '2026-07-26T12:00:00.000Z'
+    const machineNow = new Date('2026-07-26T12:00:01.000Z')
+
+    expect(
+      deriveSessionState({
+        persistedStatus: 'pending',
+        assignmentLocalDate: '2026-07-26',
+        scheduledFor,
+        timezone: 'America/Los_Angeles',
+        now: machineNow,
+      }),
+    ).toBe('available')
+    expect(
+      deriveSessionState({
+        persistedStatus: 'pending',
+        assignmentLocalDate: '2026-07-26',
+        scheduledFor,
+        timezone: 'Asia/Tokyo',
+        now: machineNow,
+      }),
+    ).toBe('available')
+  })
+
   it('keeps completed and in-progress persisted states', () => {
     expect(
       deriveSessionState({

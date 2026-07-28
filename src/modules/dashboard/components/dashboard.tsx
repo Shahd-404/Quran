@@ -101,7 +101,11 @@ export function Dashboard({
                 {data.highlightedSession ? 'الجلسة الأقرب للقراءة' : 'اكتمل ورد هذا اليوم'}
               </h2>
               {data.highlightedSession ? (
-                <SessionCard session={data.highlightedSession} />
+                <SessionCard
+                  session={data.highlightedSession}
+                  assignmentLocalDate={data.assignment.localDate}
+                  timezone={data.plan.timezone}
+                />
               ) : (
                 <p className="rounded-2xl border border-emerald-100 bg-emerald-50 px-5 py-4 text-base leading-7 text-emerald-900">
                   اكتملت جميع جلسات هذا الورد. تقبّل الله قراءتك.
@@ -114,7 +118,13 @@ export function Dashboard({
               <h2 className="mb-6 mt-1 text-2xl font-bold">جلسات الورد</h2>
               <div className="space-y-4">
                 {data.sessions.map((session) => (
-                  <SessionCard key={session.id} session={session} compact />
+                  <SessionCard
+                    key={session.id}
+                    session={session}
+                    assignmentLocalDate={data.assignment.localDate}
+                    timezone={data.plan.timezone}
+                    compact
+                  />
                 ))}
               </div>
             </section>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { render, screen, within } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Dashboard } from '../dashboard'
 import {
   CompletedKhatmaState,
@@ -10,6 +10,15 @@ import {
 import { DashboardModel } from '../../types'
 
 vi.mock('@/components/logout-button', () => ({ default: () => <button>تسجيل الخروج</button> }))
+
+beforeEach(() => {
+  vi.useFakeTimers()
+  vi.setSystemTime(new Date('2026-07-26T12:00:00.000Z'))
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
 
 function model(overrides: Partial<DashboardModel['assignment']> = {}): DashboardModel {
   const firstSession: DashboardModel['sessions'][number] = {
