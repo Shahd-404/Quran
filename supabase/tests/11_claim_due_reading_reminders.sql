@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(21);
+SELECT plan(22);
 
 INSERT INTO auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -193,6 +193,11 @@ SELECT is(
   ),
   0::bigint,
   'a second worker cannot claim deliveries already in processing'
+);
+SELECT is(
+  (SELECT count(*) FROM public.claim_due_reading_reminders(100)),
+  0::bigint,
+  'no remaining eligible work returns an empty successful result'
 );
 SELECT like(
   pg_get_functiondef('public.claim_due_reading_reminders(integer)'::regprocedure),

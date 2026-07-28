@@ -45,10 +45,7 @@ Deno.serve(async (request) => {
   const { data, error } = await supabase.rpc('claim_due_reading_reminders', { p_batch_size: 100 })
   if (error) {
     console.error('[claim_due_reading_reminders]', {
-      code: error.code,
-      message: error.message,
-      details: error.details,
-      hint: error.hint,
+      code: 'CLAIM_FAILED',
     })
     return response({ error: 'CLAIM_FAILED' }, 500)
   }
