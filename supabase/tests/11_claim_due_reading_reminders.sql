@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(22);
+SELECT plan(24);
 
 INSERT INTO auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -203,6 +203,18 @@ SELECT like(
   pg_get_functiondef('public.claim_due_reading_reminders(integer)'::regprocedure),
   '%FOR UPDATE OF nd SKIP LOCKED%',
   'claiming uses row locks with SKIP LOCKED'
+);
+SELECT ok(
+  pg_get_functiondef(
+    'public.claim_due_reading_reminders(integer)'::regprocedure
+  ) !~ 'ON[[:space:]]+CONFLICT[[:space:]]+ON[[:space:]]+CONSTRAINT',
+  'claiming does not depend on a generated constraint name'
+);
+SELECT ok(
+  pg_get_functiondef(
+    'public.claim_due_reading_reminders(integer)'::regprocedure
+  ) ~ 'ON[[:space:]]+CONFLICT[[:space:]]*\([[:space:]]*reading_session_id,[[:space:]]*push_subscription_id,[[:space:]]*notification_kind[[:space:]]*\)',
+  'conflict handling infers the existing three-column unique rule'
 );
 SELECT is(
   (
