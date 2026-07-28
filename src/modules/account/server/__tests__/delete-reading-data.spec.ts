@@ -1,10 +1,24 @@
 import { describe, expect, it, vi } from 'vitest'
 import { deleteReadingData } from '../delete-reading-data'
 
-function client(user: unknown, error?: unknown) {
+const rpcResult = {
+  success: true,
+  deleted: {
+    plans_deleted: 1,
+    khatmas_deleted: 1,
+    schedules_deleted: 1,
+    assignments_deleted: 1,
+    sessions_deleted: 1,
+    progress_events_deleted: 1,
+    subscriptions_deleted: 1,
+    deliveries_deleted: 1,
+  },
+}
+
+function client(user: unknown, error?: unknown, data: unknown = rpcResult) {
   return {
     auth: { getUser: vi.fn(async () => ({ data: { user } })) },
-    rpc: vi.fn(async () => ({ error })),
+    rpc: vi.fn(async () => ({ data, error })),
   }
 }
 
@@ -30,7 +44,19 @@ describe('deleteReadingData', () => {
     const mockClient = client({ id: 'user-a' })
     const result = await deleteReadingData(mockClient, 'حذف بياناتي')
 
-    expect(result).toEqual({ success: true })
+    expect(result).toEqual({
+      success: true,
+      deleted: {
+        plansDeleted: 1,
+        khatmasDeleted: 1,
+        schedulesDeleted: 1,
+        assignmentsDeleted: 1,
+        sessionsDeleted: 1,
+        progressEventsDeleted: 1,
+        subscriptionsDeleted: 1,
+        deliveriesDeleted: 1,
+      },
+    })
     expect(mockClient.rpc).toHaveBeenCalledWith('delete_my_reading_data', {
       p_confirmation: 'حذف بياناتي',
     })
@@ -49,9 +75,22 @@ describe('deleteReadingData', () => {
   })
 
   it('maps an atomic database deletion failure to a stable safe error', async () => {
-    const mockClient = client({ id: 'user-a' }, { message: 'DELETE_FAILED' })
+    const mockClient = client(
+      { id: 'user-a' },
+      { message: 'DELETE_READING_DATA_FAILED' },
+    )
     const result = await deleteReadingData(mockClient, 'حذف بياناتي')
 
-    expect(result).toMatchObject({ success: false, code: 'DELETE_FAILED' })
+    expect(result).toMatchObject({
+      success: false,
+      code: 'DELETE_READING_DATA_FAILED',
+    })
+  })
+
+  it('never reports success for a malformed RPC result', async () => {
+    const mockClient = client({ id: 'user-a' }, undefined, { success: true })
+    const result = await deleteReadingData(mockClient, 'حذف بياناتي')
+
+    expect(result).toMatchObject({ success: false, code: 'INTERNAL_ERROR' })
   })
 })

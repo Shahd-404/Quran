@@ -2,12 +2,12 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DeleteReadingDataCard } from '../delete-reading-data-card'
 
-const push = vi.fn()
+const replace = vi.fn()
 const refresh = vi.fn()
 const unsubscribe = vi.fn(async () => true)
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push, refresh }),
+  useRouter: () => ({ replace, refresh }),
 }))
 
 describe('DeleteReadingDataCard', () => {
@@ -24,6 +24,13 @@ describe('DeleteReadingDataCard', () => {
       },
     })
     vi.stubGlobal('PushManager', function PushManager() {})
+    Object.defineProperty(window, 'caches', {
+      configurable: true,
+      value: {
+        keys: vi.fn(async () => ['wird-static-v1', 'unrelated-cache']),
+        delete: vi.fn(async () => true),
+      },
+    })
   })
 
   it('does not mutate on the first click or cancel', () => {
@@ -76,8 +83,10 @@ describe('DeleteReadingDataCard', () => {
       json: vi.fn(async () => ({ success: true })),
     })
     await waitFor(() => expect(unsubscribe).toHaveBeenCalledTimes(1))
-    expect(push).toHaveBeenCalledWith('/app/plan/new?readingDataDeleted=1')
+    expect(replace).toHaveBeenCalledWith('/app/plan/new?readingDataDeleted=1')
     expect(refresh).toHaveBeenCalled()
+    expect(window.caches.delete).toHaveBeenCalledWith('wird-static-v1')
+    expect(window.caches.delete).not.toHaveBeenCalledWith('unrelated-cache')
   })
 
   it('keeps the deletion successful when local browser cleanup fails', async () => {
@@ -98,9 +107,34 @@ describe('DeleteReadingDataCard', () => {
     fireEvent.click(screen.getByRole('button', { name: 'تأكيد المسح النهائي' }))
 
     await waitFor(() =>
-      expect(push).toHaveBeenCalledWith(
+      expect(replace).toHaveBeenCalledWith(
         '/app/plan/new?readingDataDeleted=1&browserCleanup=failed',
       ),
     )
+  })
+
+  it('preserves confirmation and focuses a safe error after a recoverable failure', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: false,
+        json: vi.fn(async () => ({
+          success: false,
+          code: 'DELETE_READING_DATA_FAILED',
+          message: 'تعذر مسح بيانات القراءة. لم يتم حذف أي بيانات.',
+        })),
+      })),
+    )
+    render(<DeleteReadingDataCard />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'مسح جميع بيانات القراءة' }))
+    const input = screen.getByLabelText(/حذف بياناتي/)
+    fireEvent.change(input, { target: { value: 'حذف بياناتي' } })
+    fireEvent.click(screen.getByRole('button', { name: 'تأكيد المسح النهائي' }))
+
+    const error = await screen.findByRole('alert')
+    expect(error).toHaveFocus()
+    expect(input).toHaveValue('حذف بياناتي')
+    expect(replace).not.toHaveBeenCalled()
   })
 })

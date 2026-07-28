@@ -1,11 +1,68 @@
 BEGIN;
-SELECT plan(22);
+SELECT plan(24);
+
+INSERT INTO auth.users (
+  instance_id,
+  id,
+  aud,
+  role,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at,
+  confirmation_token,
+  email_change,
+  email_change_token_new,
+  recovery_token
+)
+VALUES
+  (
+    '00000000-0000-0000-0000-000000000000',
+    '00000000-0000-0000-0000-000000000030',
+    'authenticated',
+    'authenticated',
+    'delete-owner@example.invalid',
+    '',
+    now(),
+    '{"provider":"email","providers":["email"]}',
+    '{}',
+    now(),
+    now(),
+    '',
+    '',
+    '',
+    ''
+  ),
+  (
+    '00000000-0000-0000-0000-000000000000',
+    '00000000-0000-0000-0000-000000000031',
+    'authenticated',
+    'authenticated',
+    'other-owner@example.invalid',
+    '',
+    now(),
+    '{"provider":"email","providers":["email"]}',
+    '{}',
+    now(),
+    now(),
+    '',
+    '',
+    '',
+    ''
+  )
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.profiles(id, display_name, timezone, locale)
 VALUES
   ('00000000-0000-0000-0000-000000000030', 'delete-owner', 'Africa/Cairo', 'ar'),
   ('00000000-0000-0000-0000-000000000031', 'other-owner', 'Africa/Cairo', 'ar')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+  display_name = EXCLUDED.display_name,
+  timezone = EXCLUDED.timezone,
+  locale = EXCLUDED.locale;
 
 INSERT INTO public.reading_plans(id, user_id, start_page, current_unread_page, daily_pages, sessions_per_day)
 VALUES
@@ -69,7 +126,7 @@ CREATE TRIGGER test_block_reading_plan_delete BEFORE DELETE ON public.reading_pl
 FOR EACH ROW EXECUTE FUNCTION public.test_block_reading_plan_delete();
 SELECT throws_ok(
   $$SELECT public.delete_my_reading_data('حذف بياناتي')$$,
-  'DELETE_FAILED',
+  'DELETE_READING_DATA_FAILED',
   'database failures return a stable error'
 );
 SELECT is((SELECT count(*) FROM public.push_subscriptions WHERE user_id = '00000000-0000-0000-0000-000000000030'), 1::bigint, 'failure rolls back earlier subscription deletion');
@@ -78,6 +135,7 @@ DROP TRIGGER test_block_reading_plan_delete ON public.reading_plans;
 DROP FUNCTION public.test_block_reading_plan_delete();
 
 SELECT is((public.delete_my_reading_data('حذف بياناتي')->>'success')::boolean, true, 'owned deletion succeeds');
+SELECT is((public.delete_my_reading_data('حذف بياناتي')->'deleted'->>'plans_deleted')::integer, 0, 'repeat result returns typed aggregate counts');
 SELECT is((SELECT count(*) FROM public.notification_deliveries WHERE user_id = '00000000-0000-0000-0000-000000000030'), 0::bigint, 'deliveries are removed');
 SELECT is((SELECT count(*) FROM public.push_subscriptions WHERE user_id = '00000000-0000-0000-0000-000000000030'), 0::bigint, 'subscriptions are removed');
 SELECT is((SELECT count(*) FROM public.reading_progress_events WHERE user_id = '00000000-0000-0000-0000-000000000030'), 0::bigint, 'progress events are removed');
@@ -87,6 +145,7 @@ SELECT is((SELECT count(*) FROM public.plan_schedule_times WHERE plan_id = '1000
 SELECT is((SELECT count(*) FROM public.khatmas WHERE user_id = '00000000-0000-0000-0000-000000000030'), 0::bigint, 'khatmas are removed');
 SELECT is((SELECT count(*) FROM public.reading_plans WHERE user_id = '00000000-0000-0000-0000-000000000030'), 0::bigint, 'plans are removed');
 SELECT is((SELECT count(*) FROM public.profiles WHERE id = '00000000-0000-0000-0000-000000000030'), 1::bigint, 'profile is preserved');
+SELECT is((SELECT count(*) FROM auth.users WHERE id = '00000000-0000-0000-0000-000000000030'), 1::bigint, 'authentication account is preserved');
 SELECT is((SELECT display_name FROM public.profiles WHERE id = '00000000-0000-0000-0000-000000000030'), 'delete-owner', 'profile attributes are preserved');
 SELECT is((SELECT count(*) FROM public.reading_plans WHERE user_id = '00000000-0000-0000-0000-000000000031'), 1::bigint, 'other user plan remains');
 SELECT is((SELECT count(*) FROM public.notification_deliveries WHERE user_id = '00000000-0000-0000-0000-000000000031'), 1::bigint, 'other user delivery remains');

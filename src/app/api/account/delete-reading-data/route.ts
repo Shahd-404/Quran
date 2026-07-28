@@ -28,7 +28,11 @@ export async function POST(request: Request) {
             : 500
       return NextResponse.json(result, { status })
     }
-    return NextResponse.json({ success: true, code: 'READING_DATA_DELETED' })
+    return NextResponse.json({
+      success: true,
+      code: 'READING_DATA_DELETED',
+      deleted: result.deleted,
+    })
   } catch {
     return NextResponse.json(
       {

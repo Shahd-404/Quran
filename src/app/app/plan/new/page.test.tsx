@@ -44,4 +44,16 @@ describe('NewReadingPlanPage', () => {
     expect(screen.getByRole('heading', { name: /أنشئ خطة وردك/ })).toBeInTheDocument()
     expect(screen.getByLabelText(/الصفحة الابتدائية/)).toBeInTheDocument()
   })
+
+  it('shows the one-time deletion success state on onboarding', async () => {
+    const ui = await NewReadingPlanPage({
+      searchParams: { readingDataDeleted: '1' },
+    })
+    render(ui)
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'تم مسح بيانات القراءة بنجاح، ويمكنك الآن إنشاء خطة جديدة.',
+    )
+    expect(screen.getByLabelText(/الصفحة الابتدائية/)).toBeInTheDocument()
+  })
 })

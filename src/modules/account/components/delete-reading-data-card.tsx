@@ -20,6 +20,7 @@ export function DeleteReadingDataCard() {
   const router = useRouter()
   const triggerRef = useRef<HTMLButtonElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const errorRef = useRef<HTMLParagraphElement>(null)
   const [confirming, setConfirming] = useState(false)
   const [confirmation, setConfirmation] = useState('')
   const [pending, setPending] = useState(false)
@@ -28,6 +29,10 @@ export function DeleteReadingDataCard() {
   useEffect(() => {
     if (confirming) inputRef.current?.focus()
   }, [confirming])
+
+  useEffect(() => {
+    if (error) errorRef.current?.focus()
+  }, [error])
 
   function cancel() {
     if (pending) return
@@ -57,7 +62,12 @@ export function DeleteReadingDataCard() {
         body: JSON.stringify({ confirmation }),
       })
       const payload: unknown = await response.json()
-      if (!response.ok || typeof payload !== 'object' || payload === null) {
+      if (
+        !response.ok
+        || typeof payload !== 'object'
+        || payload === null
+        || (payload as Record<string, unknown>).success !== true
+      ) {
         const message =
           typeof payload === 'object' &&
           payload !== null &&
@@ -69,10 +79,26 @@ export function DeleteReadingDataCard() {
       }
 
       const browserCleanupSucceeded = await unsubscribeCurrentBrowser()
-      router.push(
+      let cacheCleanupSucceeded = true
+      if ('caches' in window) {
+        try {
+          const names = await window.caches.keys()
+          await Promise.all(
+            names
+              .filter((name) => name.startsWith('wird-'))
+              .map((name) => window.caches.delete(name)),
+          )
+        } catch {
+          cacheCleanupSucceeded = false
+        }
+      }
+      router.replace(
         `/app/plan/new?readingDataDeleted=1${browserCleanupSucceeded ? '' : '&browserCleanup=failed'}`,
       )
       router.refresh()
+      if (!cacheCleanupSucceeded) {
+        console.info('[reading-data-deletion]', { stage: 'cache-cleanup', status: 'failed' })
+      }
     } catch {
       setError('تعذر مسح بيانات القراءة. تحقق من اتصالك وحاول مرة أخرى.')
     } finally {
@@ -134,7 +160,13 @@ export function DeleteReadingDataCard() {
               className="mt-2 min-h-[3rem] w-full rounded-xl border border-stone-300 bg-white px-4 py-2 outline-none focus:border-rose-700 focus:ring-2 focus:ring-rose-700/20"
             />
             {error ? (
-              <p id="delete-reading-error" role="alert" className="mt-4 text-rose-800">
+              <p
+                ref={errorRef}
+                id="delete-reading-error"
+                role="alert"
+                tabIndex={-1}
+                className="mt-4 text-rose-800 outline-none"
+              >
                 {error}
               </p>
             ) : null}
