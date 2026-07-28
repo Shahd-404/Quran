@@ -88,6 +88,9 @@ describe('Dashboard', () => {
       '/app/history',
     )
     expect(
+      screen.getAllByRole('link', { name: 'الخصوصية والبيانات' }),
+    ).toHaveLength(1)
+    expect(
       screen.getByRole('link', { name: 'عرض تفاصيل الختمة' }),
     ).toHaveAttribute('href', '/app/history/khatmas/khatma-1')
   })

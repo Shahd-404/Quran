@@ -46,12 +46,6 @@ export function Dashboard({
             >
               الخصوصية والبيانات
             </a>
-            <a
-              href="/app/settings/privacy"
-              className="inline-flex min-h-[2.75rem] items-center justify-center rounded-xl border border-stone-300 bg-white px-4 py-2 text-center font-bold text-stone-700"
-            >
-              الخصوصية والبيانات
-            </a>
             <div className="[&_button]:min-h-[2.75rem] [&_button]:bg-white [&_button]:py-2 [&_button]:text-stone-700 [&_button]:ring-1 [&_button]:ring-stone-200 [&_button]:shadow-sm [&_button:hover]:bg-stone-50">
               <LogoutButton />
             </div>
