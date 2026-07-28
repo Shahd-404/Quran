@@ -43,7 +43,15 @@ Deno.serve(async (request) => {
   webpush.setVapidDetails(subject, publicKey, privateKey)
   const supabase = createClient(url, serviceKey, { auth: { persistSession: false } })
   const { data, error } = await supabase.rpc('claim_due_reading_reminders', { p_batch_size: 100 })
-  if (error) return response({ error: 'CLAIM_FAILED' }, 500)
+  if (error) {
+    console.error('[claim_due_reading_reminders]', {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    })
+    return response({ error: 'CLAIM_FAILED' }, 500)
+  }
 
   const counts = { claimed: 0, sent: 0, failed: 0, skipped: 0 }
   for (const claim of (data ?? []) as Claim[]) {

@@ -28,9 +28,11 @@ describe('send-due-reading-reminders source contract', () => {
     expect(source).toContain("supabase.rpc('finish_notification_delivery'")
   })
 
-  it('uses the dedicated secret and never logs request authentication values', () => {
+  it('uses the dedicated secret and logs only the protected claim error fields', () => {
     expect(source).toContain("Deno.env.get('REMINDER_INVOCATION_SECRET')")
-    expect(source).not.toMatch(/console\.(log|warn|error)/)
     expect(source).not.toContain("request.headers.get('authorization')")
+    expect(source.match(/console\.error/g)).toHaveLength(1)
+    expect(source).toContain("console.error('[claim_due_reading_reminders]'")
+    expect(source).not.toMatch(/console\.(log|warn)/)
   })
 })
