@@ -1,5 +1,9 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.32.0'
 import webpush from 'npm:web-push@3.6.7'
+import {
+  hasValidInvocationToken,
+  REMINDER_INVOCATION_HEADER,
+} from './invocation-auth.ts'
 
 type Claim = {
   delivery_id: string
@@ -17,8 +21,13 @@ function response(body: Record<string, number | string>, status = 200): Response
 }
 
 Deno.serve(async (request) => {
-  const invocationToken = Deno.env.get('REMINDER_INVOCATION_TOKEN')
-  if (!invocationToken || request.headers.get('authorization') !== `Bearer ${invocationToken}`) {
+  const invocationToken = Deno.env.get('REMINDER_INVOCATION_SECRET')
+  if (
+    !hasValidInvocationToken(
+      request.headers.get(REMINDER_INVOCATION_HEADER),
+      invocationToken,
+    )
+  ) {
     return response({ error: 'UNAUTHORIZED' }, 401)
   }
 
