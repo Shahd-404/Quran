@@ -19,7 +19,14 @@ function getSupabaseConfig() {
   return { url, anonKey };
 }
 
-export default async function NewReadingPlanPage() {
+export default async function NewReadingPlanPage({
+  searchParams,
+}: {
+  searchParams?: {
+    readingDataDeleted?: string | string[];
+    browserCleanup?: string | string[];
+  };
+}) {
   const { url, anonKey } = getSupabaseConfig();
   const cookieStore = cookies();
 
@@ -74,6 +81,22 @@ export default async function NewReadingPlanPage() {
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900">
       <div className="mx-auto max-w-3xl">
+        {searchParams?.readingDataDeleted === '1' ? (
+          <div
+            role="status"
+            className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 font-semibold text-emerald-950"
+          >
+            تم مسح بيانات القراءة بنجاح، ويمكنك الآن إنشاء خطة جديدة.
+          </div>
+        ) : null}
+        {searchParams?.browserCleanup === 'failed' ? (
+          <div
+            role="status"
+            className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-amber-950"
+          >
+            تم مسح البيانات من الحساب، لكن تعذر تنظيف اشتراك الإشعارات من هذا المتصفح. لن تُرسل إليه تذكيرات من ورد.
+          </div>
+        ) : null}
         <header className="mb-8 text-right">
           <p className="mb-2 text-sm font-medium text-emerald-700">
             إعداد خطة الورد

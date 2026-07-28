@@ -1,5 +1,18 @@
 # Wird — User Flows
 
+## Delete all reading data
+
+1. The signed-in user opens `/app/settings/privacy`.
+2. The first destructive action opens confirmation and performs no mutation.
+3. The dialog requires `حذف بياناتي` exactly. Cancel and Escape do nothing.
+4. One authenticated same-origin mutation atomically deletes only the current
+   user's reading records.
+5. The browser attempts local Push unsubscription and redirects the still
+   signed-in user to `/app/plan/new`.
+6. Success and local-cleanup outcomes are shown without exposing private data.
+
+Failures preserve all database data. There is no fake undo or retained copy.
+
 All flows assume the interface language is Arabic and layout is RTL. Page boundaries use pages 1–604.
 
 For each flow we document: Preconditions, User actions, System responses, Success outcome, and Important errors/edge states.

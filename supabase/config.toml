@@ -1,0 +1,2 @@
+[functions.send-due-reading-reminders]
+verify_jwt = false

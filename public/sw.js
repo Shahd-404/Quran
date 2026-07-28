@@ -11,6 +11,11 @@ const STATIC_ASSETS = [
 const DEFAULT_URL = '/app'
 const SESSION_URL = /^\/app\/read\/[0-9a-f]{8}-[0-9a-f-]{27}$/i
 
+function safeNotificationPath(value) {
+  if (value === DEFAULT_URL) return DEFAULT_URL
+  return typeof value === 'string' && SESSION_URL.test(value) ? value : DEFAULT_URL
+}
+
 function isSafeStaticRequest(request, url) {
   if (request.method !== 'GET' || url.origin !== self.location.origin) return false
   if (url.pathname.startsWith('/api/')) return false
@@ -82,8 +87,7 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const path = typeof event.notification.data?.url === 'string' && SESSION_URL.test(event.notification.data.url)
-    ? event.notification.data.url : DEFAULT_URL
+  const path = safeNotificationPath(event.notification.data?.url)
   event.waitUntil((async () => {
     const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
     const target = new URL(path, self.location.origin)

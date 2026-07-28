@@ -1,5 +1,15 @@
 # Architecture — Wird (initial)
 
+## Reading-data deletion boundary
+
+`public.delete_my_reading_data(text)` is the sole trusted deletion primitive.
+It derives ownership from `auth.uid()`, takes a per-user transaction advisory
+lock, and deletes dependent reading and notification rows atomically. Its
+`SECURITY DEFINER` boundary is required because ordinary RLS policies do not
+grant direct DELETE access. Execution is revoked from PUBLIC and anon and granted
+only to authenticated users. It never deletes `auth.users` or `public.profiles`
+and returns aggregate counts only.
+
 ## Purpose
 
 This architecture document describes the high-level structure and design principles for the Wird application foundation. It is intentionally introductory and records decisions that guide future implementation tasks.

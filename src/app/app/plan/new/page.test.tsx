@@ -38,7 +38,7 @@ describe('NewReadingPlanPage', () => {
   })
 
   it('renders the onboarding form when no active plan exists', async () => {
-    const ui = await NewReadingPlanPage()
+    const ui = await NewReadingPlanPage({})
     render(ui)
 
     expect(screen.getByRole('heading', { name: /أنشئ خطة وردك/ })).toBeInTheDocument()

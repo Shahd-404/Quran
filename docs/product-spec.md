@@ -1,5 +1,18 @@
 Wird — Product Specification (MVP)
 
+## Reading-data deletion
+
+An authenticated user may permanently delete all reading plans, schedules,
+khatmas, assignments, sessions, progress history, notification deliveries, and
+Push subscriptions. This is distinct from account deletion: the Auth account,
+email credentials, profile, display name, locale, and timezone are preserved.
+The action requires the exact irreversible phrase `حذف بياناتي`. After success
+the signed-in user returns to onboarding as a new reader.
+
+Database subscription deletion stops reminders for every device. The current
+browser also attempts local Push unsubscription; removed database records prevent
+future sends to other browsers.
+
 ## Product summary
 
 Wird is a mobile-first Arabic (RTL) web application that helps Muslims maintain a daily Quran reading routine by creating and following a deterministic, time-scheduled reading plan (خطة الورد) that assigns Quran pages to reading sessions each day.

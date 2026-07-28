@@ -105,3 +105,10 @@ Definition of done
 - Code compiles with no TypeScript errors, passes linting, tests, and build.
 - Tests added for new logic.
 - Documentation updated where behaviour changed.
+
+Production releases follow the environment, deployment, monitoring, backup, and
+rollback runbook in `docs/production-operations.md`.
+
+Destructive reading-data changes require an append-only migration, SQL ownership
+and rollback tests with two isolated users, route/UI regression tests, and a
+dry-run before linked deployment. Never use a remote reset or real-user data.

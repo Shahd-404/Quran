@@ -16,12 +16,17 @@ out/
 
 # Production
 build/
+.vercel/
 
 # Local env files
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env*.local
+
+# Supabase CLI local/link state
+supabase/.temp/
 
 # testing
 coverage/
@@ -33,3 +38,4 @@ ehthumbs.db
 
 # Editor
 .vscode/
+.env.functions
