@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(24);
+SELECT plan(25);
 
 INSERT INTO auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -215,6 +215,13 @@ SELECT ok(
     'public.claim_due_reading_reminders(integer)'::regprocedure
   ) ~ 'ON[[:space:]]+CONFLICT[[:space:]]*\([[:space:]]*reading_session_id,[[:space:]]*push_subscription_id,[[:space:]]*notification_kind[[:space:]]*\)',
   'conflict handling infers the existing three-column unique rule'
+);
+SELECT like(
+  pg_get_functiondef(
+    'public.claim_due_reading_reminders(integer)'::regprocedure
+  ),
+  '%#variable_conflict use_column%',
+  'the conflict target resolves to index columns instead of return variables'
 );
 SELECT is(
   (

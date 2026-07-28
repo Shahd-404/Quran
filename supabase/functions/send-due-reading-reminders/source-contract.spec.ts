@@ -28,16 +28,12 @@ describe('send-due-reading-reminders source contract', () => {
     expect(source).toContain("supabaseAdmin.rpc('finish_notification_delivery'")
   })
 
-  it('temporarily logs only the protected RPC diagnostic fields', () => {
+  it('does not retain temporary detailed RPC diagnostics', () => {
     expect(source).toContain("Deno.env.get('REMINDER_INVOCATION_SECRET')")
     expect(source).not.toContain("request.headers.get('authorization')")
-    expect(source.match(/console\.error/g)).toHaveLength(1)
-    expect(source).toContain("console.error('[reminder_rpc_error]'")
-    expect(source).toContain("operation: 'claim_due_reading_reminders'")
-    expect(source).toContain('code: error.code')
-    expect(source).toContain('message: error.message')
-    expect(source).toContain('details: error.details')
-    expect(source).toContain('hint: error.hint')
-    expect(source).not.toMatch(/console\.(log|warn)/)
+    expect(source).not.toMatch(/console\.(error|log|warn)/)
+    expect(source).not.toContain('[reminder_rpc_error]')
+    expect(source).not.toContain('error.details')
+    expect(source).not.toContain('error.hint')
   })
 })

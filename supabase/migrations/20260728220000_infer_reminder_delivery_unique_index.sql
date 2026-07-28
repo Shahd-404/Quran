@@ -15,6 +15,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = ''
 AS $$
+#variable_conflict use_column
 BEGIN
   RETURN QUERY
   WITH eligible AS MATERIALIZED (
