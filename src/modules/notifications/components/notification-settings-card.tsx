@@ -3,6 +3,11 @@
 import { useEffect, useState } from 'react'
 import { activatePushNotifications } from '../client/subscribe'
 import { isPushSupported } from '../client/push-support'
+import {
+  canShowTestNotification,
+  showTestNotification,
+  TestNotificationError,
+} from '../client/show-test-notification'
 import { notificationErrorMessages } from '../error-mapping'
 import { NotificationErrorCode, PushState } from '../types'
 
@@ -10,8 +15,13 @@ export function NotificationSettingsCard() {
   const [state, setState] = useState<PushState>('unsubscribed')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
+  const [testBusy, setTestBusy] = useState(false)
+  const [testMessage, setTestMessage] = useState('')
+  const [testSucceeded, setTestSucceeded] = useState(false)
+  const [testAvailable, setTestAvailable] = useState(false)
 
   useEffect(() => {
+    setTestAvailable(canShowTestNotification())
     if (!isPushSupported()) { setState('unsupported'); return }
     if (Notification.permission === 'denied') { setState('denied'); return }
     setState(Notification.permission === 'default' ? 'default' : 'unsubscribed')
@@ -58,6 +68,30 @@ export function NotificationSettingsCard() {
     }
   }
 
+  async function testNotification() {
+    if (testBusy) return
+    setTestBusy(true)
+    setTestMessage('')
+    setTestSucceeded(false)
+    try {
+      await showTestNotification()
+      setTestMessage('تم إرسال إشعار تجريبي إلى هذا الجهاز.')
+      setTestSucceeded(true)
+    } catch (error) {
+      const code = error instanceof Error
+        ? error.message as TestNotificationError
+        : 'TEST_NOTIFICATION_FAILED'
+      const messages: Record<TestNotificationError, string> = {
+        NOTIFICATION_SERVICE_UNAVAILABLE: 'تعذر العثور على خدمة الإشعارات.',
+        NOTIFICATION_PERMISSION_NOT_GRANTED: 'صلاحية الإشعارات غير مفعّلة.',
+        TEST_NOTIFICATION_FAILED: 'تعذر عرض الإشعار التجريبي.',
+      }
+      setTestMessage(messages[code] ?? messages.TEST_NOTIFICATION_FAILED)
+    } finally {
+      setTestBusy(false)
+    }
+  }
+
   return (
     <section className="rounded-3xl border border-stone-200/80 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="notifications-title">
       <p className="text-base font-semibold text-emerald-800">التذكيرات</p>
@@ -75,6 +109,29 @@ export function NotificationSettingsCard() {
         </button>
       )}
       {message && <p role="alert" className="mt-3 text-sm text-red-700">{message}</p>}
+      {testAvailable && (
+        <div className="mt-4 border-t border-stone-100 pt-4">
+          <button
+            type="button"
+            disabled={testBusy}
+            onClick={testNotification}
+            className="min-h-[3rem] w-full rounded-2xl border border-stone-300 px-4 py-3 font-bold text-stone-700 disabled:opacity-60"
+          >
+            {testBusy ? 'جارٍ إرسال الإشعار التجريبي...' : 'اختبار الإشعار الآن'}
+          </button>
+          <p className="mt-3 text-sm leading-6 text-stone-500">
+            هذا اختبار لعرض الإشعار على الجهاز فقط، ولا يختبر الاشتراك أو التذكيرات المجدولة.
+          </p>
+        </div>
+      )}
+      {testMessage && (
+        <p
+          role={testSucceeded ? 'status' : 'alert'}
+          className={`mt-3 text-sm ${testSucceeded ? 'text-emerald-800' : 'text-red-700'}`}
+        >
+          {testMessage}
+        </p>
+      )}
       <p className="mt-4 text-sm leading-6 text-stone-500">قد يختلف توقيت ظهور الإشعار قليلًا حسب المتصفح ونظام التشغيل.</p>
     </section>
   )

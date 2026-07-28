@@ -16,13 +16,17 @@ describe('NotificationSettingsCard', () => {
   }
   const getSubscription = vi.fn<[], Promise<typeof subscription | null>>(async () => null)
   const subscribe = vi.fn(async () => subscription)
+  const showNotification = vi.fn<[], Promise<void>>(async () => undefined)
   const register = vi.fn()
-  const registration = { pushManager: { getSubscription, subscribe } }
+  const registration = { pushManager: { getSubscription, subscribe }, showNotification }
+  const getRegistration = vi.fn(async () => null as typeof registration | null)
 
   beforeEach(() => {
     vi.restoreAllMocks()
     getSubscription.mockResolvedValue(null)
+    getRegistration.mockResolvedValue(null)
     subscribe.mockResolvedValue(subscription)
+    showNotification.mockResolvedValue(undefined)
     register.mockResolvedValue(registration)
     Object.defineProperty(window, 'isSecureContext', { configurable: true, value: true })
     Object.defineProperty(window, 'PushManager', { configurable: true, value: class {} })
@@ -33,7 +37,7 @@ describe('NotificationSettingsCard', () => {
     Object.defineProperty(navigator, 'serviceWorker', {
       configurable: true,
       value: {
-        getRegistration: vi.fn(async () => null),
+        getRegistration,
         register,
         ready: Promise.resolve(registration),
       },
@@ -94,5 +98,94 @@ describe('NotificationSettingsCard', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'تفعيل تذكيرات الورد' }))
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1))
     expect(subscribe).not.toHaveBeenCalled()
+  })
+
+  it('hides the test button when unsupported or permission is not granted', async () => {
+    Object.defineProperty(window, 'isSecureContext', { configurable: true, value: false })
+    const { unmount } = render(<NotificationSettingsCard />)
+    await screen.findByText('هذا المتصفح لا يدعم إشعارات الورد.')
+    expect(screen.queryByRole('button', { name: 'اختبار الإشعار الآن' })).not.toBeInTheDocument()
+    unmount()
+
+    Object.defineProperty(window, 'isSecureContext', { configurable: true, value: true })
+    Object.defineProperty(window, 'Notification', {
+      configurable: true,
+      value: { permission: 'denied', requestPermission: vi.fn() },
+    })
+    render(<NotificationSettingsCard />)
+    await screen.findByText(/تم منع الإشعارات/)
+    expect(screen.queryByRole('button', { name: 'اختبار الإشعار الآن' })).not.toBeInTheDocument()
+  })
+
+  it('shows the test button with granted permission even without a Push subscription', async () => {
+    Object.defineProperty(window, 'Notification', {
+      configurable: true,
+      value: { permission: 'granted', requestPermission: vi.fn() },
+    })
+    getRegistration.mockResolvedValue(null)
+
+    render(<NotificationSettingsCard />)
+
+    expect(await screen.findByRole('button', { name: 'اختبار الإشعار الآن' })).toBeInTheDocument()
+    expect(getSubscription).not.toHaveBeenCalled()
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('shows a test notification only after an explicit click and reports success accessibly', async () => {
+    Object.defineProperty(window, 'Notification', {
+      configurable: true,
+      value: { permission: 'granted', requestPermission: vi.fn() },
+    })
+    getRegistration.mockResolvedValue(registration)
+    getSubscription.mockResolvedValue(subscription)
+
+    render(<NotificationSettingsCard />)
+    const button = await screen.findByRole('button', { name: 'اختبار الإشعار الآن' })
+    expect(showNotification).not.toHaveBeenCalled()
+    expect(screen.getByText('هذا اختبار لعرض الإشعار على الجهاز فقط، ولا يختبر الاشتراك أو التذكيرات المجدولة.')).toBeInTheDocument()
+
+    fireEvent.click(button)
+
+    expect(await screen.findByRole('status')).toHaveTextContent('تم إرسال إشعار تجريبي إلى هذا الجهاز.')
+    expect(showNotification).toHaveBeenCalledTimes(1)
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('prevents duplicate clicks while the test notification is pending', async () => {
+    Object.defineProperty(window, 'Notification', {
+      configurable: true,
+      value: { permission: 'granted', requestPermission: vi.fn() },
+    })
+    getRegistration.mockResolvedValue(registration)
+    getSubscription.mockResolvedValue(subscription)
+    let resolveNotification: (() => void) | undefined
+    showNotification.mockImplementation(() => new Promise<void>((resolve) => {
+      resolveNotification = resolve
+    }))
+
+    render(<NotificationSettingsCard />)
+    const button = await screen.findByRole('button', { name: 'اختبار الإشعار الآن' })
+    fireEvent.click(button)
+    fireEvent.click(button)
+
+    expect(await screen.findByRole('button', { name: 'جارٍ إرسال الإشعار التجريبي...' })).toBeDisabled()
+    expect(showNotification).toHaveBeenCalledTimes(1)
+    resolveNotification?.()
+    await screen.findByRole('status')
+  })
+
+  it('shows a safe failure when the browser cannot display the test notification', async () => {
+    Object.defineProperty(window, 'Notification', {
+      configurable: true,
+      value: { permission: 'granted', requestPermission: vi.fn() },
+    })
+    getRegistration.mockResolvedValue(registration)
+    getSubscription.mockResolvedValue(subscription)
+    showNotification.mockRejectedValue(new Error('browser failure'))
+
+    render(<NotificationSettingsCard />)
+    fireEvent.click(await screen.findByRole('button', { name: 'اختبار الإشعار الآن' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('تعذر عرض الإشعار التجريبي.')
   })
 })
