@@ -1,47 +1,125 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '../../../../lib/supabase/server'
 import { mutationGuardResponse } from '@/lib/security/request-guards'
+import {
+  getEmailRedirectTo,
+  isExistingAccountError,
+  mapAuthFailure,
+} from '../registration'
+
+type RegisterSuccess = {
+  ok: true
+  requiresEmailConfirmation: boolean
+}
+
+type RegisterFailure = {
+  ok: false
+  code: string
+  message: string
+}
 
 export async function POST(req: Request) {
   const rejected = mutationGuardResponse(req, { requireJson: true, maxBytes: 8192 })
   if (rejected) return rejected
+
   const body = await req.json().catch(()=>null)
-  const email = body?.email?.toString()?.trim() || ''
-  const password = body?.password || ''
-  const display_name = body?.display_name?.toString()?.trim() || null
+  const email =
+    body && typeof body.email === 'string' ? body.email.trim() : ''
+  const password =
+    body && typeof body.password === 'string' ? body.password : ''
+  const displayName =
+    body && typeof body.display_name === 'string'
+      ? body.display_name.trim() || null
+      : null
 
   if (!email || !password) {
-    return NextResponse.json({ message: 'يرجى تقديم البريد الإلكتروني وكلمة المرور' }, { status: 400 })
+    return NextResponse.json<RegisterFailure>(
+      {
+        ok: false,
+        code: 'validation_failed',
+        message: 'يرجى إدخال البريد الإلكتروني وكلمة المرور.',
+      },
+      { status: 400 },
+    )
   }
   if (password.length < 8) {
-    return NextResponse.json({ message: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' }, { status: 400 })
+    return NextResponse.json<RegisterFailure>(
+      {
+        ok: false,
+        code: 'weak_password',
+        message: 'يجب أن تكون كلمة المرور 8 أحرف على الأقل.',
+      },
+      { status: 400 },
+    )
+  }
+
+  const emailRedirectTo = getEmailRedirectTo()
+  if (!emailRedirectTo) {
+    return NextResponse.json<RegisterFailure>(
+      {
+        ok: false,
+        code: 'invalid_redirect_url',
+        message: 'تعذر بدء إنشاء الحساب الآن. حاولي مرة أخرى لاحقًا.',
+      },
+      { status: 500 },
+    )
   }
 
   try {
-    const res = NextResponse.json({ ok: true })
-    const client = await createServerClient(req as any, res as any)
+    const immediateSessionResponse = NextResponse.json<RegisterSuccess>(
+      { ok: true, requiresEmailConfirmation: false },
+      { status: 201 },
+    )
+    const client = await createServerClient(req, immediateSessionResponse)
 
-    const timezone = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Africa/Cairo'
-    const { data, error } = await client.auth.signUp({ email, password, options: { data: { display_name, timezone, locale: 'ar' } } })
+    const { data, error } = await client.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { display_name: displayName },
+        emailRedirectTo,
+      },
+    })
+
     if (error) {
-      return NextResponse.json({ message: translateRegisterError(error.message) }, { status: 400 })
+      if (isExistingAccountError(error)) {
+        return NextResponse.json<RegisterSuccess>(
+          { ok: true, requiresEmailConfirmation: true },
+          { status: 200 },
+        )
+      }
+
+      const failure = mapAuthFailure(error)
+      return NextResponse.json<RegisterFailure>(
+        { ok: false, code: failure.code, message: failure.message },
+        { status: failure.status },
+      )
     }
 
-    const requiresVerification = !data?.session
-    if (requiresVerification) {
-      return NextResponse.json({ ok: true, requiresVerification: true })
+    if (!data?.user) {
+      const failure = mapAuthFailure(null)
+      return NextResponse.json<RegisterFailure>(
+        { ok: false, code: failure.code, message: failure.message },
+        { status: failure.status },
+      )
     }
 
-    return res
-  } catch (err) {
-    return NextResponse.json({ message: 'حدث خطأ أثناء محاولة التسجيل' }, { status: 500 })
+    if (!data.session) {
+      return NextResponse.json<RegisterSuccess>(
+        { ok: true, requiresEmailConfirmation: true },
+        { status: 201 },
+      )
+    }
+
+    return immediateSessionResponse
+  } catch {
+    return NextResponse.json<RegisterFailure>(
+      {
+        ok: false,
+        code: 'unexpected_failure',
+        message: 'تعذر إنشاء الحساب الآن. حاولي مرة أخرى لاحقًا.',
+      },
+      { status: 500 },
+    )
   }
-}
-
-function translateRegisterError(message: string) {
-  if (!message) return 'فشل التسجيل'
-  const m = message.toLowerCase()
-  if (m.includes('already')) return 'الحساب موجود بالفعل'
-  if (m.includes('invalid')) return 'البريد الإلكتروني غير صالح'
-  return 'فشل التسجيل'
 }
