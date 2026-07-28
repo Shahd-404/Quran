@@ -41,11 +41,15 @@ Deno.serve(async (request) => {
   }
 
   webpush.setVapidDetails(subject, publicKey, privateKey)
-  const supabase = createClient(url, serviceKey, { auth: { persistSession: false } })
-  const { data, error } = await supabase.rpc('claim_due_reading_reminders', { p_batch_size: 100 })
+  const supabaseAdmin = createClient(url, serviceKey, { auth: { persistSession: false } })
+  const { data, error } = await supabaseAdmin.rpc('claim_due_reading_reminders', { p_batch_size: 100 })
   if (error) {
-    console.error('[claim_due_reading_reminders]', {
-      code: 'CLAIM_FAILED',
+    console.error('[reminder_rpc_error]', {
+      operation: 'claim_due_reading_reminders',
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
     })
     return response({ error: 'CLAIM_FAILED' }, 500)
   }
@@ -65,7 +69,7 @@ Deno.serve(async (request) => {
         }),
         { TTL: 1800 },
       )
-      await supabase.rpc('finish_notification_delivery', {
+      await supabaseAdmin.rpc('finish_notification_delivery', {
         p_delivery_id: claim.delivery_id, p_status: 'sent',
         p_error_code: null, p_deactivate_subscription: false,
       })
@@ -74,7 +78,7 @@ Deno.serve(async (request) => {
       const statusCode = typeof cause === 'object' && cause !== null && 'statusCode' in cause
         ? Number((cause as { statusCode?: unknown }).statusCode) : 0
       const permanent = statusCode === 404 || statusCode === 410
-      await supabase.rpc('finish_notification_delivery', {
+      await supabaseAdmin.rpc('finish_notification_delivery', {
         p_delivery_id: claim.delivery_id,
         p_status: permanent ? 'skipped' : 'failed',
         p_error_code: permanent ? 'SUBSCRIPTION_EXPIRED' : 'PUSH_TRANSIENT_FAILURE',

@@ -23,21 +23,21 @@ describe('send-due-reading-reminders source contract', () => {
 
   it('preserves the claim and finish RPC calls', () => {
     expect(source).toContain(
-      "supabase.rpc('claim_due_reading_reminders', { p_batch_size: 100 })",
+      "supabaseAdmin.rpc('claim_due_reading_reminders', { p_batch_size: 100 })",
     )
-    expect(source).toContain("supabase.rpc('finish_notification_delivery'")
+    expect(source).toContain("supabaseAdmin.rpc('finish_notification_delivery'")
   })
 
-  it('uses the dedicated secret and logs only a stable protected error code', () => {
+  it('temporarily logs only the protected RPC diagnostic fields', () => {
     expect(source).toContain("Deno.env.get('REMINDER_INVOCATION_SECRET')")
     expect(source).not.toContain("request.headers.get('authorization')")
     expect(source.match(/console\.error/g)).toHaveLength(1)
-    expect(source).toContain("console.error('[claim_due_reading_reminders]'")
-    expect(source).toContain("code: 'CLAIM_FAILED'")
+    expect(source).toContain("console.error('[reminder_rpc_error]'")
+    expect(source).toContain("operation: 'claim_due_reading_reminders'")
+    expect(source).toContain('code: error.code')
+    expect(source).toContain('message: error.message')
+    expect(source).toContain('details: error.details')
+    expect(source).toContain('hint: error.hint')
     expect(source).not.toMatch(/console\.(log|warn)/)
-    expect(source).not.toContain('code: error.code')
-    expect(source).not.toContain('message: error.message')
-    expect(source).not.toContain('details: error.details')
-    expect(source).not.toContain('hint: error.hint')
   })
 })
