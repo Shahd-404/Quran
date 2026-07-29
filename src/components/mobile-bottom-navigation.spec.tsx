@@ -17,6 +17,9 @@ describe('MobileBottomNavigation', () => {
       expect(screen.getByRole('link', { name: label })).toHaveAttribute('href', href)
     })
 
+    expect(
+      screen.getByRole('navigation', { name: 'التنقل في التطبيق' }),
+    ).toHaveClass('md:hidden')
     const icons = container.querySelectorAll('svg')
     expect(icons).toHaveLength(4)
     icons.forEach((icon) => expect(icon).toHaveAttribute('aria-hidden', 'true'))

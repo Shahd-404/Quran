@@ -110,6 +110,32 @@ describe('Quran page provider', () => {
     expect(safeMessage).not.toMatch(/401|invalid_client|secret-token/)
   })
 
+  it.each([
+    [401, 'QURAN_UPSTREAM_UNAUTHORIZED'],
+    [403, 'QURAN_UPSTREAM_FORBIDDEN'],
+    [404, 'QURAN_UPSTREAM_NOT_FOUND'],
+    [429, 'QURAN_UPSTREAM_RATE_LIMITED'],
+    [500, 'QURAN_UPSTREAM_SERVER_ERROR'],
+  ] as const)(
+    'maps provider status %s to the stable code %s',
+    async (statusCode, errorCode) => {
+      const provider = sdkClient(
+        vi
+          .fn()
+          .mockRejectedValue(
+            new Error(`${statusCode} upstream-sensitive-details`),
+          ),
+      )
+
+      await expect(
+        loadQuranPage(17, provider, chapters),
+      ).rejects.toMatchObject({
+        code: errorCode,
+        upstreamStatusCode: statusCode,
+      })
+    },
+  )
+
   it('rejects missing server-only provider configuration', () => {
     vi.stubEnv('QF_CLIENT_ID', '')
     vi.stubEnv('QF_CLIENT_SECRET', '')

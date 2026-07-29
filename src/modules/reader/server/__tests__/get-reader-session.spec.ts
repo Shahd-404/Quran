@@ -126,6 +126,33 @@ describe('getReaderSession', () => {
     expect(supabase.from).toHaveBeenCalledWith('reading_plans')
   })
 
+  it('rejects a reversed stored page range before Quran loading', async () => {
+    const supabase = client({
+      tables: {
+        reading_sessions: {
+          data: {
+            id: sessionId,
+            daily_assignment_id:
+              '22222222-2222-2222-2222-222222222222',
+            session_order: 1,
+            start_page: 82,
+            end_page: 80,
+            status: 'pending',
+            last_opened_page: null,
+            first_opened_at: null,
+            last_opened_at: null,
+          },
+          error: null,
+        },
+      },
+    })
+
+    const result = await getReaderSession(supabase, sessionId)
+
+    expect(result.status).toBe('error')
+    expect(supabase.from).toHaveBeenCalledTimes(1)
+  })
+
   it('never exposes a raw database error', async () => {
     const supabase = client({
       tables: {

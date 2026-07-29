@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { BookOpen, History, House } from 'lucide-react'
+import { BookOpen } from 'lucide-react'
+import { DesktopNavigation } from './desktop-navigation'
 import { ThemeToggle } from './theme/theme-toggle'
 
 export function SiteHeader() {
@@ -21,22 +22,7 @@ export function SiteHeader() {
         </Link>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <nav className="hidden items-center md:flex" aria-label="التنقل الرئيسي">
-            <Link
-              href="/app"
-              className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-muted transition hover:bg-elevated hover:text-ink sm:px-4"
-            >
-              <House aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
-              لوحة الورد
-            </Link>
-            <Link
-              href="/app/history"
-              className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-muted transition hover:bg-elevated hover:text-ink"
-            >
-              <History aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
-              السجل
-            </Link>
-          </nav>
+          <DesktopNavigation />
           <ThemeToggle />
         </div>
       </div>

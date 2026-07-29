@@ -3,7 +3,11 @@ import { notFound, redirect } from 'next/navigation'
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
 import { getSafeQuranErrorMessage } from '@/modules/quran/server/errors'
-import { getQuranPage } from '@/modules/quran/server/get-page'
+import type { QuranPage } from '@/modules/quran/types'
+import {
+  createQuranCorrelationId,
+  loadQuranPageRange,
+} from '@/modules/quran/server/get-page-range'
 import { ReaderError } from '@/modules/reader/components/reader-error'
 import { ReaderView } from '@/modules/reader/components/reader-view'
 import { selectReaderPage } from '@/modules/reader/page-selection'
@@ -42,39 +46,44 @@ export default async function ReadingSessionPage({
     redirect(`/app/read/${session.id}?page=${selection.pageNumber}`)
   }
 
+  const correlationId = createQuranCorrelationId()
+  let pages: QuranPage[]
   try {
-    const page = await getQuranPage(selection.pageNumber)
-    const positionResult = await recordReadingPosition(
-      client,
-      session,
-      selection.pageNumber,
-    )
-    const displayedSession =
-      positionResult.success &&
-      positionResult.changed &&
-      session.status === 'pending'
-        ? {
-            ...session,
-            status: 'in_progress' as const,
-            lastOpenedPage: selection.pageNumber,
-          }
-        : session
-    return (
-      <ReaderView
-        session={displayedSession}
-        page={page}
-        saveWarning={
-          positionResult.success ? null : positionResult.message
-        }
-      />
-    )
+    pages = await loadQuranPageRange(session.startPage, session.endPage, {
+      correlationId,
+    })
   } catch (error) {
     return (
       <ReaderError
+        correlationId={correlationId}
         session={session}
         pageNumber={selection.pageNumber}
         message={getSafeQuranErrorMessage(error)}
       />
     )
   }
+
+  const positionResult = await recordReadingPosition(
+    client,
+    session,
+    selection.pageNumber,
+  )
+  const displayedSession =
+    positionResult.success &&
+    positionResult.changed &&
+    session.status === 'pending'
+      ? {
+          ...session,
+          status: 'in_progress' as const,
+          lastOpenedPage: selection.pageNumber,
+        }
+      : session
+  return (
+    <ReaderView
+      session={displayedSession}
+      pages={pages}
+      currentPageNumber={selection.pageNumber}
+      saveWarning={positionResult.success ? null : positionResult.message}
+    />
+  )
 }

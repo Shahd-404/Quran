@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { getQuranPage } from '@/modules/quran/server/get-page'
+import { loadQuranPageRange } from '@/modules/quran/server/get-page-range'
 import { getReaderSession } from '@/modules/reader/server/get-reader-session'
 import { recordReadingPosition } from '@/modules/reader/server/record-reading-position'
 import ReadingSessionPage from '../page'
@@ -15,14 +15,18 @@ vi.mock('@/modules/reader/server/get-reader-session', () => ({
 vi.mock('@/modules/reader/server/record-reading-position', () => ({
   recordReadingPosition: vi.fn(),
 }))
-vi.mock('@/modules/quran/server/get-page', () => ({
-  getQuranPage: vi.fn(),
+vi.mock('@/modules/quran/server/get-page-range', () => ({
+  createQuranCorrelationId: vi.fn(
+    () => '11111111-2222-4333-8444-555555555555',
+  ),
+  loadQuranPageRange: vi.fn(),
 }))
 vi.mock('next/headers', () => ({ headers: () => new Headers() }))
 vi.mock('next/server', () => ({
   NextResponse: class NextResponse extends Response {},
 }))
 vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
   redirect: vi.fn((href: string) => {
     throw new Error(`REDIRECT:${href}`)
   }),
@@ -46,6 +50,19 @@ const session = {
   assignmentStatus: 'pending' as const,
   currentUnreadPage: 17,
 }
+
+const pages = [17, 18].map((pageNumber) => ({
+  pageNumber,
+  verses: [
+    {
+      chapterId: 2,
+      chapterNameArabic: 'البقرة',
+      verseKey: `2:${pageNumber}`,
+      verseNumber: pageNumber,
+      uthmaniText: `نص الصفحة ${pageNumber}`,
+    },
+  ],
+}))
 
 describe('ReadingSessionPage', () => {
   beforeEach(() => {
@@ -97,11 +114,7 @@ describe('ReadingSessionPage', () => {
       status: 'success',
       session,
     })
-    vi.mocked(recordReadingPosition).mockResolvedValue({
-      success: true,
-      changed: true,
-    })
-    vi.mocked(getQuranPage).mockRejectedValue(
+    vi.mocked(loadQuranPageRange).mockRejectedValue(
       new Error('401 invalid_client secret-token'),
     )
 
@@ -112,8 +125,40 @@ describe('ReadingSessionPage', () => {
       }),
     )
 
-    expect(html).toContain('تعذّر تحميل صفحة القرآن الآن')
+    expect(html).toContain('تعذّر تحميل صفحات القرآن الآن')
     expect(html).not.toMatch(/401|invalid_client|secret-token/)
+    expect(html).toContain('11111111-2222-4333-8444-555555555555')
     expect(recordReadingPosition).not.toHaveBeenCalled()
+  })
+
+  it('loads the complete range before recording the reading position', async () => {
+    vi.mocked(getReaderSession).mockResolvedValue({
+      status: 'success',
+      session,
+    })
+    vi.mocked(loadQuranPageRange).mockResolvedValue(pages)
+    vi.mocked(recordReadingPosition).mockResolvedValue({
+      success: true,
+      changed: true,
+    })
+
+    const html = renderToStaticMarkup(
+      await ReadingSessionPage({
+        params: { sessionId: session.id },
+        searchParams: {},
+      }),
+    )
+
+    expect(loadQuranPageRange).toHaveBeenCalledWith(17, 18, {
+      correlationId: '11111111-2222-4333-8444-555555555555',
+    })
+    expect(recordReadingPosition).toHaveBeenCalledWith({}, session, 17)
+    expect(
+      vi.mocked(loadQuranPageRange).mock.invocationCallOrder[0],
+    ).toBeLessThan(
+      vi.mocked(recordReadingPosition).mock.invocationCallOrder[0],
+    )
+    expect(html).toContain('data-quran-page="17"')
+    expect(html).toContain('data-quran-page="18"')
   })
 })

@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+import vm from 'node:vm'
 import { describe, expect, it } from 'vitest'
 
 const source = fs.readFileSync('public/sw.js', 'utf8')
@@ -19,9 +20,78 @@ describe('shared Service Worker', () => {
   it('restricts cache candidates to same-origin GET and excludes APIs', () => {
     expect(source).toContain("request.method !== 'GET'")
     expect(source).toContain('url.origin !== self.location.origin')
-    expect(source).toContain("url.pathname.startsWith('/api/')")
+    expect(source).toContain('API_PATH.test(url.pathname)')
     expect(source).toContain("const AUTHENTICATED_PATH = /^\\/app(?:\\/|$)/")
     expect(source).toContain('if (AUTHENTICATED_PATH.test(url.pathname)) return')
+  })
+  it('does not intercept APIs, Quran Foundation, Supabase, or token requests', () => {
+    const listeners = new Map<string, (event: {
+      request: { method: string; mode: string; url: string }
+      respondWith: (response: unknown) => void
+    }) => void>()
+    const context = {
+      URL,
+      Response,
+      console,
+      fetch: async () => ({ ok: false }),
+      caches: {
+        keys: async () => [],
+        match: async () => null,
+        open: async () => ({
+          addAll: async () => undefined,
+          put: async () => undefined,
+        }),
+        delete: async () => true,
+      },
+      self: {
+        location: { origin: 'https://wird.example' },
+        addEventListener: (
+          type: string,
+          listener: (event: {
+            request: { method: string; mode: string; url: string }
+            respondWith: (response: unknown) => void
+          }) => void,
+        ) => listeners.set(type, listener),
+        clients: {
+          claim: async () => undefined,
+          matchAll: async () => [],
+          openWindow: async () => undefined,
+        },
+        registration: {
+          showNotification: async () => undefined,
+        },
+        skipWaiting: async () => undefined,
+      },
+    }
+    vm.runInNewContext(source, context)
+    const fetchHandler = listeners.get('fetch')
+    expect(fetchHandler).toBeDefined()
+
+    const isIntercepted = (url: string, mode = 'cors') => {
+      let intercepted = false
+      fetchHandler?.({
+        request: { method: 'GET', mode, url },
+        respondWith: () => {
+          intercepted = true
+        },
+      })
+      return intercepted
+    }
+
+    expect(isIntercepted('https://wird.example/api/quran', 'navigate')).toBe(
+      false,
+    )
+    expect(
+      isIntercepted(
+        'https://apis.quran.foundation/content/api/v4/verses/by_page/80',
+      ),
+    ).toBe(false)
+    expect(
+      isIntercepted('https://project.supabase.co/rest/v1/reading_sessions'),
+    ).toBe(false)
+    expect(
+      isIntercepted('https://oauth2.quran.foundation/oauth2/token'),
+    ).toBe(false)
   })
   it('keeps authenticated navigation network-only with an offline fallback', () => {
     expect(source).toContain("request.mode === 'navigate'")
@@ -41,7 +111,7 @@ describe('shared Service Worker', () => {
     expect(installHandler).not.toContain('skipWaiting')
   })
   it('deletes only old Wird-owned caches', () => {
-    expect(source).toContain("const STATIC_CACHE = 'wird-static-v2'")
+    expect(source).toContain("const STATIC_CACHE = 'wird-static-v3'")
     expect(source).toContain('name.startsWith(WIRD_CACHE_PREFIX)')
     expect(source).toContain('name !== STATIC_CACHE')
   })

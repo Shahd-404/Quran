@@ -2,7 +2,10 @@ import { PageNumber } from '@quranjs/api'
 import { ServerClient } from '@quranjs/api/server'
 import { QuranChapter, QuranPage } from '../types'
 import { getQuranFoundationClient } from './client'
-import { QuranMalformedResponseError, QuranProviderError } from './errors'
+import {
+  normalizeQuranLoadError,
+  QuranMalformedResponseError,
+} from './errors'
 import { getQuranChapters } from './get-chapters'
 
 const pageCache = new Map<number, Promise<QuranPage>>()
@@ -33,8 +36,7 @@ export async function loadQuranPage(
       chapters,
     ])
   } catch (error) {
-    if (error instanceof QuranMalformedResponseError) throw error
-    throw new QuranProviderError()
+    throw normalizeQuranLoadError(error)
   }
 
   if (!Array.isArray(verses) || verses.length === 0) {

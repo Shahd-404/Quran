@@ -39,10 +39,28 @@ const page: QuranPage = {
   ],
 }
 
+const secondPage: QuranPage = {
+  pageNumber: 18,
+  verses: [
+    {
+      chapterId: 3,
+      chapterNameArabic: 'آل عمران',
+      verseKey: '3:1',
+      verseNumber: 1,
+      uthmaniText: 'نص الصفحة الثانية',
+    },
+  ],
+}
+
 describe('ReaderView', () => {
   it('renders Uthmani Quran text in a no-translate container', () => {
     const { container } = render(
-      <ReaderView session={session} page={page} saveWarning={null} />,
+      <ReaderView
+        session={session}
+        pages={[page, secondPage]}
+        currentPageNumber={17}
+        saveWarning={null}
+      />,
     )
 
     expect(screen.getByText('مَا نَنسَخْ مِنْ ءَايَةٍ')).toBeInTheDocument()
@@ -53,7 +71,14 @@ describe('ReaderView', () => {
   })
 
   it('keeps previous and next navigation inside the session range', () => {
-    render(<ReaderView session={session} page={page} saveWarning={null} />)
+    render(
+      <ReaderView
+        session={session}
+        pages={[page, secondPage]}
+        currentPageNumber={17}
+        saveWarning={null}
+      />,
+    )
 
     const previous = screen.getByText('الصفحة السابقة').closest('[aria-disabled]')
     const next = screen.getByRole('link', { name: /الصفحة التالية/ })
@@ -74,7 +99,14 @@ describe('ReaderView', () => {
   })
 
   it('shows saved-position context with an explicit completion action', () => {
-    render(<ReaderView session={session} page={page} saveWarning={null} />)
+    render(
+      <ReaderView
+        session={session}
+        pages={[page, secondPage]}
+        currentPageNumber={17}
+        saveWarning={null}
+      />,
+    )
 
     expect(
       screen.getByText(/يُحفظ موضع الصفحة تلقائيًا/),
@@ -88,7 +120,8 @@ describe('ReaderView', () => {
     render(
       <ReaderView
         session={{ ...session, status: 'completed' }}
-        page={page}
+        pages={[page, secondPage]}
+        currentPageNumber={17}
         saveWarning={null}
       />,
     )
@@ -115,7 +148,14 @@ describe('ReaderView', () => {
         }),
       }),
     )
-    render(<ReaderView session={session} page={page} saveWarning={null} />)
+    render(
+      <ReaderView
+        session={session}
+        pages={[page, secondPage]}
+        currentPageNumber={17}
+        saveWarning={null}
+      />,
+    )
 
     fireEvent.click(
       screen.getByRole('button', { name: 'أتممت قراءة الجلسة' }),
@@ -144,5 +184,24 @@ describe('ReaderView', () => {
       'تعذّر تحميل صفحة القرآن الآن.',
     )
     expect(screen.queryByText(/invalid_client|token|SQLSTATE/)).not.toBeInTheDocument()
+  })
+
+  it('renders every loaded page once in ascending order with visible boundaries', () => {
+    const { container } = render(
+      <ReaderView
+        session={session}
+        pages={[page, secondPage]}
+        currentPageNumber={17}
+        saveWarning={null}
+      />,
+    )
+
+    expect(
+      [...container.querySelectorAll('[data-quran-page]')].map((element) =>
+        element.getAttribute('data-quran-page'),
+      ),
+    ).toEqual(['17', '18'])
+    expect(screen.getByRole('heading', { name: 'صفحة ١٧' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'صفحة ١٨' })).toBeInTheDocument()
   })
 })

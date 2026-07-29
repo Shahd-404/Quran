@@ -90,6 +90,10 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 - Session times must be distinct and stored in chronological order.
 - Pages per day are divided deterministically across sessions; remainder assigned to earliest sessions.
 - Daily assignments are created once per local calendar day from the active plan.
+- The reader loads every page from a session's stored start page through its
+  stored end page as one validated inclusive range. It renders no partial range
+  as a successful session, and it records no open position until the complete
+  initial range has loaded.
 - A session becomes `in_progress` when opened; only explicit user confirmation marks it `completed`.
 - Completion stores a timestamp (presentation uses user timezone) and advances the current unread page only for explicitly completed pages.
 - Completing page 604 completes the khatma and records start and completion dates.
@@ -146,6 +150,8 @@ Wird reduces planning friction by splitting a user's daily page target into sche
   a compact bottom navigation. The active Dashboard keeps one dominant reading
   action and places remaining sessions and secondary settings behind
   presentation-only disclosures.
+- Authenticated desktop navigation exposes Dashboard, History, Plan, and
+  Settings at the same breakpoint where the mobile navigation is hidden.
 - Application controls and statuses use the Lucide outline icon system with
   visible Arabic labels and accessible names where an icon stands alone.
 - Every application page includes the footer text
