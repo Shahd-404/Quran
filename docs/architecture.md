@@ -86,6 +86,11 @@ Notes:
 - The root `public/sw.js` has shared Web Push and PWA responsibilities. It
   caches only public static assets and a dedicated offline document. Navigation
   is network-first and authenticated HTML is never written to Cache Storage.
+- Wird-owned static cache names are versioned per production UI release.
+  Service Worker scripts bypass the HTTP cache when checked for updates. A
+  waiting worker activates and reloads the page only after the user presses the
+  explicit update action; install and update discovery never call
+  `skipWaiting` automatically.
 - Quran pages, Supabase traffic, application APIs, mutations, credentials,
   subscription material, assignments, and progress data are excluded from
   offline caching.

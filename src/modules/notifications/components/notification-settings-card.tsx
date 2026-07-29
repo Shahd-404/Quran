@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Bell, BellOff, CircleCheck, Send, TriangleAlert } from 'lucide-react'
 import { activatePushNotifications } from '../client/subscribe'
 import { isPushSupported } from '../client/push-support'
 import {
@@ -11,7 +12,7 @@ import {
 import { notificationErrorMessages } from '../error-mapping'
 import { NotificationErrorCode, PushState } from '../types'
 
-export function NotificationSettingsCard() {
+export function NotificationSettingsCard({ embedded = false }: { embedded?: boolean }) {
   const [state, setState] = useState<PushState>('unsubscribed')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
@@ -93,10 +94,21 @@ export function NotificationSettingsCard() {
   }
 
   return (
-    <section className="surface-card p-5 sm:p-6" aria-labelledby="notifications-title">
-      <p className="eyebrow">التذكيرات</p>
-      <h2 id="notifications-title" className="section-title">إشعارات جلسات الورد</h2>
-      <p className="mt-3 leading-7 text-muted">
+    <section className={embedded ? '' : 'surface-card p-4 sm:p-5'} aria-labelledby="notifications-title">
+      {embedded ? (
+        <h2 id="notifications-title" className="sr-only">إشعارات جلسات الورد</h2>
+      ) : (
+        <div className="flex items-center gap-3">
+          <span className="icon-tile" aria-hidden="true">
+            <Bell aria-hidden="true" focusable="false" size={21} strokeWidth={1.8} />
+          </span>
+          <div>
+            <p className="eyebrow">التذكيرات</p>
+            <h2 id="notifications-title" className="section-title">إشعارات جلسات الورد</h2>
+          </div>
+        </div>
+      )}
+      <p className={`${embedded ? '' : 'mt-3'} text-sm leading-6 text-muted`}>
         {state === 'unsupported' && 'هذا المتصفح لا يدعم إشعارات الورد.'}
         {(state === 'default' || state === 'unsubscribed') && 'فعّلي التذكيرات ليصلك تنبيه عند موعد كل جلسة.'}
         {state === 'subscribed' && 'تذكيرات الورد مفعّلة على هذا الجهاز.'}
@@ -105,10 +117,20 @@ export function NotificationSettingsCard() {
       {state !== 'unsupported' && state !== 'denied' && (
         <button type="button" disabled={busy} onClick={state === 'subscribed' ? disable : enable}
           className="btn-secondary mt-4 w-full">
+          {state === 'subscribed' ? (
+            <BellOff aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
+          ) : (
+            <Bell aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
+          )}
           {busy ? 'جارٍ التنفيذ…' : state === 'subscribed' ? 'إيقاف التذكيرات على هذا الجهاز' : 'تفعيل تذكيرات الورد'}
         </button>
       )}
-      {message && <p role="alert" className="status-danger mt-3 text-sm">{message}</p>}
+      {message && (
+        <p role="alert" className="status-danger mt-3 flex items-start gap-2 text-sm">
+          <TriangleAlert aria-hidden="true" focusable="false" className="mt-0.5 shrink-0" size={17} strokeWidth={1.8} />
+          <span>{message}</span>
+        </p>
+      )}
       {testAvailable && (
         <div className="mt-4 border-t border-line/70 pt-4">
           <button
@@ -117,6 +139,7 @@ export function NotificationSettingsCard() {
             onClick={testNotification}
             className="btn-secondary w-full"
           >
+            <Send aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
             {testBusy ? 'جارٍ إرسال الإشعار التجريبي...' : 'اختبار الإشعار الآن'}
           </button>
           <p className="mt-3 text-sm leading-6 text-muted">
@@ -129,7 +152,14 @@ export function NotificationSettingsCard() {
           role={testSucceeded ? 'status' : 'alert'}
           className={`mt-3 rounded-xl px-3 py-2 text-sm ${testSucceeded ? 'bg-primary-soft text-primary-muted' : 'bg-danger-soft text-danger'}`}
         >
-          {testMessage}
+          <span className="flex items-start gap-2">
+            {testSucceeded ? (
+              <CircleCheck aria-hidden="true" focusable="false" className="mt-0.5 shrink-0" size={17} strokeWidth={1.8} />
+            ) : (
+              <TriangleAlert aria-hidden="true" focusable="false" className="mt-0.5 shrink-0" size={17} strokeWidth={1.8} />
+            )}
+            <span>{testMessage}</span>
+          </span>
         </p>
       )}
       <p className="mt-4 text-sm leading-6 text-muted">قد يختلف توقيت ظهور الإشعار قليلًا حسب المتصفح ونظام التشغيل.</p>

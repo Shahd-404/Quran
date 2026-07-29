@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { CircleCheck } from 'lucide-react'
 
 const RESEND_COOLDOWN_SECONDS = 60
 const EMAIL_RATE_LIMIT_MESSAGE =
@@ -198,14 +199,12 @@ export default function RegisterPage() {
           aria-labelledby="registration-success-title"
           className="surface-card mx-auto w-full max-w-lg p-6 text-center shadow-lift sm:p-9"
         >
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-primary-soft text-primary-muted">
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-8 w-8 fill-none stroke-current">
-              <path d="M5 12.5l4.2 4.2L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-            </svg>
+          <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-primary-soft text-primary-muted">
+            <CircleCheck aria-hidden="true" focusable="false" size={24} strokeWidth={1.8} />
           </div>
           <h1
             id="registration-success-title"
-            className="mt-5 text-2xl font-bold text-ink"
+            className="mt-4 text-xl font-semibold text-ink"
           >
             تم إنشاء حسابك بنجاح
           </h1>
@@ -276,10 +275,10 @@ export default function RegisterPage() {
         className="surface-card mx-auto w-full max-w-lg p-6 shadow-lift sm:p-9"
       >
         <p className="eyebrow">حساب جديد</p>
-        <h1 className="page-title !text-3xl">ابدأ رحلتك مع ورد</h1>
+        <h1 className="page-title">ابدأ رحلتك مع ورد</h1>
         <p className="page-description !mt-2">أنشئ حسابك، ثم صمّم خطة قراءة تناسب يومك.</p>
 
-        <div className="mt-7 space-y-5">
+        <div className="mt-9 space-y-5">
         <label className="field-label">
           الاسم (اختياري)
           <input
@@ -367,7 +366,7 @@ export default function RegisterPage() {
 
         <div className="mt-5 text-center text-sm text-muted">
           لديك حساب؟{' '}
-          <a href="/login" className="font-bold text-primary-muted underline-offset-4 hover:underline">
+          <a href="/login" className="font-semibold text-primary-muted underline-offset-4 hover:underline">
             تسجيل الدخول
           </a>
         </div>

@@ -4,6 +4,7 @@ import { PwaControls } from '../pwa-controls'
 
 describe('PwaControls', () => {
   beforeEach(() => {
+    vi.clearAllMocks()
     Object.defineProperty(window, 'matchMedia', { configurable: true, value: vi.fn(() => ({ matches: false })) })
     Object.defineProperty(navigator, 'serviceWorker', {
       configurable: true,
@@ -14,6 +15,32 @@ describe('PwaControls', () => {
         removeEventListener: vi.fn(),
       },
     })
+  })
+  it('checks for a fresh service worker without activating it automatically', async () => {
+    render(<PwaControls />)
+
+    await waitFor(() =>
+      expect(navigator.serviceWorker.register).toHaveBeenCalledWith('/sw.js', {
+        scope: '/',
+        updateViaCache: 'none',
+      }),
+    )
+  })
+  it('posts the activation message only after the user presses update', async () => {
+    const postMessage = vi.fn()
+    const waiting = { postMessage } as unknown as ServiceWorker
+    vi.mocked(navigator.serviceWorker.register).mockResolvedValue({
+      waiting,
+      installing: null,
+      addEventListener: vi.fn(),
+    } as unknown as ServiceWorkerRegistration)
+
+    render(<PwaControls />)
+
+    const button = await screen.findByRole('button', { name: 'تحديث التطبيق' })
+    expect(postMessage).not.toHaveBeenCalled()
+    fireEvent.click(button)
+    expect(postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' })
   })
   it('prompts only after the install button is clicked', async () => {
     const prompt = vi.fn(async () => undefined)

@@ -12,12 +12,12 @@ export function HistorySessionRow({ event }: { event: HistoryEvent }) {
     <article className="rounded-2xl border border-line bg-surface p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-primary-muted">
+          <p className="text-xs font-medium text-primary-muted">
             {event.sessionOrder
               ? `الجلسة ${formatArabicNumber(event.sessionOrder)}`
               : 'جلسة قراءة مكتملة'}
           </p>
-          <h4 className="mt-1 text-lg font-bold text-ink">
+          <h4 className="mt-1 text-[1.0625rem] font-semibold text-ink">
             {pageRange}
           </h4>
           <p className="mt-1 text-sm text-muted">
@@ -25,7 +25,7 @@ export function HistorySessionRow({ event }: { event: HistoryEvent }) {
             {event.pageCount === 1 ? 'صفحة' : 'صفحات'}
           </p>
         </div>
-        <p className="rounded-xl bg-primary-soft px-3 py-2 text-sm font-semibold text-primary-muted">
+        <p className="rounded-xl bg-primary-soft px-3 py-2 text-xs font-medium text-primary-muted">
           اكتملت الساعة {event.formattedCompletionTime}
         </p>
       </div>

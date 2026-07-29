@@ -26,7 +26,7 @@ describe('CompletionEstimateCard', () => {
     expect(screen.getByText(/٣ صفحات يوميًا/)).toHaveTextContent(
       'متوقع تختمي القرآن خلال ٢٠٢ يومًا بإذن الله.',
     )
-    expect(screen.getByText('كل صفحة تقرّبك من الختمة 🌿')).toBeInTheDocument()
+    expect(screen.getByText('كل صفحة تقرّبك من الختمة.')).toBeInTheDocument()
     expect(screen.getByText('١٥ فبراير ٢٠٢٧').closest('time')).toHaveAttribute(
       'datetime',
       '2027-02-15',
@@ -71,7 +71,7 @@ describe('CompletionEstimateCard', () => {
       />,
     )
     expect(
-      screen.getByText('أتممتِ الختمة، تقبّل الله منكِ 🌿'),
+      screen.getByText('أتممتِ الختمة، تقبّل الله منكِ.'),
     ).toBeInTheDocument()
   })
 

@@ -52,6 +52,13 @@ For each flow we document: Preconditions, User actions, System responses, Succes
   page, khatma progress, and a motivational expected completion date derived
   from the saved plan target and timezone.
 - Success: User sees clear action to begin next session.
+- Mobile hierarchy: The compact daily summary, next session, daily progress,
+  and completion estimate appear first. Remaining daily sessions are disclosed
+  only after the user selects `عرض جميع جلسات اليوم`; opening or closing the
+  disclosure never opens, completes, or mutates a session.
+- Mobile navigation: Authenticated pages provide fixed access to Today,
+  History, Plan, and Settings. Account and privacy actions remain under
+  Settings rather than competing with the daily reading action.
 - Edge: If offline, show cached state and indicate offline; if plan paused, show paused state.
 - Offline navigation never replays cached authenticated Dashboard HTML; it shows
   the public Arabic offline page until connectivity returns.

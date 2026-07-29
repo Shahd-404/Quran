@@ -132,12 +132,22 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 
 - Alexandria is the primary Arabic UI typeface, with IBM Plex Sans Arabic,
   Cairo, and system Arabic fonts as fallbacks.
+- The mobile type scale uses 14px regular body text, 12–13px supporting text,
+  17–18px semibold card titles, 24px mobile page titles, and 32px desktop page
+  titles. Bold weight is reserved for the primary page heading and essential
+  numeric values.
 - Light mode uses a warm off-white canvas, white surfaces, deep green actions,
   and restrained beige/gold accents.
 - Dark mode uses a deep charcoal canvas, elevated dark surfaces, readable
   neutral text, and a soft green accent.
 - Shared spacing, radii, shadows, fields, buttons, badges, progress bars,
   dialogs, status messages, header, and footer use semantic design tokens.
+- Authenticated mobile pages expose Today, History, Plan, and Settings through
+  a compact bottom navigation. The active Dashboard keeps one dominant reading
+  action and places remaining sessions and secondary settings behind
+  presentation-only disclosures.
+- Application controls and statuses use the Lucide outline icon system with
+  visible Arabic labels and accessible names where an icon stands alone.
 - Every application page includes the footer text
   `صُنع بمحبة — إهداء لعبدالله الفيل`.
 

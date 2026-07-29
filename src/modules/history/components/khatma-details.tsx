@@ -1,4 +1,5 @@
 import React from 'react'
+import { ArrowRight } from 'lucide-react'
 import { formatArabicNumber } from '@/modules/dashboard/formatting'
 import { ProgressBar } from '@/modules/dashboard/components/progress-bar'
 import { KhatmaHistoryModel } from '../types'
@@ -13,18 +14,19 @@ export function KhatmaDetails({ data }: { data: KhatmaHistoryModel }) {
         <header>
           <a
             href="/app/history"
-            className="text-sm font-bold text-primary-muted hover:underline"
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary-muted hover:underline"
           >
+            <ArrowRight aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
             العودة إلى سجل القراءة
           </a>
           <p className="eyebrow mt-5">
             تفاصيل الختمة
           </p>
-          <h1 className="mt-1 text-3xl font-bold sm:text-4xl">
+          <h1 className="page-title !mt-1">
             الختمة رقم {formatArabicNumber(khatma.cycleNumber)}
           </h1>
           {khatma.status === 'completed' ? (
-            <p className="mt-3 text-xl font-bold text-primary-muted">
+            <p className="mt-3 text-lg font-semibold text-primary-muted">
               تمت الختمة بحمد الله
             </p>
           ) : (
@@ -34,12 +36,12 @@ export function KhatmaDetails({ data }: { data: KhatmaHistoryModel }) {
           )}
         </header>
 
-        <section className="surface-card mt-7 p-6 sm:p-8">
+        <section className="surface-card mt-5 p-4 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <h2 className="text-xl font-bold">
+            <h2 className="text-lg font-semibold">
               {khatma.status === 'completed' ? 'ختمة مكتملة' : 'ختمة نشطة'}
             </h2>
-            <span className="rounded-full bg-primary-soft px-4 py-2 font-bold text-primary-muted">
+            <span className="rounded-full bg-primary-soft px-3 py-1.5 font-semibold text-primary-muted">
               {formatArabicNumber(khatma.percentage)}٪
             </span>
           </div>
@@ -79,7 +81,7 @@ export function KhatmaDetails({ data }: { data: KhatmaHistoryModel }) {
           className="surface-card mt-7 p-5 sm:p-7"
           aria-labelledby="khatma-timeline-title"
         >
-          <h2 id="khatma-timeline-title" className="text-2xl font-bold">
+          <h2 id="khatma-timeline-title" className="text-lg font-semibold">
             سجل قراءة هذه الختمة
           </h2>
           {data.dayGroups.length === 0 ? (
@@ -109,7 +111,7 @@ function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div className="surface-muted p-4">
       <dt className="text-sm text-muted">{label}</dt>
-      <dd className="mt-1 font-bold">{value}</dd>
+      <dd className="mt-1 font-semibold">{value}</dd>
     </div>
   )
 }

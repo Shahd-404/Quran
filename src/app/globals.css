@@ -22,10 +22,8 @@
   --color-warning-soft: 253 245 224;
   --color-hero: 10 67 50;
   --color-hero-muted: 199 226 211;
-  --color-hero: 10 67 50;
-  --color-hero-muted: 199 226 211;
-  --shadow-card: 0 12px 34px rgba(31, 39, 34, 0.055);
-  --shadow-lift: 0 22px 64px rgba(21, 35, 28, 0.12);
+  --shadow-card: 0 5px 18px rgba(31, 39, 34, 0.045);
+  --shadow-lift: 0 14px 42px rgba(21, 35, 28, 0.1);
 }
 
 .dark {
@@ -48,10 +46,8 @@
   --color-warning-soft: 63 48 27;
   --color-hero: 19 52 39;
   --color-hero-muted: 163 214 187;
-  --color-hero: 19 52 39;
-  --color-hero-muted: 163 214 187;
-  --shadow-card: 0 14px 38px rgba(0, 0, 0, 0.2);
-  --shadow-lift: 0 24px 70px rgba(0, 0, 0, 0.34);
+  --shadow-card: 0 6px 20px rgba(0, 0, 0, 0.16);
+  --shadow-lift: 0 16px 48px rgba(0, 0, 0, 0.28);
 }
 
 html {
@@ -67,6 +63,9 @@ body {
   font-family: var(--font-arabic), 'Alexandria', 'IBM Plex Sans Arabic', 'Cairo',
     system-ui, sans-serif;
   font-feature-settings: 'kern' 1, 'liga' 1, 'tnum' 1;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.75;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
@@ -103,7 +102,7 @@ body {
 
 @layer components {
   .page-shell {
-    @apply min-h-[70vh] bg-canvas px-4 py-8 text-ink sm:px-6 lg:py-12;
+    @apply min-h-[70vh] bg-canvas px-4 py-5 text-ink sm:px-6 sm:py-8 lg:py-10;
   }
 
   .page-container {
@@ -115,7 +114,7 @@ body {
   }
 
   .surface-card {
-    @apply rounded-card border border-line/80 bg-surface shadow-card;
+    @apply rounded-card border border-line/75 bg-surface shadow-card;
   }
 
   .surface-muted {
@@ -123,23 +122,23 @@ body {
   }
 
   .eyebrow {
-    @apply text-sm font-bold tracking-wide text-primary-muted;
+    @apply text-xs font-medium tracking-wide text-primary-muted;
   }
 
   .page-title {
-    @apply mt-2 text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl;
+    @apply mt-2 text-2xl font-bold leading-tight tracking-tight text-ink sm:text-[2rem];
   }
 
   .page-description {
-    @apply mt-3 max-w-2xl text-base leading-8 text-muted;
+    @apply mt-3 max-w-2xl text-sm leading-7 text-muted;
   }
 
   .section-title {
-    @apply mt-1 text-xl font-bold leading-snug text-ink sm:text-2xl;
+    @apply mt-1 text-[1.0625rem] font-semibold leading-snug text-ink sm:text-lg;
   }
 
   .btn {
-    @apply inline-flex min-h-[3rem] items-center justify-center gap-2 rounded-2xl px-5 py-3 text-center text-sm font-bold transition duration-200 disabled:cursor-not-allowed disabled:opacity-55 sm:text-base;
+    @apply inline-flex min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-center text-sm font-semibold transition duration-200 disabled:cursor-not-allowed disabled:opacity-55;
   }
 
   .btn-primary {
@@ -159,7 +158,7 @@ body {
   }
 
   .field-label {
-    @apply block text-sm font-bold text-ink;
+    @apply block text-xs font-medium text-ink;
   }
 
   .field-control {
@@ -167,23 +166,35 @@ body {
   }
 
   .status-success {
-    @apply rounded-2xl border border-primary/25 bg-primary-soft px-5 py-4 text-primary-muted;
+    @apply rounded-2xl border border-primary/25 bg-primary-soft px-4 py-3 text-primary-muted;
   }
 
   .status-warning {
-    @apply rounded-2xl border border-warning/30 bg-warning-soft px-5 py-4 text-warning;
+    @apply rounded-2xl border border-warning/30 bg-warning-soft px-4 py-3 text-warning;
   }
 
   .status-danger {
-    @apply rounded-2xl border border-danger/30 bg-danger-soft px-5 py-4 text-danger;
+    @apply rounded-2xl border border-danger/30 bg-danger-soft px-4 py-3 text-danger;
   }
 
   .empty-state {
-    @apply rounded-2xl border border-dashed border-line bg-elevated px-6 py-8 text-center text-muted;
+    @apply rounded-2xl border border-dashed border-line bg-elevated px-5 py-6 text-center text-muted;
   }
 
   .icon-tile {
-    @apply grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary-muted;
+    @apply grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary-muted;
+  }
+}
+
+@supports selector(body:has(.mobile-bottom-nav)) {
+  body:has(.mobile-bottom-nav) .site-footer {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  }
+
+  @media (min-width: 768px) {
+    body:has(.mobile-bottom-nav) .site-footer {
+      padding-bottom: 0;
+    }
   }
 }
 

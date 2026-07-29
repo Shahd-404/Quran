@@ -1,4 +1,6 @@
 import React from 'react'
+import { CalendarCheck, Clock3, Files } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import {
   COMPLETION_ESTIMATE_FALLBACK_ARABIC,
   CompletionEstimateVariant,
@@ -54,38 +56,38 @@ export function CompletionEstimateCard({
         'border border-primary/20 bg-primary-soft text-right',
         compact
           ? 'rounded-2xl p-4'
-          : 'rounded-card p-5 shadow-card sm:p-6',
+          : 'rounded-card p-4 shadow-card sm:p-5',
       ].join(' ')}
     >
       {copy && estimate ? (
         <>
-          <h2
-            className={
-              compact
-                ? 'text-base font-bold text-ink'
-                : 'text-xl font-bold text-ink'
-            }
-          >
-            {copy.title}
-          </h2>
+          <div className="flex items-center gap-3">
+            <span className="icon-tile" aria-hidden="true">
+              <CalendarCheck aria-hidden="true" focusable="false" size={21} strokeWidth={1.8} />
+            </span>
+            <h2 className={compact ? 'text-base font-semibold text-ink' : 'text-lg font-semibold text-ink'}>
+              {copy.title}
+            </h2>
+          </div>
           {variant === 'active-plan' ? (
-            <dl className="mt-4 grid grid-cols-3 gap-2" aria-label="تفاصيل الوقت المتبقي">
-              <Metric label="الصفحات" value={estimate.remainingPages} />
-              <Metric label="الأيام تقريبًا" value={estimate.expectedReadingDays} />
+            <dl className="mt-4 grid grid-cols-3 divide-x divide-x-reverse divide-line/70 rounded-2xl border border-primary/15 bg-surface/70" aria-label="تفاصيل الوقت المتبقي">
+              <Metric label="الصفحات" value={estimate.remainingPages} Icon={Files} />
+              <Metric label="الأيام تقريبًا" value={estimate.expectedReadingDays} Icon={CalendarCheck} />
               <Metric
                 label="الجلسات تقريبًا"
                 value={estimate.estimatedRemainingSessions}
+                Icon={Clock3}
               />
             </dl>
           ) : copy.remainingText ? (
-            <p className="mt-3 font-semibold text-ink">{copy.remainingText}</p>
+            <p className="mt-3 font-medium text-ink">{copy.remainingText}</p>
           ) : null}
           <p className="mt-3 leading-7 text-muted">{copy.primaryText}</p>
           {copy.expectedDatePrefix && copy.formattedExpectedDate ? (
             <p className="mt-2 leading-7 text-muted">
               {copy.expectedDatePrefix}{' '}
               <time
-                className="font-bold text-ink"
+                className="font-semibold text-ink"
                 dateTime={estimate.expectedCompletionDate ?? undefined}
               >
                 {copy.formattedExpectedDate}
@@ -93,22 +95,21 @@ export function CompletionEstimateCard({
             </p>
           ) : null}
           {copy.encouragement ? (
-            <p className="mt-3 text-sm font-semibold text-primary-muted">
+            <p className="mt-3 text-xs font-medium text-primary-muted">
               {copy.encouragement}
             </p>
           ) : null}
         </>
       ) : (
         <>
-          <h2
-            className={
-              compact
-                ? 'text-base font-bold text-ink'
-                : 'text-xl font-bold text-ink'
-            }
-          >
-            موعد الختم المتوقع
-          </h2>
+          <div className="flex items-center gap-3">
+            <span className="icon-tile" aria-hidden="true">
+              <CalendarCheck aria-hidden="true" focusable="false" size={21} strokeWidth={1.8} />
+            </span>
+            <h2 className={compact ? 'text-base font-semibold text-ink' : 'text-lg font-semibold text-ink'}>
+              موعد الختم المتوقع
+            </h2>
+          </div>
           <p className="mt-2 leading-7 text-muted">
             {COMPLETION_ESTIMATE_FALLBACK_ARABIC}
           </p>
@@ -121,14 +122,19 @@ export function CompletionEstimateCard({
 function Metric({
   label,
   value,
+  Icon,
 }: {
   label: string
   value: number | null
+  Icon: LucideIcon
 }) {
   return (
-    <div className="rounded-xl bg-surface/75 p-3">
-      <dt className="text-xs leading-5 text-muted">{label}</dt>
-      <dd className="mt-1 text-lg font-bold text-ink">
+    <div className="min-w-0 p-2.5 text-center sm:p-3">
+      <dt className="flex items-center justify-center gap-1 text-[0.6875rem] leading-5 text-muted">
+        <Icon aria-hidden="true" focusable="false" size={14} strokeWidth={1.8} />
+        <span>{label}</span>
+      </dt>
+      <dd className="mt-0.5 text-xl font-semibold text-ink">
         {value === null ? '—' : new Intl.NumberFormat('ar-EG').format(value)}
       </dd>
     </div>

@@ -1,4 +1,5 @@
 import React from 'react'
+import { ArrowRight, BookMarked } from 'lucide-react'
 import { ReadingHistoryModel } from '../types'
 import { CurrentKhatmaCard, KhatmaList } from './khatma-list'
 import { HistoryDayGroup } from './history-day-group'
@@ -9,8 +10,9 @@ export function HistoryPage({ data }: { data: ReadingHistoryModel }) {
   return (
     <main className="page-shell">
       <div className="page-container">
-        <header className="mb-8">
-          <a href="/app" className="text-sm font-bold text-primary-muted hover:underline">
+        <header className="mb-5">
+          <a href="/app" className="inline-flex items-center gap-2 text-sm font-medium text-primary-muted hover:underline">
+            <ArrowRight aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
             العودة إلى لوحة الورد
           </a>
           <h1 className="page-title">
@@ -39,17 +41,15 @@ export function HistoryPage({ data }: { data: ReadingHistoryModel }) {
             className="surface-card p-5 sm:p-7"
             aria-labelledby="reading-timeline-title"
           >
-            <h2 id="reading-timeline-title" className="text-2xl font-bold">
+            <h2 id="reading-timeline-title" className="text-lg font-semibold">
               جلسات القراءة المكتملة
             </h2>
             {data.dayGroups.length === 0 ? (
               <div className="empty-state mt-5">
                 <span className="icon-tile mx-auto" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current">
-                    <path d="M6 4h12v16H6zM9 8h6M9 12h6M9 16h4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
-                  </svg>
+                  <BookMarked aria-hidden="true" focusable="false" size={21} strokeWidth={1.8} />
                 </span>
-                <h3 className="mt-4 font-bold text-ink">سجلّك جاهز لأول جلسة</h3>
+                <h3 className="mt-4 font-semibold text-ink">سجلّك جاهز لأول جلسة</h3>
                 <p className="mt-2 leading-7">سيظهر هنا سجل جلساتك بعد إكمال أول جلسة قراءة.</p>
               </div>
             ) : (

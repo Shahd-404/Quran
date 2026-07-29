@@ -1,5 +1,14 @@
 import React from 'react'
-import LogoutButton from '@/components/logout-button'
+import {
+  Bell,
+  BookOpen,
+  CalendarDays,
+  ChevronDown,
+  CircleCheck,
+  Clock3,
+  Files,
+  Settings,
+} from 'lucide-react'
 import { StatusToast } from '@/components/status-toast'
 import { NotificationSettingsCard } from '@/modules/notifications/components/notification-settings-card'
 import { CompletionEstimateCard } from '@/modules/reading-plan/components/completion-estimate-card'
@@ -19,64 +28,57 @@ export function Dashboard({
   planUpdated?: boolean
 }) {
   const displayName = data.profile.displayName?.trim()
+  const remainingSessions = data.highlightedSession
+    ? data.sessions.filter((session) => session.id !== data.highlightedSession?.id)
+    : data.sessions
 
   return (
     <main className="page-shell">
       <div className="page-container">
-        <section className="relative overflow-hidden rounded-card bg-hero px-6 py-8 text-white shadow-lift sm:px-9 sm:py-10">
+        <section
+          className="relative overflow-hidden rounded-card bg-hero px-5 py-5 text-white shadow-card sm:px-7 sm:py-7 lg:px-8"
+          aria-labelledby="daily-summary-title"
+        >
           <div
             aria-hidden="true"
-            className="absolute -left-16 -top-20 h-56 w-56 rounded-full border border-white/10 bg-white/5"
+            className="absolute -left-14 -top-16 h-40 w-40 rounded-full border border-white/10 bg-white/5"
           />
-          <div
-            aria-hidden="true"
-            className="absolute -bottom-20 right-1/3 h-44 w-44 rounded-full border border-accent/20"
-          />
-          <div className="relative grid items-end gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(20rem,0.8fr)]">
-            <div>
-              <p className="text-sm font-bold text-hero-muted">مساحتك اليومية مع القرآن</p>
-              <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-                السلام عليكم{displayName ? `، ${displayName}` : ''}
-              </h1>
-              <p className="mt-3 max-w-xl text-base leading-8 text-white/80">
-                خطوة هادئة اليوم، وصفحة بعد صفحة تكتمل الختمة بإذن الله.
-              </p>
-              <p className="mt-5 inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white/90">
-                {data.assignment.formattedDate}
-              </p>
-            </div>
+          <div className="relative">
+            <p className="text-xs font-medium text-hero-muted">
+              {data.assignment.formattedDate}
+            </p>
+            <h1
+              id="daily-summary-title"
+              className="mt-1.5 text-2xl font-bold tracking-tight sm:text-[2rem]"
+            >
+              السلام عليكم{displayName ? `، ${displayName}` : ''}
+            </h1>
+            <p className="mt-1.5 text-sm leading-6 text-white/80">
+              خطوة هادئة اليوم تقرّبك من تمام الختمة.
+            </p>
 
-            <dl className="grid grid-cols-3 gap-2 sm:gap-3" aria-label="ملخص التقدم">
+            <dl
+              className="mt-4 grid grid-cols-3 divide-x divide-x-reverse divide-white/15 border-t border-white/15 pt-3"
+              aria-label="ملخص ورد اليوم"
+            >
               <HeroMetric
-                label="أنجزت اليوم"
+                Icon={CircleCheck}
+                label="المنجز"
                 value={`${formatArabicNumber(data.assignment.percentage)}٪`}
               />
               <HeroMetric
+                Icon={BookOpen}
                 label="الصفحة التالية"
                 value={formatArabicNumber(data.plan.currentUnreadPage)}
               />
               <HeroMetric
-                label="الهدف اليومي"
+                Icon={Files}
+                label="هدف اليوم"
                 value={formatArabicNumber(data.plan.dailyPageTarget)}
               />
             </dl>
           </div>
         </section>
-
-        <nav
-          className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-surface p-2 shadow-card"
-          aria-label="إجراءات لوحة الورد"
-        >
-          <a href="/app/history" className="btn-ghost min-h-[2.75rem] flex-1 px-4 py-2 sm:flex-none">
-            سجل القراءة
-          </a>
-          <a href="/app/settings/privacy" className="btn-ghost min-h-[2.75rem] flex-1 px-4 py-2 sm:flex-none">
-            الخصوصية والبيانات
-          </a>
-          <div className="mr-auto min-w-[8.5rem] [&_button]:min-h-[2.75rem] [&_button]:bg-transparent [&_button]:px-4 [&_button]:py-2 [&_button]:text-muted [&_button]:shadow-none hover:[&_button]:bg-danger-soft hover:[&_button]:text-danger">
-            <LogoutButton />
-          </div>
-        </nav>
 
         {completionRecorded ? (
           <StatusToast message="تم تسجيل إكمال الجلسة بنجاح" />
@@ -87,57 +89,86 @@ export function Dashboard({
         ) : null}
 
         {data.plan.status === 'completed' ? (
-          <section className="status-success mt-6" aria-labelledby="khatma-completed-title">
-            <p className="text-sm font-semibold">تم تسجيل آخر صفحة</p>
-            <h2 id="khatma-completed-title" className="mt-1 text-2xl font-bold text-ink">
-              اكتملت الختمة
-            </h2>
-            <p className="mt-2 leading-7">
-              تقبّل الله قراءتك. لن تبدأ ختمة جديدة إلا باختيارك الصريح.
-            </p>
+          <section className="status-success mt-4 flex items-start gap-3" aria-labelledby="khatma-completed-title">
+            <CircleCheck aria-hidden="true" focusable="false" className="mt-0.5 shrink-0" size={20} strokeWidth={1.8} />
+            <div>
+              <h2 id="khatma-completed-title" className="text-lg font-semibold text-ink">
+                اكتملت الختمة
+              </h2>
+              <p className="mt-1 text-sm leading-6">
+                تقبّل الله قراءتك. لن تبدأ ختمة جديدة إلا باختيارك الصريح.
+              </p>
+            </div>
           </section>
         ) : null}
 
-        <div className="mt-7 grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(19rem,0.75fr)]">
-          <div className="space-y-6">
-            <section className="surface-card overflow-hidden" aria-labelledby="highlighted-session-title">
-              <div className="border-b border-accent/20 bg-accent-soft px-5 py-5 sm:px-7">
-                <p className="eyebrow !text-warning">خطوتك التالية</p>
-                <h2 id="highlighted-session-title" className="section-title">
-                  {data.highlightedSession ? 'جلسة القراءة الأقرب' : 'اكتمل ورد هذا اليوم'}
-                </h2>
+        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.85fr)] lg:items-start">
+          <section
+            className="lg:col-start-1 lg:row-start-1"
+            aria-labelledby="highlighted-session-title"
+          >
+            <div className="mb-2 flex items-center gap-2 px-1">
+              <BookOpen aria-hidden="true" focusable="false" size={20} strokeWidth={1.8} className="text-primary-muted" />
+              <h2 id="highlighted-session-title" className="section-title !mt-0">
+                {data.highlightedSession ? 'جلسة القراءة التالية' : 'ورد اليوم مكتمل'}
+              </h2>
+            </div>
+            {data.highlightedSession ? (
+              <SessionCard
+                session={data.highlightedSession}
+                assignmentLocalDate={data.assignment.localDate}
+                timezone={data.plan.timezone}
+                featured
+              />
+            ) : (
+              <div className="status-success flex items-start gap-2 leading-6">
+                <CircleCheck aria-hidden="true" focusable="false" className="mt-0.5 shrink-0" size={18} strokeWidth={1.8} />
+                اكتملت جميع جلسات ورد اليوم. تقبّل الله قراءتك.
               </div>
-              <div className="p-5 sm:p-7">
-                {data.highlightedSession ? (
-                  <SessionCard
-                    session={data.highlightedSession}
-                    assignmentLocalDate={data.assignment.localDate}
-                    timezone={data.plan.timezone}
-                  />
-                ) : (
-                  <div className="status-success text-center leading-7">
-                    اكتملت جميع جلسات هذا الورد. تقبّل الله قراءتك.
-                  </div>
-                )}
-              </div>
-            </section>
+            )}
+          </section>
 
+          <div className="lg:col-start-1 lg:row-start-2">
             <DailyProgressCard assignment={data.assignment} />
+          </div>
 
-            <section className="surface-card p-5 sm:p-7">
-              <div className="flex items-center gap-3">
-                <span className="icon-tile" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current">
-                    <path d="M7 3v3M17 3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
-                  </svg>
+          <div className="lg:col-start-2 lg:row-start-1">
+            <CompletionEstimateCard
+              currentUnreadPage={data.plan.currentUnreadPage}
+              pagesPerDay={data.plan.dailyPageTarget}
+              sessionsPerDay={data.plan.sessionsPerDay}
+              timezone={data.plan.timezone}
+              effectiveFrom={data.plan.effectiveFrom}
+              variant="active-plan"
+            />
+          </div>
+
+          {remainingSessions.length > 0 ? (
+            <details className="group surface-card p-4 lg:col-start-1 lg:row-start-3">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl [&::-webkit-details-marker]:hidden">
+                <span className="flex items-center gap-3">
+                  <span className="icon-tile" aria-hidden="true">
+                    <Clock3 aria-hidden="true" focusable="false" size={21} strokeWidth={1.8} />
+                  </span>
+                  <span>
+                    <span className="block text-[1.0625rem] font-semibold text-ink">
+                      عرض جميع جلسات اليوم
+                    </span>
+                    <span className="mt-0.5 block text-xs text-muted">
+                      {formatArabicNumber(remainingSessions.length)} جلسات إضافية
+                    </span>
+                  </span>
                 </span>
-                <div>
-                  <p className="eyebrow">جلسات اليوم</p>
-                  <h2 className="section-title">جدول الجلسات</h2>
-                </div>
-              </div>
-              <div className="mt-6 space-y-4">
-                {data.sessions.map((session) => (
+                <ChevronDown
+                  aria-hidden="true"
+                  focusable="false"
+                  size={19}
+                  strokeWidth={1.8}
+                  className="shrink-0 text-muted transition group-open:rotate-180"
+                />
+              </summary>
+              <div className="mt-4 space-y-3 border-t border-line/70 pt-4">
+                {remainingSessions.map((session) => (
                   <SessionCard
                     key={session.id}
                     session={session}
@@ -147,68 +178,106 @@ export function Dashboard({
                   />
                 ))}
               </div>
-            </section>
-          </div>
+            </details>
+          ) : null}
 
-          <aside className="space-y-6">
+          <div className="lg:col-start-2 lg:row-start-2">
             <KhatmaProgressCard
               khatma={data.khatma}
               currentUnreadPage={data.plan.currentUnreadPage}
             />
-            <CompletionEstimateCard
-              currentUnreadPage={data.plan.currentUnreadPage}
-              pagesPerDay={data.plan.dailyPageTarget}
-              sessionsPerDay={data.plan.sessionsPerDay}
-              timezone={data.plan.timezone}
-              effectiveFrom={data.plan.effectiveFrom}
-              variant="active-plan"
-            />
-            <NotificationSettingsCard />
+          </div>
 
-            <section className="surface-card p-5 sm:p-6">
-              <p className="eyebrow">ملخص الخطة</p>
-              <h2 className="section-title">
-                {data.plan.status === 'completed'
-                  ? 'خطة الورد المكتملة'
-                  : 'خطة الورد النشطة'}
-              </h2>
-              <dl className="mt-5 divide-y divide-line/70">
+          <details className="group surface-card p-4 lg:col-start-2 lg:row-start-3">
+            <DisclosureHeading Icon={Bell} title="الإشعارات" description="تذكيرات جلسات الورد" />
+            <div className="mt-4 border-t border-line/70 pt-4">
+              <NotificationSettingsCard embedded />
+            </div>
+          </details>
+
+          <details className="group surface-card p-4 lg:col-start-2 lg:row-start-4">
+            <DisclosureHeading Icon={CalendarDays} title="تفاصيل الخطة" description="الهدف والمواعيد" />
+            <div className="mt-4 border-t border-line/70 pt-3">
+              <dl className="divide-y divide-line/70">
                 <PlanDetail label="الهدف اليومي" value={`${formatArabicNumber(data.plan.dailyPageTarget)} صفحات`} />
                 <PlanDetail label="عدد الجلسات" value={`${formatArabicNumber(data.plan.sessionsPerDay)} جلسات`} />
-                <div className="flex items-center justify-between gap-4 py-4">
-                  <dt className="text-sm text-muted">المنطقة الزمنية</dt>
-                  <dd className="max-w-[11rem] break-words text-left text-sm font-bold text-ink" dir="ltr">
+                <div className="flex items-center justify-between gap-4 py-3">
+                  <dt className="text-xs text-muted">المنطقة الزمنية</dt>
+                  <dd className="max-w-[11rem] break-words text-left text-xs font-medium text-ink" dir="ltr">
                     {data.plan.timezone}
                   </dd>
                 </div>
               </dl>
               {data.plan.status === 'active' ? (
-                <a href="/app/plan/settings" className="btn-secondary mt-5 w-full">
+                <a href="/app/plan/settings" className="btn-secondary mt-3 w-full">
+                  <Settings aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
                   إعدادات الخطة
                 </a>
               ) : null}
-            </section>
-          </aside>
+            </div>
+          </details>
         </div>
       </div>
     </main>
   )
 }
 
-function HeroMetric({ label, value }: { label: string; value: string }) {
+function HeroMetric({
+  Icon,
+  label,
+  value,
+}: {
+  Icon: typeof BookOpen
+  label: string
+  value: string
+}) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/10 px-3 py-4 text-center backdrop-blur-sm">
-      <dt className="text-xs leading-5 text-hero-muted">{label}</dt>
-      <dd className="mt-1 text-xl font-bold text-white sm:text-2xl">{value}</dd>
+    <div className="min-w-0 px-2 text-center">
+      <dt className="flex items-center justify-center gap-1 text-[0.6875rem] leading-5 text-hero-muted">
+        <Icon aria-hidden="true" focusable="false" size={14} strokeWidth={1.8} />
+        <span className="truncate">{label}</span>
+      </dt>
+      <dd className="mt-0.5 text-xl font-semibold text-white sm:text-2xl">{value}</dd>
     </div>
+  )
+}
+
+function DisclosureHeading({
+  Icon,
+  title,
+  description,
+}: {
+  Icon: typeof Bell
+  title: string
+  description: string
+}) {
+  return (
+    <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl [&::-webkit-details-marker]:hidden">
+      <span className="flex items-center gap-3">
+        <span className="icon-tile" aria-hidden="true">
+          <Icon aria-hidden="true" focusable="false" size={21} strokeWidth={1.8} />
+        </span>
+        <span>
+          <span className="block text-[1.0625rem] font-semibold text-ink">{title}</span>
+          <span className="mt-0.5 block text-xs text-muted">{description}</span>
+        </span>
+      </span>
+      <ChevronDown
+        aria-hidden="true"
+        focusable="false"
+        size={19}
+        strokeWidth={1.8}
+        className="shrink-0 text-muted transition group-open:rotate-180"
+      />
+    </summary>
   )
 }
 
 function PlanDetail({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 py-4">
-      <dt className="text-sm text-muted">{label}</dt>
-      <dd className="text-sm font-bold text-ink">{value}</dd>
+    <div className="flex items-center justify-between gap-4 py-3">
+      <dt className="text-xs text-muted">{label}</dt>
+      <dd className="text-sm font-medium text-ink">{value}</dd>
     </div>
   )
 }

@@ -10,5 +10,18 @@ describe('security headers', () => {
     expect(headers['X-Content-Type-Options']).toBe('nosniff')
     expect(headers['X-Frame-Options']).toBe('DENY')
     expect(headers['Permissions-Policy']).not.toContain('*')
+
+    const serviceWorkerRule = rules.find(
+      (rule: { source: string }) => rule.source === '/sw.js',
+    )
+    const serviceWorkerHeaders = Object.fromEntries(
+      serviceWorkerRule.headers.map(
+        (header: { key: string; value: string }) => [header.key, header.value],
+      ),
+    )
+    expect(serviceWorkerHeaders['Cache-Control']).toBe(
+      'no-cache, no-store, must-revalidate',
+    )
+    expect(serviceWorkerHeaders['Service-Worker-Allowed']).toBe('/')
   })
 })

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { CircleCheck } from 'lucide-react'
 
 type CompletionState =
   | 'idle'
@@ -62,7 +63,7 @@ export function CompletionAction({ sessionId }: { sessionId: string }) {
   if (state === 'idle') {
     return (
       <section className="surface-card mt-5 p-5">
-        <h2 className="text-lg font-bold text-ink">
+        <h2 className="text-lg font-semibold text-ink">
           هل أنهيت صفحات الجلسة؟
         </h2>
         <p className="mt-2 text-sm leading-7 text-muted">
@@ -96,14 +97,12 @@ export function CompletionAction({ sessionId }: { sessionId: string }) {
         aria-describedby="completion-confirmation-description"
         className="surface-card w-full max-w-lg border-accent/30 p-6 shadow-lift"
       >
-      <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent-soft text-warning" aria-hidden="true">
-        <svg viewBox="0 0 24 24" className="h-7 w-7 fill-none stroke-current">
-          <path d="M7 12.5l3 3L17 8.5" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-        </svg>
+      <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-accent-soft text-warning" aria-hidden="true">
+        <CircleCheck aria-hidden="true" focusable="false" size={24} strokeWidth={1.8} />
       </div>
       <h2
         id="completion-confirmation-title"
-        className="mt-4 text-center text-xl font-bold text-ink"
+        className="mt-4 text-center text-lg font-semibold text-ink"
       >
         تأكيد إكمال الجلسة
       </h2>

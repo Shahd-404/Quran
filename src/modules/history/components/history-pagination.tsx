@@ -30,7 +30,7 @@ export function HistoryPagination({
       ) : (
         <span
           aria-disabled="true"
-          className="inline-flex min-h-[2.75rem] items-center rounded-xl border border-line px-4 py-2 font-bold text-muted/50"
+          className="inline-flex min-h-[2.75rem] items-center rounded-xl border border-line px-4 py-2 font-semibold text-muted/50"
         >
           السابق
         </span>
@@ -49,7 +49,7 @@ export function HistoryPagination({
       ) : (
         <span
           aria-disabled="true"
-          className="inline-flex min-h-[2.75rem] items-center rounded-xl bg-elevated px-4 py-2 font-bold text-muted/50"
+          className="inline-flex min-h-[2.75rem] items-center rounded-xl bg-elevated px-4 py-2 font-semibold text-muted/50"
         >
           التالي
         </span>

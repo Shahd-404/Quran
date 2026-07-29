@@ -9,17 +9,17 @@ export function CurrentKhatmaCard({
   khatma: KhatmaHistorySummary
 }) {
   return (
-    <section className="rounded-card border border-primary/25 bg-primary-soft p-5 sm:p-6">
+    <section className="rounded-card border border-primary/25 bg-primary-soft p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-primary-muted">
+          <p className="text-xs font-medium text-primary-muted">
             الختمة الحالية
           </p>
-          <h2 className="mt-1 text-2xl font-bold">
+          <h2 className="mt-1 text-lg font-semibold">
             الختمة رقم {formatArabicNumber(khatma.cycleNumber)}
           </h2>
         </div>
-        <span className="rounded-full bg-surface px-4 py-2 font-bold text-primary-muted">
+        <span className="rounded-full bg-surface px-3 py-1.5 text-lg font-semibold text-primary-muted">
           {formatArabicNumber(khatma.percentage)}٪
         </span>
       </div>
@@ -32,25 +32,25 @@ export function CurrentKhatmaCard({
       <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl bg-surface/80 p-3">
           <dt className="text-muted">صفحة البداية</dt>
-          <dd className="mt-1 font-bold">
+          <dd className="mt-1 font-semibold">
             {formatArabicNumber(khatma.startPage)}
           </dd>
         </div>
         <div className="rounded-xl bg-surface/80 p-3">
           <dt className="text-muted">الصفحة التالية</dt>
-          <dd className="mt-1 font-bold">
+          <dd className="mt-1 font-semibold">
             {formatArabicNumber(khatma.currentUnreadPage ?? khatma.startPage)}
           </dd>
         </div>
         <div className="rounded-xl bg-surface/80 p-3">
           <dt className="text-muted">الصفحات المكتملة</dt>
-          <dd className="mt-1 font-bold">
+          <dd className="mt-1 font-semibold">
             {formatArabicNumber(khatma.completedPages)}
           </dd>
         </div>
         <div className="rounded-xl bg-surface/80 p-3">
           <dt className="text-muted">تاريخ البداية</dt>
-          <dd className="mt-1 font-bold">{khatma.formattedStartDate}</dd>
+          <dd className="mt-1 font-semibold">{khatma.formattedStartDate}</dd>
         </div>
       </dl>
       <a
@@ -70,12 +70,12 @@ export function KhatmaList({
 }) {
   return (
     <section aria-labelledby="previous-khatmas-title">
-      <h2 id="previous-khatmas-title" className="text-2xl font-bold">
+      <h2 id="previous-khatmas-title" className="text-lg font-semibold">
         الختمات السابقة
       </h2>
       {khatmas.length === 0 ? (
         <div className="empty-state mt-4">
-          <h3 className="font-bold text-ink">لا توجد ختمات مكتملة بعد</h3>
+          <h3 className="font-semibold text-ink">لا توجد ختمات مكتملة بعد</h3>
           <p className="mt-2">ستظهر هنا عند إكمال أول ختمة بإذن الله.</p>
         </div>
       ) : (
@@ -85,31 +85,31 @@ export function KhatmaList({
               key={khatma.id}
               className="surface-card p-5"
             >
-              <p className="text-sm font-semibold text-primary-muted">
+              <p className="text-xs font-medium text-primary-muted">
                 الختمة رقم {formatArabicNumber(khatma.cycleNumber)}
               </p>
               <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <dt className="text-muted">تاريخ البداية</dt>
-                  <dd className="mt-1 font-bold">
+                  <dd className="mt-1 font-medium">
                     {khatma.formattedStartDate}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-muted">تاريخ الإكمال</dt>
-                  <dd className="mt-1 font-bold">
+                  <dd className="mt-1 font-medium">
                     {khatma.formattedCompletionDate}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-muted">صفحة البداية</dt>
-                  <dd className="mt-1 font-bold">
+                  <dd className="mt-1 font-medium">
                     {formatArabicNumber(khatma.startPage)}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-muted">الصفحات المكتملة</dt>
-                  <dd className="mt-1 font-bold">
+                  <dd className="mt-1 font-medium">
                     {formatArabicNumber(khatma.completedPages)}
                   </dd>
                 </div>

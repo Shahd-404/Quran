@@ -21,10 +21,11 @@ describe('theme support', () => {
   })
 
   it('toggles from light to dark and persists the preference', async () => {
-    render(<ThemeToggle />)
+    const { container } = render(<ThemeToggle />)
     const toggle = await screen.findByRole('button', {
       name: 'تفعيل الوضع الداكن',
     })
+    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
 
     fireEvent.click(toggle)
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { Download, RefreshCw } from 'lucide-react'
 
 interface InstallPromptEvent extends Event {
   prompt(): Promise<void>
@@ -20,7 +21,7 @@ export function PwaControls() {
     if (!('serviceWorker' in navigator)) return
     const onControllerChange = () => { if (updateRequested.current) window.location.reload() }
     navigator.serviceWorker.addEventListener('controllerchange', onControllerChange)
-    navigator.serviceWorker.register('/sw.js', { scope: '/' }).then((registration) => {
+    navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' }).then((registration) => {
       if (registration.waiting) setWaitingWorker(registration.waiting)
       registration.addEventListener('updatefound', () => {
         const worker = registration.installing
@@ -57,12 +58,18 @@ export function PwaControls() {
   }
   if (!installPrompt && !waitingWorker) return null
   return (
-    <section aria-label="إعدادات التطبيق" className="mx-auto mt-4 flex w-full max-w-5xl flex-wrap gap-2 px-4 sm:px-6">
-      {installPrompt && <button type="button" onClick={install} className="btn-secondary min-h-[2.75rem] rounded-xl px-4 py-2">تثبيت تطبيق ورد</button>}
+    <section aria-label="إعدادات التطبيق" className="mx-auto mt-3 flex w-full max-w-5xl flex-wrap gap-2 px-4 sm:px-6">
+      {installPrompt && (
+        <button type="button" onClick={install} className="btn-secondary rounded-xl">
+          <Download aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
+          تثبيت تطبيق ورد
+        </button>
+      )}
       {waitingWorker && (
-        <div role="status" className="status-warning flex items-center gap-3 rounded-xl px-4 py-2 text-sm">
+        <div role="status" className="status-warning flex items-center gap-3 rounded-xl text-sm">
+          <RefreshCw aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} className="shrink-0" />
           <span>يتوفر تحديث جديد</span>
-          <button type="button" onClick={update} className="font-bold underline underline-offset-4">تحديث التطبيق</button>
+          <button type="button" onClick={update} className="font-semibold underline underline-offset-4">تحديث التطبيق</button>
         </div>
       )}
     </section>

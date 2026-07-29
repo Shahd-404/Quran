@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { formatArabicNumber } from '@/modules/dashboard/formatting'
 import { QuranPage, QuranVerse } from '@/modules/quran/types'
 import { CompletionAction } from '@/modules/session-completion/components/completion-action'
@@ -47,9 +48,9 @@ function NavigationLink({
   href: string
 }) {
   const label = direction === 'previous' ? 'الصفحة السابقة' : 'الصفحة التالية'
-  const arrow = direction === 'previous' ? '→' : '←'
+  const DirectionIcon = direction === 'previous' ? ArrowRight : ArrowLeft
   const classes =
-    'inline-flex min-h-[3rem] items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold transition sm:text-base'
+    'inline-flex min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition'
 
   if (disabled) {
     return (
@@ -57,7 +58,7 @@ function NavigationLink({
         aria-disabled="true"
         className={`${classes} cursor-not-allowed bg-elevated text-muted/50`}
       >
-        <span aria-hidden="true">{arrow}</span>
+        <DirectionIcon aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
         {label}
       </span>
     )
@@ -68,7 +69,7 @@ function NavigationLink({
       href={href}
       className={`${classes} bg-primary text-white hover:bg-primary-strong`}
     >
-      <span aria-hidden="true">{arrow}</span>
+      <DirectionIcon aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
       {label}
     </Link>
   )
@@ -97,14 +98,14 @@ export function ReaderView({
               href="/app"
               className="btn-secondary min-h-[2.75rem] px-4 py-2 text-sm"
             >
-              <span aria-hidden="true">→</span>
+              <ArrowRight aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
               العودة للوحة الورد
             </Link>
             <div className="text-left">
-              <p className="text-sm font-semibold text-primary-muted">
+              <p className="text-xs font-medium text-primary-muted">
                 جلسة الورد {formatArabicNumber(session.sessionOrder)}
               </p>
-              <p className="mt-1 font-bold">
+              <p className="mt-1 font-semibold">
                 الصفحات {formatArabicNumber(session.startPage)}–
                 {formatArabicNumber(session.endPage)}
               </p>
@@ -117,7 +118,7 @@ export function ReaderView({
                 {formatArabicNumber(currentPage)}
               </h1>
             </div>
-            <span className="rounded-full bg-primary-soft px-3 py-1.5 text-sm font-bold text-primary-muted">
+            <span className="rounded-full bg-primary-soft px-3 py-1.5 text-xs font-medium text-primary-muted">
               {STATUS_LABELS[session.status]}
             </span>
           </div>

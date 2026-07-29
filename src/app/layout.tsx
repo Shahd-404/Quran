@@ -51,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={alexandria.variable}>
         <a
           href="#main-content"
-          className="fixed right-4 top-3 z-[60] -translate-y-20 rounded-xl bg-primary px-4 py-2 font-bold text-white transition focus:translate-y-0"
+          className="fixed right-4 top-3 z-[60] -translate-y-20 rounded-xl bg-primary px-4 py-2 font-semibold text-white transition focus:translate-y-0"
         >
           الانتقال إلى المحتوى
         </a>

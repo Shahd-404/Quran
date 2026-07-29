@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { CircleCheck } from 'lucide-react'
 
 export default function Home() {
   return (
@@ -6,11 +7,11 @@ export default function Home() {
       <section className="page-container grid items-center gap-10 py-6 lg:grid-cols-[1.05fr_0.95fr] lg:py-12">
         <div>
           <p className="eyebrow">قراءة ثابتة، بخطوات هادئة</p>
-          <h1 className="mt-4 max-w-2xl text-4xl font-bold leading-[1.3] tracking-tight text-ink sm:text-5xl">
+          <h1 className="mt-3 max-w-2xl text-3xl font-bold leading-[1.35] tracking-tight text-ink sm:text-4xl">
             وردك اليومي للقرآن،
             <span className="block text-primary-muted">منظّم حول يومك.</span>
           </h1>
-          <p className="mt-5 max-w-xl text-lg leading-9 text-muted">
+          <p className="mt-4 max-w-xl text-sm leading-7 text-muted sm:text-base sm:leading-8">
             خطّة عربية هادئة تقسّم صفحاتك إلى جلسات واضحة، وتحفظ تقدّمك فقط
             عندما تؤكد إكمال القراءة.
           </p>
@@ -22,8 +23,8 @@ export default function Home() {
               تسجيل الدخول
             </Link>
           </div>
-          <p className="mt-5 flex items-center gap-2 text-sm font-semibold text-muted">
-            <span className="h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
+          <p className="mt-5 flex items-center gap-2 text-sm font-medium text-muted">
+            <CircleCheck aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} className="text-accent" />
             لا تقدّم تلقائيًا — أنت من يؤكد كل جلسة.
           </p>
         </div>
@@ -37,7 +38,7 @@ export default function Home() {
                   <p className="eyebrow">ورد اليوم</p>
                   <h2 className="section-title">خمس صفحات بهدوء</h2>
                 </div>
-                <span className="rounded-full bg-primary-soft px-4 py-2 font-bold text-primary-muted">
+                <span className="rounded-full bg-primary-soft px-3 py-1.5 font-semibold text-primary-muted">
                   ٤٠٪
                 </span>
               </div>
@@ -71,7 +72,7 @@ function PreviewSession({
     <div className={`flex items-center justify-between rounded-2xl border p-4 ${active ? 'border-primary/25 bg-primary-soft' : 'border-line bg-elevated'}`}>
       <div>
         <p className="text-sm text-muted">{title}</p>
-        <p className="mt-1 font-bold text-ink">{pages}</p>
+        <p className="mt-1 font-semibold text-ink">{pages}</p>
       </div>
       <span className={`h-3 w-3 rounded-full ${active ? 'bg-primary' : 'bg-line'}`} />
     </div>

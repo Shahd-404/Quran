@@ -2,6 +2,7 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Trash2, TriangleAlert } from 'lucide-react'
 
 const CONFIRMATION = 'حذف بياناتي'
 
@@ -134,23 +135,21 @@ export function DeleteReadingDataCard() {
 
   return (
     <section
-      className="surface-card border-danger/30 p-6 sm:p-8"
+      className="surface-card border-danger/30 p-4 sm:p-6"
       aria-labelledby="delete-reading-data-title"
     >
       <div className="flex items-start gap-4">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-danger-soft text-danger" aria-hidden="true">
-          <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current">
-            <path d="M6 7h12M9 7V4h6v3M8 10v7M12 10v7M16 10v7M7 7l1 14h8l1-14" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
-          </svg>
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-danger-soft text-danger" aria-hidden="true">
+          <Trash2 aria-hidden="true" focusable="false" size={21} strokeWidth={1.8} />
         </span>
         <div>
-          <p className="text-sm font-bold text-danger">منطقة حساسة</p>
-          <h2 id="delete-reading-data-title" className="mt-1 text-2xl font-bold text-ink">
+          <p className="text-xs font-medium text-danger">منطقة حساسة</p>
+          <h2 id="delete-reading-data-title" className="mt-1 text-lg font-semibold text-ink">
             مسح بيانات القراءة
           </h2>
         </div>
       </div>
-      <p className="mt-4 leading-8 text-muted">
+      <p className="mt-3 text-sm leading-7 text-muted">
         سيتم حذف جميع خططك، جلسات القراءة، التقدم، الختمات، وسجل القراءة نهائيًا.
         لن يتم حذف حسابك أو بريدك الإلكتروني.
       </p>
@@ -162,6 +161,7 @@ export function DeleteReadingDataCard() {
           onClick={() => setConfirming(true)}
           className="btn-danger mt-6"
         >
+          <Trash2 aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
           مسح جميع بيانات القراءة
         </button>
       ) : (
@@ -175,13 +175,13 @@ export function DeleteReadingDataCard() {
             onKeyDown={handleDialogKeyDown}
             className="surface-card w-full max-w-lg border-danger/35 p-5 shadow-lift sm:p-7"
           >
-            <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-danger-soft text-2xl font-bold text-danger" aria-hidden="true">
-              !
+            <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-danger-soft text-danger" aria-hidden="true">
+              <TriangleAlert aria-hidden="true" focusable="false" size={23} strokeWidth={1.8} />
             </div>
-            <h3 id="delete-confirmation-title" className="mt-4 text-center text-xl font-bold text-ink">
+            <h3 id="delete-confirmation-title" className="mt-4 text-center text-lg font-semibold text-ink">
               تأكيد مسح بيانات القراءة
             </h3>
-            <p id="delete-confirmation-description" className="mt-3 text-center font-semibold text-danger">
+            <p id="delete-confirmation-description" className="mt-3 text-center text-sm font-medium text-danger">
               هذا الإجراء نهائي ولا يمكن التراجع عنه.
             </p>
             <form onSubmit={handleSubmit}>
@@ -217,6 +217,7 @@ export function DeleteReadingDataCard() {
                 disabled={pending || confirmation !== CONFIRMATION}
                 className="btn-danger"
               >
+                <Trash2 aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
                 {pending ? 'جارٍ المسح النهائي…' : 'تأكيد المسح النهائي'}
               </button>
               <button

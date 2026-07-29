@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Dashboard } from '../dashboard'
 import {
@@ -18,6 +18,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers()
+  vi.unstubAllGlobals()
 })
 
 function model(overrides: Partial<DashboardModel['assignment']> = {}): DashboardModel {
@@ -31,6 +32,27 @@ function model(overrides: Partial<DashboardModel['assignment']> = {}): Dashboard
     formattedTime: '٨:٠٠ ص',
     persistedStatus: 'pending',
     presentationState: 'available',
+  }
+  const secondSession: DashboardModel['sessions'][number] = {
+    ...firstSession,
+    id: 'session-2',
+    sessionOrder: 2,
+    startPage: 19,
+    endPage: 20,
+    scheduledFor: '2026-07-26T15:00:00Z',
+    formattedTime: '٥:٠٠ م',
+    presentationState: 'upcoming',
+  }
+  const thirdSession: DashboardModel['sessions'][number] = {
+    ...firstSession,
+    id: 'session-3',
+    sessionOrder: 3,
+    startPage: 21,
+    endPage: 21,
+    pageCount: 1,
+    scheduledFor: '2026-07-26T20:00:00Z',
+    formattedTime: '١٠:٠٠ م',
+    presentationState: 'upcoming',
   }
   return {
     profile: { displayName: 'مريم' },
@@ -64,7 +86,7 @@ function model(overrides: Partial<DashboardModel['assignment']> = {}): Dashboard
       percentage: 0,
       ...overrides,
     },
-    sessions: [firstSession],
+    sessions: [firstSession, secondSession, thirdSession],
     highlightedSession: firstSession,
   }
 }
@@ -87,13 +109,8 @@ describe('Dashboard', () => {
       'href',
       '/app/plan/settings',
     )
-    expect(screen.getByRole('link', { name: 'سجل القراءة' })).toHaveAttribute(
-      'href',
-      '/app/history',
-    )
-    expect(
-      screen.getAllByRole('link', { name: 'الخصوصية والبيانات' }),
-    ).toHaveLength(1)
+    expect(screen.queryByRole('link', { name: 'سجل القراءة' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'الخصوصية والبيانات' })).not.toBeInTheDocument()
     expect(
       screen.getByRole('link', { name: 'عرض تفاصيل الختمة' }),
     ).toHaveAttribute('href', '/app/history/khatmas/khatma-1')
@@ -106,11 +123,41 @@ describe('Dashboard', () => {
       'aria-valuenow',
       '0',
     )
-    expect(screen.getAllByRole('link', { name: 'ابدأ القراءة' })[0]).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'ابدأ القراءة' })).toHaveAttribute(
       'href',
       '/app/read/session-1',
     )
     expect(screen.queryByText(/إكمال الجلسة/)).not.toBeInTheDocument()
+  })
+
+  it('keeps the mobile hero compact and exposes one dominant reading action', () => {
+    const { container } = render(<Dashboard data={model()} />)
+
+    const greeting = screen.getByRole('heading', { name: 'السلام عليكم، مريم' })
+    const hero = greeting.closest('section')
+    expect(hero).toHaveClass('px-5', 'py-5')
+    expect(hero).not.toHaveClass('py-8', 'py-10')
+    expect(within(hero as HTMLElement).getByText('المنجز')).toBeInTheDocument()
+
+    const dominantActions = container.querySelectorAll('[data-dominant-action="true"]')
+    expect(dominantActions).toHaveLength(1)
+    expect(dominantActions[0]).toHaveTextContent('ابدأ القراءة')
+  })
+
+  it('keeps remaining sessions collapsed and disclosure does not mutate reading or plan state', () => {
+    const fetchSpy = vi.fn()
+    vi.stubGlobal('fetch', fetchSpy)
+    render(<Dashboard data={model()} />)
+
+    const summary = screen.getByText('عرض جميع جلسات اليوم').closest('summary')
+    const disclosure = summary?.closest('details') as HTMLDetailsElement
+    expect(disclosure).not.toHaveAttribute('open')
+    expect(screen.getByText('٢ جلسات إضافية')).toBeInTheDocument()
+
+    fireEvent.click(summary as HTMLElement)
+
+    expect(disclosure.open).toBe(true)
+    expect(fetchSpy).not.toHaveBeenCalled()
   })
 
   it('renders the active-plan completion estimate near khatma progress', () => {
@@ -158,7 +205,7 @@ describe('Dashboard', () => {
       'aria-valuenow',
       '100',
     )
-    expect(screen.getByText('اكتمل ورد هذا اليوم')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'ورد اليوم مكتمل' })).toBeInTheDocument()
   })
 
   it('renders the dedicated completed-khatma state and explicit action', () => {
@@ -192,10 +239,7 @@ describe('Dashboard', () => {
       'href',
       '/app/khatma/new',
     )
-    expect(screen.getByRole('link', { name: 'سجل القراءة' })).toHaveAttribute(
-      'href',
-      '/app/history',
-    )
+    expect(screen.queryByRole('link', { name: 'سجل القراءة' })).not.toBeInTheDocument()
     expect(
       screen.getByRole('link', { name: 'عرض تفاصيل الختمة' }),
     ).toHaveAttribute('href', '/app/history/khatmas/khatma-1')
@@ -247,7 +291,7 @@ describe('Dashboard', () => {
 
     render(<Dashboard data={data} />)
 
-    const planSummary = screen.getByText('ملخص الخطة').closest('section')
+    const planSummary = screen.getByText('تفاصيل الخطة').closest('details')
     const assignmentCard = screen.getByText('ورد اليوم').closest('section')
 
     expect(planSummary).not.toBeNull()
@@ -255,9 +299,9 @@ describe('Dashboard', () => {
     expect(within(planSummary as HTMLElement).getByText('٦ صفحات')).toBeInTheDocument()
     expect(within(planSummary as HTMLElement).getByText('٢ جلسات')).toBeInTheDocument()
     expect(assignmentCard).toHaveTextContent('٠من٥صفحات مكتملة')
-    expect(screen.getAllByText('الصفحات ١٧–١٨')).toHaveLength(2)
+    expect(screen.getAllByText('الصفحات ١٧–١٨')).toHaveLength(1)
     expect(
       screen.getAllByText(/موعد الجلسة: ٨:٠٠ ص/),
-    ).toHaveLength(2)
+    ).toHaveLength(1)
   })
 })

@@ -27,11 +27,9 @@ module.exports = {
         'warning-soft': 'rgb(var(--color-warning-soft) / <alpha-value>)',
         hero: 'rgb(var(--color-hero) / <alpha-value>)',
         'hero-muted': 'rgb(var(--color-hero-muted) / <alpha-value>)',
-        hero: 'rgb(var(--color-hero) / <alpha-value>)',
-        'hero-muted': 'rgb(var(--color-hero-muted) / <alpha-value>)',
       },
       borderRadius: {
-        card: '1.75rem',
+        card: '1.125rem',
       },
       boxShadow: {
         card: 'var(--shadow-card)',

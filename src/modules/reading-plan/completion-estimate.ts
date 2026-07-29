@@ -320,7 +320,7 @@ export function formatCompletionEstimateArabic(
     return {
       title: 'موعد الختم المتوقع',
       remainingText: null,
-      primaryText: 'أتممتِ الختمة، تقبّل الله منكِ 🌿',
+      primaryText: 'أتممتِ الختمة، تقبّل الله منكِ.',
       expectedDatePrefix: null,
       formattedExpectedDate: null,
       encouragement: null,
@@ -351,6 +351,6 @@ export function formatCompletionEstimateArabic(
         : `مع الاستمرار على ${dailyTarget} صفحات يوميًا، ${duration}`,
     expectedDatePrefix: 'موعد الختم المتوقع:',
     formattedExpectedDate,
-    encouragement: 'كل صفحة تقرّبك من الختمة 🌿',
+    encouragement: 'كل صفحة تقرّبك من الختمة.',
   }
 }

@@ -139,7 +139,7 @@ export default function OnboardingForm() {
       case 1:
         return (
           <fieldset>
-            <legend className="mb-4 text-xl font-bold text-ink">اختر من أين تبدأ</legend>
+            <legend className="mb-4 text-lg font-semibold text-ink">اختر من أين تبدأ</legend>
             <label className="field-label mb-4">
               الصفحة الابتدائية
               <input
@@ -159,7 +159,7 @@ export default function OnboardingForm() {
       case 2:
         return (
           <fieldset>
-            <legend className="mb-4 text-xl font-bold text-ink">الصفحات اليومية</legend>
+            <legend className="mb-4 text-lg font-semibold text-ink">الصفحات اليومية</legend>
             <label className="field-label mb-4">
               عدد الصفحات اليومية
               <input
@@ -179,7 +179,7 @@ export default function OnboardingForm() {
                   type="button"
                   key={choice}
                   onClick={() => handleField('dailyPages', choice)}
-                  className={`min-h-[2.75rem] rounded-2xl border px-3 py-2 text-sm font-bold transition ${values.dailyPages === choice ? 'border-primary bg-primary-soft text-primary-muted' : 'border-line bg-surface text-muted hover:border-primary/40'}`}>
+                  className={`min-h-[2.75rem] rounded-2xl border px-3 py-2 text-sm font-semibold transition ${values.dailyPages === choice ? 'border-primary bg-primary-soft text-primary-muted' : 'border-line bg-surface text-muted hover:border-primary/40'}`}>
                   {choice} صفحة
                 </button>
               ))}
@@ -202,7 +202,7 @@ export default function OnboardingForm() {
       case 3:
         return (
           <fieldset>
-            <legend className="mb-4 text-xl font-bold text-ink">عدد الجلسات اليومية</legend>
+            <legend className="mb-4 text-lg font-semibold text-ink">عدد الجلسات اليومية</legend>
             <label className="field-label mb-4">
               عدد الجلسات
               <input
@@ -225,7 +225,7 @@ export default function OnboardingForm() {
             </label>
             {errors.sessionsCount && <p id="sessions-count-error" className="status-danger text-sm">{errors.sessionsCount}</p>}
             <div className="surface-muted mt-4 space-y-3 p-4">
-              <p className="text-sm font-bold text-ink">توزيع الصفحات لكل جلسة</p>
+              <p className="text-xs font-medium text-ink">توزيع الصفحات لكل جلسة</p>
               <div className="space-y-2">
                 {distribution.map((session, index) => (
                   <div key={index} className="rounded-2xl border border-line bg-surface p-3">
@@ -240,7 +240,7 @@ export default function OnboardingForm() {
       case 4:
         return (
           <fieldset>
-            <legend className="mb-4 text-xl font-bold text-ink">أوقات الجلسات</legend>
+            <legend className="mb-4 text-lg font-semibold text-ink">أوقات الجلسات</legend>
             <div className="space-y-4">
               {Array.from({ length: values.sessionsCount }, (_, index) => (
                 <label key={index} className="field-label">
@@ -263,19 +263,19 @@ export default function OnboardingForm() {
       case 5:
         return (
           <div>
-            <h2 className="mb-4 text-xl font-bold text-ink">مراجعة الخطة</h2>
+            <h2 className="mb-4 text-lg font-semibold text-ink">مراجعة الخطة</h2>
             <dl className="grid gap-3 text-ink sm:grid-cols-2">
               <div className="surface-muted p-4">
                 <dt className="text-sm text-muted">الصفحة الابتدائية</dt>
-                <dd className="mt-1 font-bold">{values.startPage}</dd>
+                <dd className="mt-1 font-semibold">{values.startPage}</dd>
               </div>
               <div className="surface-muted p-4">
                 <dt className="text-sm text-muted">الصفحات اليومية</dt>
-                <dd className="mt-1 font-bold">{values.dailyPages}</dd>
+                <dd className="mt-1 font-semibold">{values.dailyPages}</dd>
               </div>
               <div className="surface-muted p-4">
                 <dt className="text-sm text-muted">عدد الجلسات</dt>
-                <dd className="mt-1 font-bold">{values.sessionsCount}</dd>
+                <dd className="mt-1 font-semibold">{values.sessionsCount}</dd>
               </div>
               <div className="surface-muted p-4">
                 <dt className="text-sm text-muted">أوقات الجلسات</dt>
@@ -295,11 +295,11 @@ export default function OnboardingForm() {
               </div>
               <div className="surface-muted p-4">
                 <dt className="text-sm text-muted">المنطقة الزمنية</dt>
-                <dd className="mt-1 break-all font-bold" dir="ltr">{values.timezone}</dd>
+                <dd className="mt-1 break-all font-semibold" dir="ltr">{values.timezone}</dd>
               </div>
               <div className="surface-muted p-4">
                 <dt className="text-sm text-muted">تاريخ النفاذ</dt>
-                <dd className="mt-1 font-bold">{values.effectiveFrom}</dd>
+                <dd className="mt-1 font-semibold">{values.effectiveFrom}</dd>
               </div>
             </dl>
             <div className="mt-6">
@@ -324,7 +324,7 @@ export default function OnboardingForm() {
     <form onSubmit={handleSubmit} className="surface-card mx-auto max-w-3xl p-5 sm:p-8">
       <div className="mb-6 text-center">
         <p className="eyebrow">خطوة {step} من 5</p>
-        <h2 className="mt-2 text-2xl font-bold text-ink">تفاصيل خطة وردك</h2>
+        <h2 className="mt-2 text-lg font-semibold text-ink">تفاصيل خطة وردك</h2>
         <p className="mt-1 text-muted">إعداد خطة قراءة القرآن اليومية الخاصة بك.</p>
       </div>
 
@@ -337,7 +337,7 @@ export default function OnboardingForm() {
             />
           ))}
         </div>
-        <p className="mt-3 text-sm font-bold text-muted">{stepTitles[step - 1]}</p>
+        <p className="mt-3 text-xs font-medium text-muted">{stepTitles[step - 1]}</p>
       </div>
 
       {renderStep()}

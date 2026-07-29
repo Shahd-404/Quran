@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { TriangleAlert } from 'lucide-react'
 
 type LoginResponse = {
   message?: unknown
@@ -55,10 +56,10 @@ export default function LoginPage() {
       <div className="mx-auto grid w-full max-w-4xl overflow-hidden rounded-card border border-line bg-surface shadow-lift md:grid-cols-[0.85fr_1.15fr]">
         <aside className="relative hidden overflow-hidden bg-hero p-9 text-white md:block">
           <div aria-hidden="true" className="absolute -left-16 -top-16 h-48 w-48 rounded-full border border-white/10" />
-          <p className="text-sm font-bold text-hero-muted">مرحبًا بعودتك</p>
-          <h1 className="mt-4 text-3xl font-bold leading-tight">
+          <p className="text-xs font-medium text-hero-muted">مرحبًا بعودتك</p>
+          <h2 className="mt-3 text-2xl font-semibold leading-tight">
             وردك ينتظرك بهدوء
-          </h1>
+          </h2>
           <p className="mt-4 leading-8 text-white/75">
             تابع من الصفحة التي توقفت عندها، ولن يتقدّم سجلك إلا بعد تأكيدك.
           </p>
@@ -69,7 +70,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="p-6 sm:p-9">
           <p className="eyebrow">تسجيل الدخول</p>
-          <h1 className="page-title !text-3xl">أهلًا بك في ورد</h1>
+          <h1 className="page-title">أهلًا بك في ورد</h1>
           <p className="page-description !mt-2">
             أدخل بياناتك للعودة إلى خطة القراءة.
           </p>
@@ -111,8 +112,9 @@ export default function LoginPage() {
           </div>
 
           {error ? (
-            <div id="login-error" role="alert" className="status-danger mt-5 text-sm leading-6">
-              {error}
+            <div id="login-error" role="alert" className="status-danger mt-5 flex items-start gap-2 text-sm leading-6">
+              <TriangleAlert aria-hidden="true" focusable="false" className="mt-0.5 shrink-0" size={18} strokeWidth={1.8} />
+              <span>{error}</span>
             </div>
           ) : null}
 
@@ -122,7 +124,7 @@ export default function LoginPage() {
 
           <p className="mt-5 text-center text-sm text-muted">
             لا تملك حسابًا؟{' '}
-            <a href="/register" className="font-bold text-primary-muted underline-offset-4 hover:underline">
+            <a href="/register" className="font-semibold text-primary-muted underline-offset-4 hover:underline">
               إنشاء حساب جديد
             </a>
           </p>

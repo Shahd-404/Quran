@@ -54,15 +54,15 @@ function SettingsSummary({
 }) {
   return (
     <section className="surface-card p-5">
-      <h3 className="text-lg font-bold text-ink">{title}</h3>
+      <h3 className="text-lg font-semibold text-ink">{title}</h3>
       <dl className="mt-4 space-y-4">
         <div className="flex items-center justify-between gap-4">
           <dt className="text-muted">الصفحات اليومية</dt>
-          <dd className="font-bold">{formatArabicNumber(dailyPages)} صفحات</dd>
+          <dd className="font-semibold">{formatArabicNumber(dailyPages)} صفحات</dd>
         </div>
         <div className="flex items-center justify-between gap-4">
           <dt className="text-muted">عدد الجلسات</dt>
-          <dd className="font-bold">{formatArabicNumber(sessionsCount)} جلسات</dd>
+          <dd className="font-semibold">{formatArabicNumber(sessionsCount)} جلسات</dd>
         </div>
         <div>
           <dt className="text-muted">مواعيد الجلسات</dt>
@@ -73,7 +73,7 @@ function SettingsSummary({
                 className="flex items-center justify-between rounded-xl bg-elevated px-3 py-2"
               >
                 <span>الجلسة {formatArabicNumber(index + 1)}</span>
-                <span className="font-bold" dir="ltr">
+                <span className="font-semibold" dir="ltr">
                   {time}
                 </span>
               </div>
@@ -93,7 +93,7 @@ function DistributionSummary({ sessions }: { sessions: SessionRange[] }) {
           key={session.sessionOrder}
           className="rounded-2xl border border-primary/20 bg-surface p-4"
         >
-          <p className="font-bold">
+          <p className="font-semibold">
             الجلسة {formatArabicNumber(session.sessionOrder)}
           </p>
           <p className="mt-1 text-muted">
@@ -221,7 +221,7 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
             <p className="eyebrow">
               الإعدادات الحالية ظاهرة ويمكن تعديلها
             </p>
-            <h2 className="mt-2 text-2xl font-bold">إعدادات الورد القادم</h2>
+            <h2 className="mt-2 text-lg font-semibold">إعدادات الورد القادم</h2>
 
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
               <label className="block font-semibold" htmlFor="daily-pages">
@@ -293,7 +293,7 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
             </div>
 
             <fieldset className="mt-7">
-              <legend className="font-bold">مواعيد الجلسات</legend>
+              <legend className="font-semibold">مواعيد الجلسات</legend>
               <div className="mt-3 grid gap-4 sm:grid-cols-2">
                 {values.sessionTimes.map((time, index) => (
                   <label
@@ -336,7 +336,7 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
             <p className="eyebrow">معاينة</p>
             <h2
               id="distribution-preview-title"
-              className="mt-2 text-xl font-bold"
+              className="mt-2 text-lg font-semibold"
             >
               توزيع صفحات أول ورد جديد
             </h2>
@@ -370,7 +370,7 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
         <>
           <section className="surface-muted p-6 sm:p-8">
             <p className="eyebrow">المراجعة النهائية</p>
-            <h2 className="mt-2 text-2xl font-bold">الإعدادات القديمة والجديدة</h2>
+            <h2 className="mt-2 text-lg font-semibold">الإعدادات القديمة والجديدة</h2>
             <div className="mt-6 grid gap-5 md:grid-cols-2">
               <SettingsSummary
                 title="الإعدادات الحالية"
@@ -388,7 +388,7 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
               />
             </div>
             <div className="mt-6 rounded-2xl border border-primary/20 bg-primary-soft p-5">
-              <h3 className="text-lg font-bold">التوزيع المتوقع للورد القادم</h3>
+              <h3 className="text-lg font-semibold">التوزيع المتوقع للورد القادم</h3>
               <div className="mt-4">
                 <DistributionSummary sessions={distribution} />
               </div>

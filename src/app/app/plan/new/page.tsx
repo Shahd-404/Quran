@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowRight, CircleCheck, TriangleAlert } from 'lucide-react';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -84,21 +85,24 @@ export default async function NewReadingPlanPage({
         {searchParams?.readingDataDeleted === '1' ? (
           <div
             role="status"
-            className="status-success mb-6 font-semibold"
+            className="status-success mb-4 flex items-start gap-2 font-medium"
           >
-            تم مسح بيانات القراءة بنجاح، ويمكنك الآن إنشاء خطة جديدة.
+            <CircleCheck aria-hidden="true" focusable="false" className="mt-0.5 shrink-0" size={18} strokeWidth={1.8} />
+            <span>تم مسح بيانات القراءة بنجاح، ويمكنك الآن إنشاء خطة جديدة.</span>
           </div>
         ) : null}
         {searchParams?.browserCleanup === 'failed' ? (
           <div
             role="status"
-            className="status-warning mb-6"
+            className="status-warning mb-4 flex items-start gap-2"
           >
-            تم مسح البيانات من الحساب، لكن تعذر تنظيف اشتراك الإشعارات من هذا المتصفح. لن تُرسل إليه تذكيرات من ورد.
+            <TriangleAlert aria-hidden="true" focusable="false" className="mt-0.5 shrink-0" size={18} strokeWidth={1.8} />
+            <span>تم مسح البيانات من الحساب، لكن تعذر تنظيف اشتراك الإشعارات من هذا المتصفح. لن تُرسل إليه تذكيرات من ورد.</span>
           </div>
         ) : null}
-        <header className="mb-8 text-right">
-          <a href="/app" className="text-sm font-bold text-primary-muted hover:underline">
+        <header className="mb-5 text-right">
+          <a href="/app" className="inline-flex items-center gap-2 text-sm font-medium text-primary-muted hover:underline">
+            <ArrowRight aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
             العودة إلى لوحة الورد
           </a>
           <p className="eyebrow mt-5">

@@ -74,30 +74,30 @@ export function NewKhatmaForm({
     <div className="space-y-6">
       <section className="surface-card p-6 sm:p-8">
         <p className="eyebrow">إعدادات خطتك السابقة</p>
-        <h2 className="mt-2 text-2xl font-bold">الخطة التي أكملت بها ختمتك</h2>
+        <h2 className="mt-2 text-lg font-semibold">الخطة التي أكملت بها ختمتك</h2>
         <dl className="mt-6 grid gap-4 sm:grid-cols-3">
           <div className="surface-muted p-4">
             <dt className="text-sm text-muted">الصفحات اليومية</dt>
-            <dd className="mt-2 font-bold">
+            <dd className="mt-2 font-semibold">
               {formatArabicNumber(configuration.dailyPages)} صفحات
             </dd>
           </div>
           <div className="surface-muted p-4">
             <dt className="text-sm text-muted">الجلسات اليومية</dt>
-            <dd className="mt-2 font-bold">
+            <dd className="mt-2 font-semibold">
               {formatArabicNumber(configuration.sessionsPerDay)} جلسات
             </dd>
           </div>
           <div className="surface-muted p-4">
             <dt className="text-sm text-muted">المنطقة الزمنية</dt>
-            <dd className="mt-2 break-words font-bold" dir="ltr">
+            <dd className="mt-2 break-words font-semibold" dir="ltr">
               {configuration.timezone}
             </dd>
           </div>
         </dl>
 
         <div className="mt-6">
-          <h3 className="font-bold">مواعيد الجلسات</h3>
+          <h3 className="font-semibold">مواعيد الجلسات</h3>
           <ol className="mt-3 grid gap-3 sm:grid-cols-2">
             {configuration.schedules.map((schedule) => (
               <li
@@ -107,7 +107,7 @@ export function NewKhatmaForm({
                 <span className="text-muted">
                   الجلسة {formatArabicNumber(schedule.sessionOrder)}
                 </span>
-                <span className="font-bold">
+                <span className="font-semibold">
                   {formatScheduleTime(schedule.scheduledTime)}
                 </span>
               </li>
@@ -140,7 +140,7 @@ export function NewKhatmaForm({
           onSubmit={handleSubmit}
           className="rounded-card border border-primary/25 bg-primary-soft p-6 sm:p-8"
         >
-          <h2 className="text-xl font-bold">
+          <h2 className="text-lg font-semibold">
             هل تريد بدء ختمة جديدة من الصفحة الأولى بنفس إعدادات خطتك السابقة؟
           </h2>
           <p className="mt-3 leading-7 text-muted">

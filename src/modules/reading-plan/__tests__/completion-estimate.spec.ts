@@ -60,7 +60,7 @@ describe('Quran completion estimate', () => {
         3,
         'active-plan',
       )?.primaryText,
-    ).toBe('أتممتِ الختمة، تقبّل الله منكِ 🌿')
+    ).toBe('أتممتِ الختمة، تقبّل الله منكِ.')
   })
 
   it('rounds partial final days upward', () => {
