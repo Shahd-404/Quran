@@ -20,12 +20,24 @@ const SERVICES: Record<
 
 let client: ServerClient | null = null
 
-function getEnvironment(): QuranEnvironment {
-  const environment = process.env.QF_ENV
+export function resolveQuranEnvironment(
+  environment: string | undefined,
+  vercelEnvironment: string | undefined,
+): QuranEnvironment {
   if (environment !== 'prelive' && environment !== 'production') {
     throw new QuranConfigurationError()
   }
+  if (vercelEnvironment === 'production' && environment !== 'production') {
+    throw new QuranConfigurationError()
+  }
   return environment
+}
+
+function getEnvironment(): QuranEnvironment {
+  return resolveQuranEnvironment(
+    process.env.QF_ENV,
+    process.env.VERCEL_ENV,
+  )
 }
 
 export function getQuranFoundationClient(): ServerClient {
