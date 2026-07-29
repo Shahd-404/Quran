@@ -77,17 +77,18 @@ function NavigationLink({
 
 export function ReaderView({
   session,
-  page,
+  pages,
+  currentPageNumber,
   saveWarning,
 }: {
   session: ReaderSession
-  page: QuranPage
+  pages: QuranPage[]
+  currentPageNumber: number
   saveWarning: string | null
 }) {
-  const currentPage = page.pageNumber
+  const currentPage = currentPageNumber
   const pagePosition = currentPage - session.startPage + 1
   const sessionPageCount = session.endPage - session.startPage + 1
-  const verseGroups = groupVerses(page.verses)
 
   return (
     <main className="page-shell !py-5 sm:!py-8">
@@ -133,45 +134,72 @@ export function ReaderView({
           </div>
         ) : null}
 
-        <article className="surface-card mt-5 px-5 py-8 sm:px-10 sm:py-12">
-          {verseGroups.map((group) => (
-            <section
-              key={`${currentPage}-${group.chapterId}`}
-              className="notranslate [&+&]:mt-10"
-              translate="no"
-              aria-label={
-                group.chapterNameArabic
-                  ? `سورة ${group.chapterNameArabic}`
-                  : `السورة ${group.chapterId}`
-              }
-            >
-              <h2 className="mx-auto mb-7 max-w-xl rounded-2xl border border-accent/30 bg-accent-soft px-4 py-3 text-center text-xl font-bold text-ink">
-                سورة{' '}
-                {group.chapterNameArabic ??
-                  formatArabicNumber(group.chapterId)}
-              </h2>
-              <p
-                className="text-center text-[1.7rem] leading-[2.65] text-ink sm:text-[2rem] sm:leading-[2.8]"
-                style={{
-                  fontFamily:
-                    "'UthmanicHafs', 'Traditional Arabic', 'Amiri', serif",
-                }}
+        <div
+          className="mt-5 space-y-5"
+          aria-label="صفحات جلسة الورد"
+        >
+          {pages.map((page) => {
+            const verseGroups = groupVerses(page.verses)
+            const isCurrentPage = page.pageNumber === currentPage
+
+            return (
+              <article
+                id={`quran-page-${page.pageNumber}`}
+                key={page.pageNumber}
+                data-quran-page={page.pageNumber}
+                data-current-page={isCurrentPage ? 'true' : undefined}
+                className={`surface-card px-5 py-8 sm:px-10 sm:py-12 ${
+                  isCurrentPage ? 'ring-2 ring-primary/25' : ''
+                }`}
+                aria-labelledby={`quran-page-title-${page.pageNumber}`}
               >
-                {group.verses.map((verse) => (
-                  <span key={verse.verseKey}>
-                    <span>{verse.uthmaniText}</span>{' '}
-                    <span
-                      className="whitespace-nowrap text-[0.72em] font-bold text-primary-muted"
-                      aria-label={`الآية ${verse.verseNumber}`}
+                <h2
+                  id={`quran-page-title-${page.pageNumber}`}
+                  className="mb-7 border-b border-line/70 pb-4 text-center text-sm font-semibold text-primary-muted"
+                >
+                  صفحة {formatArabicNumber(page.pageNumber)}
+                </h2>
+                {verseGroups.map((group) => (
+                  <section
+                    key={`${page.pageNumber}-${group.chapterId}`}
+                    className="notranslate [&+&]:mt-10"
+                    translate="no"
+                    aria-label={
+                      group.chapterNameArabic
+                        ? `سورة ${group.chapterNameArabic}`
+                        : `السورة ${group.chapterId}`
+                    }
+                  >
+                    <h3 className="mx-auto mb-7 max-w-xl rounded-2xl border border-accent/30 bg-accent-soft px-4 py-3 text-center text-xl font-bold text-ink">
+                      سورة{' '}
+                      {group.chapterNameArabic ??
+                        formatArabicNumber(group.chapterId)}
+                    </h3>
+                    <p
+                      className="text-center text-[1.7rem] leading-[2.65] text-ink sm:text-[2rem] sm:leading-[2.8]"
+                      style={{
+                        fontFamily:
+                          "'UthmanicHafs', 'Traditional Arabic', 'Amiri', serif",
+                      }}
                     >
-                      ﴿{formatArabicNumber(verse.verseNumber)}﴾
-                    </span>{' '}
-                  </span>
+                      {group.verses.map((verse) => (
+                        <span key={verse.verseKey}>
+                          <span>{verse.uthmaniText}</span>{' '}
+                          <span
+                            className="whitespace-nowrap text-[0.72em] font-bold text-primary-muted"
+                            aria-label={`الآية ${verse.verseNumber}`}
+                          >
+                            ﴿{formatArabicNumber(verse.verseNumber)}﴾
+                          </span>{' '}
+                        </span>
+                      ))}
+                    </p>
+                  </section>
                 ))}
-              </p>
-            </section>
-          ))}
-        </article>
+              </article>
+            )
+          })}
+        </div>
 
         <nav
           aria-label="التنقل بين صفحات جلسة الورد"

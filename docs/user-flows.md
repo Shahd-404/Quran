@@ -191,7 +191,13 @@ For each flow we document: Preconditions, User actions, System responses, Succes
 
 - Preconditions: Reader fails to load assigned page(s).
 - User actions: Tap retry, or open network status.
-- System responses: Show error state and explanatory message; provide retry; if offline, show cached pages if available and a clear offline indicator; if page permanently missing from provider, show fallback message and contact support.
+- System responses: Load the stored start and end pages as one inclusive,
+  ascending range. If any required page fails, show one safe error state with a
+  correlation ID and provide retry; render no incomplete range as successful
+  and do not record an opened position. Retry repeats only the complete content
+  loading operation. If offline, show a clear offline indicator; if a page is
+  permanently missing from the provider, show a fallback message and contact
+  support.
 - Success: User recovers by retrying or using cached content.
 - Quran text is not claimed as offline content. A connectivity failure displays
   a safe Arabic error and retry action without recording position or completion.

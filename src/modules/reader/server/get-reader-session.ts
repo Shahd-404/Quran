@@ -42,18 +42,32 @@ function isNullableString(value: unknown): value is string | null {
   return value === null || typeof value === 'string'
 }
 
+function isQuranPage(value: unknown): value is number {
+  return (
+    typeof value === 'number' &&
+    Number.isInteger(value) &&
+    value >= 1 &&
+    value <= 604
+  )
+}
+
 function parseSession(value: unknown): SessionRow | null {
   if (
     !isRecord(value) ||
     typeof value.id !== 'string' ||
     typeof value.daily_assignment_id !== 'string' ||
     typeof value.session_order !== 'number' ||
-    typeof value.start_page !== 'number' ||
-    typeof value.end_page !== 'number' ||
+    !Number.isInteger(value.session_order) ||
+    value.session_order < 1 ||
+    !isQuranPage(value.start_page) ||
+    !isQuranPage(value.end_page) ||
+    value.start_page > value.end_page ||
     !['pending', 'in_progress', 'completed'].includes(String(value.status)) ||
     !(
       value.last_opened_page === null ||
-      typeof value.last_opened_page === 'number'
+      (isQuranPage(value.last_opened_page) &&
+        value.last_opened_page >= value.start_page &&
+        value.last_opened_page <= value.end_page)
     ) ||
     !isNullableString(value.first_opened_at) ||
     !isNullableString(value.last_opened_at)
@@ -80,7 +94,7 @@ function parsePlan(value: unknown): PlanRow | null {
   if (
     !isRecord(value) ||
     typeof value.id !== 'string' ||
-    typeof value.current_unread_page !== 'number'
+    !isQuranPage(value.current_unread_page)
   ) {
     return null
   }

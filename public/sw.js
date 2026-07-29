@@ -1,4 +1,4 @@
-const STATIC_CACHE = 'wird-static-v2'
+const STATIC_CACHE = 'wird-static-v3'
 const OFFLINE_URL = '/offline.html'
 const WIRD_CACHE_PREFIX = 'wird-'
 const STATIC_ASSETS = [
@@ -11,6 +11,7 @@ const STATIC_ASSETS = [
 const DEFAULT_URL = '/app'
 const SESSION_URL = /^\/app\/read\/[0-9a-f]{8}-[0-9a-f-]{27}$/i
 const AUTHENTICATED_PATH = /^\/app(?:\/|$)/
+const API_PATH = /^\/api(?:\/|$)/
 
 function safeNotificationPath(value) {
   if (value === DEFAULT_URL) return DEFAULT_URL
@@ -19,7 +20,7 @@ function safeNotificationPath(value) {
 
 function isSafeStaticRequest(request, url) {
   if (request.method !== 'GET' || url.origin !== self.location.origin) return false
-  if (url.pathname.startsWith('/api/')) return false
+  if (API_PATH.test(url.pathname)) return false
   return url.pathname.startsWith('/_next/static/')
     || url.pathname.startsWith('/icons/')
     || url.pathname === '/manifest.webmanifest'
@@ -48,6 +49,7 @@ self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
   if (request.method !== 'GET' || url.origin !== self.location.origin) return
+  if (API_PATH.test(url.pathname)) return
   if (request.mode === 'navigate') {
     event.respondWith(fetch(request).catch(async () => {
       const cached = await caches.match(OFFLINE_URL)

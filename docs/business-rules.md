@@ -107,6 +107,14 @@ Quran page boundary rules
   - Reason: Fixed page boundary for MVP.
   - Edge: Attempts to set start page <1 or >604 must be rejected.
 
+- BR-PAGE-002: A reading session's `start_page` and `end_page` form an
+  inclusive, ascending range. Every page in that range must load before the
+  reader is successful or the session may be presented as `in_progress`.
+  - Example: `start_page = 80` and `end_page = 82` loads 80, 81, and 82 in
+    that order.
+  - Edge: Invalid, reversed, duplicated, missing, or out-of-order pages produce
+    a safe all-or-nothing loading error and never advance reading progress.
+
 Khatma rules
 
 - BR-KHATMA-001: Completing page 604 completes the current khatma cycle.

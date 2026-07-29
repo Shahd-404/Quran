@@ -1,7 +1,10 @@
 import { ServerClient } from '@quranjs/api/server'
 import { QuranChapter } from '../types'
 import { getQuranFoundationClient } from './client'
-import { QuranMalformedResponseError, QuranProviderError } from './errors'
+import {
+  normalizeQuranLoadError,
+  QuranMalformedResponseError,
+} from './errors'
 
 let chaptersPromise: Promise<Map<number, QuranChapter>> | null = null
 
@@ -11,8 +14,8 @@ export async function loadQuranChapters(
   let chapters
   try {
     chapters = await client.content.v4.chapters.list({ language: 'ar' })
-  } catch {
-    throw new QuranProviderError()
+  } catch (error) {
+    throw normalizeQuranLoadError(error)
   }
 
   if (!Array.isArray(chapters) || chapters.length === 0) {

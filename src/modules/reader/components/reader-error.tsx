@@ -6,10 +6,12 @@ import { ReaderSession } from '../types'
 import { OfflineAwareReaderMessage } from '@/modules/offline/components/offline-aware-reader-message'
 
 export function ReaderError({
+  correlationId,
   message,
   session,
   pageNumber,
 }: {
+  correlationId?: string
   message: string
   session?: ReaderSession
   pageNumber?: number
@@ -37,6 +39,12 @@ export function ReaderError({
           </p>
         ) : null}
         <OfflineAwareReaderMessage fallback={message} />
+        {correlationId ? (
+          <p className="mt-3 font-mono text-xs text-muted" dir="ltr">
+            <span className="font-sans">رقم التتبع: </span>
+            {correlationId}
+          </p>
+        ) : null}
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
           <Link
             href={retryHref}
