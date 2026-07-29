@@ -64,6 +64,25 @@ describe('OnboardingForm', () => {
     expect(await screen.findByText(/عدد الصفحات اليومية يجب أن يكون بين 1 و 604/)).toBeInTheDocument()
   })
 
+  it('updates the live completion estimate without creating a plan', async () => {
+    render(<OnboardingForm />)
+    await goToStep2('1')
+
+    const estimate = screen.getByRole('region', {
+      name: 'موعد الختم المتوقع',
+    })
+    expect(estimate).toHaveAttribute('aria-live', 'polite')
+    expect(estimate).toHaveTextContent('خلال ٦٠٤ يومًا')
+
+    fireEvent.change(screen.getByLabelText(/عدد الصفحات اليومية/), {
+      target: { value: '3' },
+    })
+
+    expect(estimate).toHaveTextContent('خلال ٢٠٢ يومًا')
+    expect(estimate.querySelector('time')).not.toBeNull()
+    expect(global.fetch).not.toHaveBeenCalled()
+  })
+
   it('shows error when sessions exceed daily pages', async () => {
     render(<OnboardingForm />)
     await goToStep3('1', '2')

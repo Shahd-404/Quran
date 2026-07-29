@@ -42,6 +42,7 @@ function model(overrides: Partial<DashboardModel['assignment']> = {}): Dashboard
       dailyPageTarget: 5,
       sessionsPerDay: 3,
       timezone: 'Africa/Cairo',
+      effectiveFrom: '2026-07-26',
     },
     khatma: {
       id: 'khatma-1',
@@ -116,6 +117,18 @@ describe('Dashboard', () => {
       '/app/read/session-1',
     )
     expect(screen.queryByText(/إكمال الجلسة/)).not.toBeInTheDocument()
+  })
+
+  it('renders the active-plan completion estimate near khatma progress', () => {
+    render(<Dashboard data={model()} />)
+
+    expect(
+      screen.getByRole('heading', { name: 'موعد الختم المتوقع' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('باقي لكِ ٥٨٨ صفحة.')).toBeInTheDocument()
+    expect(screen.getByText(/خلال ١١٨ يومًا/)).toBeInTheDocument()
+    expect(screen.getByText(/موعد الختم المتوقع:/).querySelector('time'))
+      .toHaveAttribute('datetime', '2026-11-20')
   })
 
   it('renders partial progress and the calm carried-over notice', () => {
@@ -195,6 +208,7 @@ describe('Dashboard', () => {
             id: 'plan-2',
             effectiveFrom: '2026-07-28',
             formattedEffectiveDate: 'الثلاثاء، ٢٨ يوليو ٢٠٢٦',
+            currentUnreadPage: 1,
             dailyPageTarget: 5,
             sessionsPerDay: 2,
             timezone: 'Africa/Cairo',

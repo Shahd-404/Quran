@@ -76,6 +76,8 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 - Explicit session completion with confirmation and timestamp.
 - Persistent current unread page and khatma progress.
 - Basic dashboard showing today’s progress and sessions.
+- A derived, motivational khatma completion estimate based on the next unread
+  page, daily page target, effective date, and saved plan timezone.
 - Read-only Arabic reading history with completed-session timelines and current
   and completed khatma archives.
 - Opt-in Web Push reminders for scheduled reading sessions on each subscribed device.
@@ -91,6 +93,9 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 - A session becomes `in_progress` when opened; only explicit user confirmation marks it `completed`.
 - Completion stores a timestamp (presentation uses user timezone) and advances the current unread page only for explicitly completed pages.
 - Completing page 604 completes the khatma and records start and completion dates.
+- Plan creation, plan settings, and the active-plan Dashboard show an
+  informational expected completion date. The estimate is never persisted and
+  never changes assignments, sessions, or reading progress.
 - `reading_progress_events` is the authoritative append-only source for reading
   history. History pages never regenerate events or infer completion from mutable
   session state alone.

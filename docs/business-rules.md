@@ -2,7 +2,7 @@
 
 This document lists stable, testable business rules grouped by domain. Each rule includes an ID, statement, reason/intent, examples, and relevant edge cases.
 
-Section keys: BR-USER-*, BR-PLAN-*, BR-SCHEDULE-*, BR-DISTRIBUTION-*, BR-DAILY-*, BR-SESSION-*, BR-COMPLETE-*, BR-MISSED-*, BR-PAGE-*, BR-KHATMA-*, BR-TIME-*, BR-NOTIF-*, BR-EDIT-*, BR-INTEGRITY-*.
+Section keys: BR-USER-*, BR-PLAN-*, BR-SCHEDULE-*, BR-DISTRIBUTION-*, BR-DAILY-*, BR-SESSION-*, BR-COMPLETE-*, BR-MISSED-*, BR-PAGE-*, BR-KHATMA-*, BR-ESTIMATE-*, BR-TIME-*, BR-NOTIF-*, BR-EDIT-*, BR-INTEGRITY-*.
 
 User and account rules
 
@@ -129,6 +129,24 @@ Khatma rules
 
 - BR-KHATMA-007: A new khatma may start today or on a future date in the saved plan timezone. Before a future effective date, the dashboard shows a calm scheduled-start state and creates no daily assignment.
   - Reason: Date boundaries follow the saved reading schedule rather than the device timezone.
+
+Completion estimate rules
+
+- BR-ESTIMATE-001: An active khatma's remaining page count is derived
+  inclusively from its next unread page: `604 - current_unread_page + 1`.
+  A completed khatma has zero remaining pages even though the bounded database
+  sentinel remains at page 604.
+  - Reason: Page 604 remains unread while an active plan points to it, and is
+    complete only when the explicit plan/khatma status records completion.
+
+- BR-ESTIMATE-002: Expected reading days equal the ceiling of remaining pages
+  divided by the valid daily page target. The first reading date is day one, so
+  the expected date adds `expected_reading_days - 1` calendar days.
+
+- BR-ESTIMATE-003: The first reading date is the plan effective date when it is
+  in the future; otherwise it is today in the saved plan timezone. The estimate
+  is derived display information only and must not be persisted or mutate
+  assignments, sessions, progress, or completion state.
 
 Timezone rules
 

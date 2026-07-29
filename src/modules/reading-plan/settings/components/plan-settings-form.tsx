@@ -3,6 +3,7 @@
 import React, { FormEvent, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { formatArabicNumber } from '@/modules/dashboard/formatting'
+import { CompletionEstimateCard } from '@/modules/reading-plan/components/completion-estimate-card'
 import { distributePages } from '@/modules/reading-plan/engine/distribute-pages'
 import { SessionRange } from '@/modules/reading-plan/engine/types'
 import { defaultSessionTimes } from '@/modules/reading-plan/onboarding/labels'
@@ -275,6 +276,21 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
               </p>
             ) : null}
 
+            <div className="mt-6">
+              <CompletionEstimateCard
+                currentUnreadPage={current.currentUnreadPage}
+                pagesPerDay={values.dailyPages}
+                timezone={current.timezone}
+                effectiveFrom={current.effectiveFrom}
+                variant="active-plan"
+                live
+                compact
+              />
+              <p className="mt-3 text-sm leading-7 text-stone-600">
+                تغيير عدد الصفحات سيغيّر موعد الختم المتوقع للأيام القادمة فقط.
+              </p>
+            </div>
+
             <fieldset className="mt-7">
               <legend className="font-bold">مواعيد الجلسات</legend>
               <div className="mt-3 grid gap-4 sm:grid-cols-2">
@@ -375,6 +391,16 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
               <div className="mt-4">
                 <DistributionSummary sessions={distribution} />
               </div>
+            </div>
+            <div className="mt-6">
+              <CompletionEstimateCard
+                currentUnreadPage={current.currentUnreadPage}
+                pagesPerDay={values.dailyPages}
+                timezone={current.timezone}
+                effectiveFrom={current.effectiveFrom}
+                variant="active-plan"
+                compact
+              />
             </div>
           </section>
 

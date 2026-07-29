@@ -2,9 +2,10 @@
 
 import React, { useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { CompletionEstimateCard } from '@/modules/reading-plan/components/completion-estimate-card'
 import { distributePages } from '@/modules/reading-plan/engine/distribute-pages'
 import { buttonLabels, defaultDailyPageChoices, defaultSessionTimes, stepTitles } from './labels'
-import { formatEstimateDays, getLocalEffectiveDate, validateDailyPages, validateSessionTimes, validateSessionsCount, validateStartPage } from './schema'
+import { getLocalEffectiveDate, validateDailyPages, validateSessionTimes, validateSessionsCount, validateStartPage } from './schema'
 
 const initialValues = {
   startPage: 1,
@@ -184,7 +185,17 @@ export default function OnboardingForm() {
               ))}
             </div>
             {errors.dailyPages && <p id="daily-pages-error" className="text-red-600 text-sm mt-3">{errors.dailyPages}</p>}
-            <p className="mt-4 text-slate-600">{formatEstimateDays(values.startPage, values.dailyPages)}</p>
+            <div className="mt-5">
+              <CompletionEstimateCard
+                currentUnreadPage={values.startPage}
+                pagesPerDay={values.dailyPages}
+                timezone={values.timezone}
+                effectiveFrom={values.effectiveFrom}
+                variant="new-plan"
+                live
+                compact
+              />
+            </div>
           </fieldset>
         )
       case 3:
@@ -290,6 +301,16 @@ export default function OnboardingForm() {
                 <dd>{values.effectiveFrom}</dd>
               </div>
             </dl>
+            <div className="mt-6">
+              <CompletionEstimateCard
+                currentUnreadPage={values.startPage}
+                pagesPerDay={values.dailyPages}
+                timezone={values.timezone}
+                effectiveFrom={values.effectiveFrom}
+                variant="new-plan"
+                compact
+              />
+            </div>
           </div>
         )
       default:

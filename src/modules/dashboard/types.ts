@@ -31,6 +31,7 @@ export type DashboardModel = {
     dailyPageTarget: number
     sessionsPerDay: number
     timezone: string
+    effectiveFrom: string
   }
   khatma: {
     id: string
@@ -83,6 +84,7 @@ export type FuturePlanDashboardModel = {
     id: string
     effectiveFrom: string
     formattedEffectiveDate: string
+    currentUnreadPage: number
     dailyPageTarget: number
     sessionsPerDay: number
     timezone: string

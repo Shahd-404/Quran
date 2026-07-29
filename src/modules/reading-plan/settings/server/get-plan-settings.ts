@@ -10,6 +10,7 @@ type PlanRow = {
   daily_pages: number
   sessions_per_day: number
   timezone: string
+  effective_from: string
 }
 
 type ScheduleRow = {
@@ -28,7 +29,8 @@ function parsePlan(value: unknown): PlanRow | null {
     !Number.isInteger(value.current_unread_page) ||
     !Number.isInteger(value.daily_pages) ||
     !Number.isInteger(value.sessions_per_day) ||
-    typeof value.timezone !== 'string'
+    typeof value.timezone !== 'string' ||
+    typeof value.effective_from !== 'string'
   ) {
     return null
   }
@@ -69,7 +71,9 @@ export async function getPlanSettings(
 
   const planResult = await client
     .from('reading_plans')
-    .select('id,current_unread_page,daily_pages,sessions_per_day,timezone')
+    .select(
+      'id,current_unread_page,daily_pages,sessions_per_day,timezone,effective_from',
+    )
     .eq('user_id', user.id)
     .eq('status', 'active')
     .limit(1)
@@ -99,6 +103,7 @@ export async function getPlanSettings(
       dailyPages: plan.daily_pages,
       sessionsPerDay: plan.sessions_per_day,
       timezone: plan.timezone,
+      effectiveFrom: plan.effective_from,
       schedules,
     },
   }

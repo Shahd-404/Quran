@@ -6,6 +6,7 @@ import { DailyProgressCard } from './daily-progress-card'
 import { KhatmaProgressCard } from './khatma-progress-card'
 import { SessionCard } from './session-card'
 import { NotificationSettingsCard } from '@/modules/notifications/components/notification-settings-card'
+import { CompletionEstimateCard } from '@/modules/reading-plan/components/completion-estimate-card'
 
 export function Dashboard({
   data,
@@ -135,6 +136,13 @@ export function Dashboard({
             <KhatmaProgressCard
               khatma={data.khatma}
               currentUnreadPage={data.plan.currentUnreadPage}
+            />
+            <CompletionEstimateCard
+              currentUnreadPage={data.plan.currentUnreadPage}
+              pagesPerDay={data.plan.dailyPageTarget}
+              timezone={data.plan.timezone}
+              effectiveFrom={data.plan.effectiveFrom}
+              variant="active-plan"
             />
 
             <section className="rounded-3xl border border-stone-200/80 bg-white p-5 shadow-[0_8px_30px_rgba(28,25,23,0.05)] sm:p-6">

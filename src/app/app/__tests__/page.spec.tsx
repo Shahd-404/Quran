@@ -78,6 +78,7 @@ describe('AppPage', () => {
           id: 'plan-2',
           effectiveFrom: '2026-07-28',
           formattedEffectiveDate: 'الثلاثاء، ٢٨ يوليو ٢٠٢٦',
+          currentUnreadPage: 1,
           dailyPageTarget: 5,
           sessionsPerDay: 2,
           timezone: 'Africa/Cairo',

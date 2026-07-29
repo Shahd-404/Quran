@@ -84,9 +84,3 @@ export function getLocalEffectiveDate() {
   return `${year}-${month}-${day}`
 }
 
-export function formatEstimateDays(startPage: number, dailyPages: number) {
-  const remaining = MAX_PAGE - startPage + 1
-  if (dailyPages <= 0) return 'حوالي 0 يوم'
-  const days = Math.ceil(remaining / dailyPages)
-  return `حوالي ${days} يوم`
-}

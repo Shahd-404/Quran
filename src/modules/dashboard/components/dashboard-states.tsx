@@ -5,6 +5,7 @@ import {
   FuturePlanDashboardModel,
 } from '../types'
 import { formatArabicNumber } from '../formatting'
+import { CompletionEstimateCard } from '@/modules/reading-plan/components/completion-estimate-card'
 
 function StateHeader({ displayName }: { displayName: string | null }) {
   return (
@@ -59,6 +60,9 @@ export function CompletedKhatmaState({
             <p className="mt-4 max-w-2xl leading-8 text-emerald-50/90">
               تقبّل الله قراءتك، وجعل القرآن نورًا لقلبك. لن تبدأ دورة جديدة إلا
               عندما تختار ذلك صراحة.
+            </p>
+            <p className="mt-3 font-semibold text-emerald-100">
+              أتممتِ الختمة، تقبّل الله منكِ 🌿
             </p>
           </div>
 
@@ -140,6 +144,16 @@ export function FuturePlanState({ data }: { data: FuturePlanDashboardModel }) {
               </dd>
             </div>
           </dl>
+          <div className="mx-auto mt-6 max-w-lg">
+            <CompletionEstimateCard
+              currentUnreadPage={data.plan.currentUnreadPage}
+              pagesPerDay={data.plan.dailyPageTarget}
+              timezone={data.plan.timezone}
+              effectiveFrom={data.plan.effectiveFrom}
+              variant="active-plan"
+              compact
+            />
+          </div>
         </section>
       </div>
     </div>

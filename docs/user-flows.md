@@ -29,7 +29,9 @@ For each flow we document: Preconditions, User actions, System responses, Succes
 
 - Preconditions: Authenticated user, no active plan.
 - User actions: Open `Create Plan`, enter starting page (1–604), daily pages (>=1), sessions per day (1–6), set distinct scheduled times, review detected timezone, tap `Review`.
-- System responses: Validate inputs, show deterministic session allocation preview, allow edits.
+- System responses: Validate inputs, show deterministic session allocation and
+  a live, non-persisted expected khatma date in the detected plan timezone, and
+  allow edits.
 - Success outcome: User confirms plan; system saves active plan and creates today's daily assignment.
 - Errors/edge: Invalid page number, sessions > daily pages (prevent), duplicate times (prevent), missing times (prevent).
 
@@ -45,7 +47,10 @@ For each flow we document: Preconditions, User actions, System responses, Succes
 
 - Preconditions: Authenticated user with active plan.
 - User actions: Open app or dashboard.
-- System responses: Display today's date, total assigned pages, completed count, progress %, list of sessions with scheduled times and states, current unread page, khatma progress.
+- System responses: Display today's date, total assigned pages, completed count,
+  progress %, list of sessions with scheduled times and states, current unread
+  page, khatma progress, and a motivational expected completion date derived
+  from the saved plan target and timezone.
 - Success: User sees clear action to begin next session.
 - Edge: If offline, show cached state and indicate offline; if plan paused, show paused state.
 - Offline navigation never replays cached authenticated Dashboard HTML; it shows
@@ -123,7 +128,11 @@ For each flow we document: Preconditions, User actions, System responses, Succes
 
 - Preconditions: Active plan exists.
 - User actions: Choose the visible `إعدادات الخطة` action from the active-plan summary, open `/app/plan/settings`, change daily pages, session count, or session times, preview the new page distribution, review old and new settings, and confirm with `حفظ تعديلات الخطة`.
-- System responses: Atomically update only the active plan configuration and schedule. Preserve all previously created assignments and sessions, including their page ranges, times, and statuses. Apply the new values to the first assignment generated after the save.
+- System responses: Preview the revised expected khatma date immediately without
+  saving, then atomically update only the active plan configuration and
+  schedule after confirmation. Preserve all previously created assignments and
+  sessions, including their page ranges, times, and statuses. Apply the new
+  values to the first assignment generated after the save.
 - Success: Return to `/app`, show `تم حفظ تعديلات الخطة`, and display the updated plan summary while the current assignment cards retain their original page ranges and scheduled timestamps.
 - Edge: The settings flow cannot change unread page, completed progress, active khatma, existing assignments, or existing sessions. Changing the starting page or resetting progress requires a separate warned operation.
 

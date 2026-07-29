@@ -225,6 +225,7 @@ export async function getDashboardData(
               plan.effective_from,
               plan.timezone,
             ),
+            currentUnreadPage: plan.current_unread_page,
             dailyPageTarget: plan.daily_pages,
             sessionsPerDay: plan.sessions_per_day,
             timezone: plan.timezone,
@@ -315,6 +316,7 @@ export async function getDashboardData(
           dailyPageTarget: plan.daily_pages,
           sessionsPerDay: plan.sessions_per_day,
           timezone: plan.timezone,
+          effectiveFrom: plan.effective_from,
         },
         khatma: {
           id: khatma.id,
