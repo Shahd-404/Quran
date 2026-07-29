@@ -22,6 +22,11 @@ Vercel Preview and Production:
 - `QF_CLIENT_ID` (server-only)
 - `QF_CLIENT_SECRET` (server-only)
 - `QF_ENV` (`prelive` for staging; `production` only with approved credentials)
+
+Use separate Vercel targets for `QF_ENV`: `prelive` for Preview and
+`production` for Production. The server rejects `QF_ENV=prelive` when
+`VERCEL_ENV=production` so a live reader cannot silently use the limited
+prelive Quran dataset.
 - `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
 
 The Next.js runtime does not use `SUPABASE_SERVICE_ROLE_KEY`; do not configure
