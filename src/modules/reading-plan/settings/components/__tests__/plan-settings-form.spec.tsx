@@ -16,6 +16,7 @@ const current = {
   dailyPages: 4,
   sessionsPerDay: 2,
   timezone: 'Africa/Cairo',
+  effectiveFrom: '2026-07-26',
   schedules: [
     { sessionOrder: 1, scheduledTime: '08:00' },
     { sessionOrder: 2, scheduledTime: '18:00' },
@@ -157,6 +158,25 @@ describe('PlanSettingsForm', () => {
     expect(
       screen.getByRole('button', { name: 'حفظ تعديلات الخطة' }),
     ).toBeInTheDocument()
+  })
+
+  it('updates the completion estimate before saving without a mutation', () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    render(<PlanSettingsForm current={current} />)
+
+    expect(screen.getByText(/خلال ١٤١ يومًا/)).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('عدد صفحات الورد اليومية'), {
+      target: { value: '6' },
+    })
+
+    expect(screen.getByText(/خلال ٩٤ يومًا/)).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'تغيير عدد الصفحات سيغيّر موعد الختم المتوقع للأيام القادمة فقط.',
+      ),
+    ).toBeInTheDocument()
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 
   it('saves only editable configuration and redirects with success feedback', async () => {

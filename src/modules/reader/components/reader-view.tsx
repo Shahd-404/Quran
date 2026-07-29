@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { formatArabicNumber } from '@/modules/dashboard/formatting'
 import { QuranPage, QuranVerse } from '@/modules/quran/types'
 import { CompletionAction } from '@/modules/session-completion/components/completion-action'
@@ -47,17 +48,17 @@ function NavigationLink({
   href: string
 }) {
   const label = direction === 'previous' ? 'الصفحة السابقة' : 'الصفحة التالية'
-  const arrow = direction === 'previous' ? '→' : '←'
+  const DirectionIcon = direction === 'previous' ? ArrowRight : ArrowLeft
   const classes =
-    'inline-flex min-h-[3rem] items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold transition sm:text-base'
+    'inline-flex min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition'
 
   if (disabled) {
     return (
       <span
         aria-disabled="true"
-        className={`${classes} cursor-not-allowed bg-stone-100 text-stone-400`}
+        className={`${classes} cursor-not-allowed bg-elevated text-muted/50`}
       >
-        <span aria-hidden="true">{arrow}</span>
+        <DirectionIcon aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
         {label}
       </span>
     )
@@ -66,9 +67,9 @@ function NavigationLink({
   return (
     <Link
       href={href}
-      className={`${classes} bg-emerald-900 text-white hover:bg-emerald-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800`}
+      className={`${classes} bg-primary text-white hover:bg-primary-strong`}
     >
-      <span aria-hidden="true">{arrow}</span>
+      <DirectionIcon aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
       {label}
     </Link>
   )
@@ -89,35 +90,35 @@ export function ReaderView({
   const verseGroups = groupVerses(page.verses)
 
   return (
-    <div className="-m-4 min-h-screen bg-[#f7f6f2] text-stone-900">
+    <main className="page-shell !py-5 sm:!py-8">
       <div className="mx-auto w-full max-w-4xl px-4 py-5 sm:px-6 sm:py-8">
-        <header className="rounded-3xl border border-stone-200 bg-white px-4 py-4 shadow-sm sm:px-6">
+        <header className="surface-card px-4 py-4 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <Link
               href="/app"
-              className="inline-flex min-h-[2.75rem] items-center gap-2 rounded-2xl bg-stone-100 px-4 py-2 text-sm font-bold text-stone-700 hover:bg-stone-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+              className="btn-secondary min-h-[2.75rem] px-4 py-2 text-sm"
             >
-              <span aria-hidden="true">→</span>
+              <ArrowRight aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
               العودة للوحة الورد
             </Link>
             <div className="text-left">
-              <p className="text-sm font-semibold text-emerald-800">
+              <p className="text-xs font-medium text-primary-muted">
                 جلسة الورد {formatArabicNumber(session.sessionOrder)}
               </p>
-              <p className="mt-1 font-bold">
+              <p className="mt-1 font-semibold">
                 الصفحات {formatArabicNumber(session.startPage)}–
                 {formatArabicNumber(session.endPage)}
               </p>
             </div>
           </div>
-          <div className="mt-4 flex items-end justify-between gap-4 border-t border-stone-100 pt-4">
+          <div className="mt-4 flex items-end justify-between gap-4 border-t border-line/70 pt-4">
             <div>
-              <p className="text-sm text-stone-500">الصفحة الحالية</p>
+              <p className="text-sm text-muted">الصفحة الحالية</p>
               <h1 className="mt-1 text-3xl font-bold">
                 {formatArabicNumber(currentPage)}
               </h1>
             </div>
-            <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-bold text-emerald-800">
+            <span className="rounded-full bg-primary-soft px-3 py-1.5 text-xs font-medium text-primary-muted">
               {STATUS_LABELS[session.status]}
             </span>
           </div>
@@ -126,13 +127,13 @@ export function ReaderView({
         {saveWarning ? (
           <div
             role="status"
-            className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900"
+            className="status-warning mt-4 text-sm leading-6"
           >
             {saveWarning}
           </div>
         ) : null}
 
-        <article className="mt-5 rounded-[2rem] border border-stone-200 bg-[#fffefb] px-5 py-8 shadow-[0_12px_40px_rgba(28,25,23,0.06)] sm:px-10 sm:py-12">
+        <article className="surface-card mt-5 px-5 py-8 sm:px-10 sm:py-12">
           {verseGroups.map((group) => (
             <section
               key={`${currentPage}-${group.chapterId}`}
@@ -144,13 +145,13 @@ export function ReaderView({
                   : `السورة ${group.chapterId}`
               }
             >
-              <h2 className="mx-auto mb-7 max-w-xl rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-center text-xl font-bold text-emerald-950">
+              <h2 className="mx-auto mb-7 max-w-xl rounded-2xl border border-accent/30 bg-accent-soft px-4 py-3 text-center text-xl font-bold text-ink">
                 سورة{' '}
                 {group.chapterNameArabic ??
                   formatArabicNumber(group.chapterId)}
               </h2>
               <p
-                className="text-center text-[1.7rem] leading-[2.65] text-stone-950 sm:text-[2rem] sm:leading-[2.8]"
+                className="text-center text-[1.7rem] leading-[2.65] text-ink sm:text-[2rem] sm:leading-[2.8]"
                 style={{
                   fontFamily:
                     "'UthmanicHafs', 'Traditional Arabic', 'Amiri', serif",
@@ -160,7 +161,7 @@ export function ReaderView({
                   <span key={verse.verseKey}>
                     <span>{verse.uthmaniText}</span>{' '}
                     <span
-                      className="whitespace-nowrap text-[0.72em] font-bold text-emerald-800"
+                      className="whitespace-nowrap text-[0.72em] font-bold text-primary-muted"
                       aria-label={`الآية ${verse.verseNumber}`}
                     >
                       ﴿{formatArabicNumber(verse.verseNumber)}﴾
@@ -174,9 +175,9 @@ export function ReaderView({
 
         <nav
           aria-label="التنقل بين صفحات جلسة الورد"
-          className="mt-5 rounded-3xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5"
+          className="surface-card mt-5 p-4 sm:p-5"
         >
-          <p className="mb-4 text-center text-sm font-semibold text-stone-600">
+          <p className="mb-4 text-center text-sm font-semibold text-muted">
             الصفحة {formatArabicNumber(pagePosition)} من{' '}
             {formatArabicNumber(sessionPageCount)} ضمن نطاق الجلسة
           </p>
@@ -197,7 +198,7 @@ export function ReaderView({
         {session.status === 'completed' ? (
           <section
             aria-label="حالة الجلسة"
-            className="mt-5 rounded-3xl border border-emerald-200 bg-emerald-50 p-5 text-center text-emerald-950"
+            className="status-success mt-5 text-center"
           >
             <h2 className="text-lg font-bold">الجلسة مكتملة</h2>
             <p className="mt-2 text-sm leading-7">
@@ -208,7 +209,7 @@ export function ReaderView({
           <CompletionAction sessionId={session.id} />
         )}
 
-        <aside className="mt-5 rounded-3xl border border-emerald-100 bg-emerald-50/70 p-5 text-sm leading-7 text-emerald-950">
+        <aside className="mt-5 rounded-card border border-primary/20 bg-primary-soft p-5 text-sm leading-7 text-primary-muted">
           <h2 className="text-base font-bold">عن جلسة الورد</h2>
           <p className="mt-2">
             الجلسة {formatArabicNumber(session.sessionOrder)} · الصفحات{' '}
@@ -226,6 +227,6 @@ export function ReaderView({
           ) : null}
         </aside>
       </div>
-    </div>
+    </main>
   )
 }

@@ -16,6 +16,7 @@ function createClient({
       daily_pages: 5,
       sessions_per_day: 2,
       timezone: 'Africa/Cairo',
+      effective_from: '2026-07-26',
     },
     error: null,
   },
@@ -68,6 +69,7 @@ describe('getPlanSettings', () => {
         dailyPages: 5,
         sessionsPerDay: 2,
         timezone: 'Africa/Cairo',
+        effectiveFrom: '2026-07-26',
         schedules: [
           { sessionOrder: 1, scheduledTime: '06:00' },
           { sessionOrder: 2, scheduledTime: '18:30' },

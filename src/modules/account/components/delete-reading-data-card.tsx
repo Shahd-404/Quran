@@ -2,6 +2,7 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Trash2, TriangleAlert } from 'lucide-react'
 
 const CONFIRMATION = 'حذف بياناتي'
 
@@ -19,6 +20,7 @@ async function unsubscribeCurrentBrowser(): Promise<boolean> {
 export function DeleteReadingDataCard() {
   const router = useRouter()
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const errorRef = useRef<HTMLParagraphElement>(null)
   const [confirming, setConfirming] = useState(false)
@@ -27,7 +29,13 @@ export function DeleteReadingDataCard() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (confirming) inputRef.current?.focus()
+    if (!confirming) return
+    inputRef.current?.focus()
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
   }, [confirming])
 
   useEffect(() => {
@@ -46,6 +54,25 @@ export function DeleteReadingDataCard() {
     if (event.key === 'Escape') {
       event.preventDefault()
       cancel()
+      return
+    }
+
+    if (event.key === 'Tab') {
+      const focusable = Array.from(
+        dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled])',
+        ) ?? [],
+      )
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
     }
   }
 
@@ -108,13 +135,21 @@ export function DeleteReadingDataCard() {
 
   return (
     <section
-      className="rounded-[2rem] border border-rose-200 bg-white p-6 shadow-sm sm:p-8"
+      className="surface-card border-danger/30 p-4 sm:p-6"
       aria-labelledby="delete-reading-data-title"
     >
-      <h2 id="delete-reading-data-title" className="text-2xl font-bold text-rose-900">
-        مسح بيانات القراءة
-      </h2>
-      <p className="mt-4 leading-8 text-stone-700">
+      <div className="flex items-start gap-4">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-danger-soft text-danger" aria-hidden="true">
+          <Trash2 aria-hidden="true" focusable="false" size={21} strokeWidth={1.8} />
+        </span>
+        <div>
+          <p className="text-xs font-medium text-danger">منطقة حساسة</p>
+          <h2 id="delete-reading-data-title" className="mt-1 text-lg font-semibold text-ink">
+            مسح بيانات القراءة
+          </h2>
+        </div>
+      </div>
+      <p className="mt-3 text-sm leading-7 text-muted">
         سيتم حذف جميع خططك، جلسات القراءة، التقدم، الختمات، وسجل القراءة نهائيًا.
         لن يتم حذف حسابك أو بريدك الإلكتروني.
       </p>
@@ -124,27 +159,33 @@ export function DeleteReadingDataCard() {
           ref={triggerRef}
           type="button"
           onClick={() => setConfirming(true)}
-          className="mt-6 min-h-[3rem] rounded-2xl bg-rose-700 px-6 py-3 font-bold text-white hover:bg-rose-800 focus:outline-none focus:ring-2 focus:ring-rose-700 focus:ring-offset-2"
+          className="btn-danger mt-6"
         >
+          <Trash2 aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
           مسح جميع بيانات القراءة
         </button>
       ) : (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="delete-confirmation-title"
-          aria-describedby="delete-confirmation-description"
-          onKeyDown={handleDialogKeyDown}
-          className="mt-6 rounded-2xl border border-rose-300 bg-rose-50 p-5"
-        >
-          <h3 id="delete-confirmation-title" className="text-xl font-bold text-rose-950">
-            تأكيد مسح بيانات القراءة
-          </h3>
-          <p id="delete-confirmation-description" className="mt-3 font-semibold text-rose-900">
-            هذا الإجراء نهائي ولا يمكن التراجع عنه.
-          </p>
-          <form onSubmit={handleSubmit}>
-            <label htmlFor="delete-reading-confirmation" className="mt-5 block font-semibold">
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/55 p-4 backdrop-blur-sm">
+          <div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-confirmation-title"
+            aria-describedby="delete-confirmation-description"
+            onKeyDown={handleDialogKeyDown}
+            className="surface-card w-full max-w-lg border-danger/35 p-5 shadow-lift sm:p-7"
+          >
+            <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-danger-soft text-danger" aria-hidden="true">
+              <TriangleAlert aria-hidden="true" focusable="false" size={23} strokeWidth={1.8} />
+            </div>
+            <h3 id="delete-confirmation-title" className="mt-4 text-center text-lg font-semibold text-ink">
+              تأكيد مسح بيانات القراءة
+            </h3>
+            <p id="delete-confirmation-description" className="mt-3 text-center text-sm font-medium text-danger">
+              هذا الإجراء نهائي ولا يمكن التراجع عنه.
+            </p>
+            <form onSubmit={handleSubmit}>
+            <label htmlFor="delete-reading-confirmation" className="field-label mt-5">
               اكتب «{CONFIRMATION}» للتأكيد
             </label>
             <input
@@ -157,7 +198,7 @@ export function DeleteReadingDataCard() {
               disabled={pending}
               aria-invalid={Boolean(error)}
               aria-describedby={error ? 'delete-reading-error' : 'delete-confirmation-description'}
-              className="mt-2 min-h-[3rem] w-full rounded-xl border border-stone-300 bg-white px-4 py-2 outline-none focus:border-rose-700 focus:ring-2 focus:ring-rose-700/20"
+              className="field-control focus:border-danger focus:ring-danger/15"
             />
             {error ? (
               <p
@@ -165,7 +206,7 @@ export function DeleteReadingDataCard() {
                 id="delete-reading-error"
                 role="alert"
                 tabIndex={-1}
-                className="mt-4 text-rose-800 outline-none"
+                className="status-danger mt-4 outline-none"
               >
                 {error}
               </p>
@@ -174,20 +215,22 @@ export function DeleteReadingDataCard() {
               <button
                 type="submit"
                 disabled={pending || confirmation !== CONFIRMATION}
-                className="min-h-[3rem] rounded-2xl bg-rose-700 px-6 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn-danger"
               >
+                <Trash2 aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
                 {pending ? 'جارٍ المسح النهائي…' : 'تأكيد المسح النهائي'}
               </button>
               <button
                 type="button"
                 disabled={pending}
                 onClick={cancel}
-                className="min-h-[3rem] rounded-2xl border border-stone-300 bg-white px-6 py-3 font-bold"
+                className="btn-secondary"
               >
                 إلغاء والعودة
               </button>
             </div>
-          </form>
+            </form>
+          </div>
         </div>
       )}
     </section>

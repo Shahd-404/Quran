@@ -72,42 +72,42 @@ export function NewKhatmaForm({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[2rem] border border-emerald-900/10 bg-white p-6 shadow-sm sm:p-8">
-        <p className="text-sm font-semibold text-emerald-800">إعدادات خطتك السابقة</p>
-        <h2 className="mt-2 text-2xl font-bold">الخطة التي أكملت بها ختمتك</h2>
+      <section className="surface-card p-6 sm:p-8">
+        <p className="eyebrow">إعدادات خطتك السابقة</p>
+        <h2 className="mt-2 text-lg font-semibold">الخطة التي أكملت بها ختمتك</h2>
         <dl className="mt-6 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl bg-stone-50 p-4">
-            <dt className="text-sm text-stone-500">الصفحات اليومية</dt>
-            <dd className="mt-2 font-bold">
+          <div className="surface-muted p-4">
+            <dt className="text-sm text-muted">الصفحات اليومية</dt>
+            <dd className="mt-2 font-semibold">
               {formatArabicNumber(configuration.dailyPages)} صفحات
             </dd>
           </div>
-          <div className="rounded-2xl bg-stone-50 p-4">
-            <dt className="text-sm text-stone-500">الجلسات اليومية</dt>
-            <dd className="mt-2 font-bold">
+          <div className="surface-muted p-4">
+            <dt className="text-sm text-muted">الجلسات اليومية</dt>
+            <dd className="mt-2 font-semibold">
               {formatArabicNumber(configuration.sessionsPerDay)} جلسات
             </dd>
           </div>
-          <div className="rounded-2xl bg-stone-50 p-4">
-            <dt className="text-sm text-stone-500">المنطقة الزمنية</dt>
-            <dd className="mt-2 break-words font-bold" dir="ltr">
+          <div className="surface-muted p-4">
+            <dt className="text-sm text-muted">المنطقة الزمنية</dt>
+            <dd className="mt-2 break-words font-semibold" dir="ltr">
               {configuration.timezone}
             </dd>
           </div>
         </dl>
 
         <div className="mt-6">
-          <h3 className="font-bold">مواعيد الجلسات</h3>
+          <h3 className="font-semibold">مواعيد الجلسات</h3>
           <ol className="mt-3 grid gap-3 sm:grid-cols-2">
             {configuration.schedules.map((schedule) => (
               <li
                 key={schedule.sessionOrder}
-                className="flex items-center justify-between gap-4 rounded-2xl border border-stone-100 px-4 py-3"
+                className="flex items-center justify-between gap-4 rounded-2xl border border-line px-4 py-3"
               >
-                <span className="text-stone-600">
+                <span className="text-muted">
                   الجلسة {formatArabicNumber(schedule.sessionOrder)}
                 </span>
-                <span className="font-bold">
+                <span className="font-semibold">
                   {formatScheduleTime(schedule.scheduledTime)}
                 </span>
               </li>
@@ -124,13 +124,13 @@ export function NewKhatmaForm({
               setError(null)
               setConfirming(true)
             }}
-            className="min-h-[3.5rem] rounded-2xl bg-emerald-800 px-6 py-4 text-base font-bold text-white transition hover:bg-emerald-900"
+            className="btn-primary min-h-[3.5rem] py-4"
           >
             ابدأ بنفس الخطة
           </button>
           <a
             href="/app/plan/new"
-            className="inline-flex min-h-[3.5rem] items-center justify-center rounded-2xl border border-stone-300 bg-white px-6 py-4 text-center font-bold text-stone-800 transition hover:bg-stone-50"
+            className="btn-secondary min-h-[3.5rem] py-4"
           >
             إنشاء خطة مختلفة
           </a>
@@ -138,12 +138,12 @@ export function NewKhatmaForm({
       ) : (
         <form
           onSubmit={handleSubmit}
-          className="rounded-[2rem] border border-emerald-200 bg-emerald-50/60 p-6 sm:p-8"
+          className="rounded-card border border-primary/25 bg-primary-soft p-6 sm:p-8"
         >
-          <h2 className="text-xl font-bold">
+          <h2 className="text-lg font-semibold">
             هل تريد بدء ختمة جديدة من الصفحة الأولى بنفس إعدادات خطتك السابقة؟
           </h2>
-          <p className="mt-3 leading-7 text-stone-600">
+          <p className="mt-3 leading-7 text-muted">
             ستبقى الختمة السابقة وسجل إنجازها كما هما، وستبدأ دورة جديدة مستقلة.
           </p>
 
@@ -158,13 +158,13 @@ export function NewKhatmaForm({
             min={initialEffectiveFrom}
             value={effectiveFrom}
             onChange={(event) => setEffectiveFrom(event.target.value)}
-            className="mt-2 min-h-[3rem] w-full max-w-sm rounded-xl border border-stone-300 bg-white px-4 py-2 text-base outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20"
+            className="field-control max-w-sm"
           />
 
           {error ? (
             <p
               role="alert"
-              className="mt-4 rounded-xl border border-rose-200 bg-white px-4 py-3 text-rose-800"
+              className="status-danger mt-4"
             >
               {error}
             </p>
@@ -174,7 +174,7 @@ export function NewKhatmaForm({
             <button
               type="submit"
               disabled={submitting}
-              className="min-h-[3rem] rounded-2xl bg-emerald-800 px-6 py-3 font-bold text-white transition hover:bg-emerald-900 disabled:cursor-wait disabled:opacity-60"
+              className="btn-primary"
             >
               {submitting ? 'جارٍ بدء الختمة…' : 'نعم، ابدأ الختمة'}
             </button>
@@ -185,7 +185,7 @@ export function NewKhatmaForm({
                 setError(null)
                 setConfirming(false)
               }}
-              className="min-h-[3rem] rounded-2xl border border-stone-300 bg-white px-6 py-3 font-bold text-stone-800 disabled:opacity-60"
+              className="btn-secondary"
             >
               العودة
             </button>

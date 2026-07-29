@@ -9,6 +9,7 @@ export type PlanSettingsModel = {
   dailyPages: number
   sessionsPerDay: number
   timezone: string
+  effectiveFrom: string
   schedules: PlanSettingsSchedule[]
 }
 

@@ -10,17 +10,17 @@ export function HistoryDayGroup({
 }) {
   return (
     <section
-      className="rounded-[1.75rem] border border-stone-200/80 bg-stone-50/70 p-5 sm:p-6"
+      className="rounded-card border border-line/80 bg-elevated p-4 sm:p-5"
       aria-labelledby={`history-day-${group.localDate}`}
     >
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h3
           id={`history-day-${group.localDate}`}
-          className="text-xl font-bold text-stone-950"
+          className="text-lg font-semibold text-ink"
         >
           {group.formattedDate}
         </h3>
-        <p className="text-sm font-semibold text-stone-600">
+        <p className="text-xs font-medium text-muted">
           {formatArabicNumber(group.totalPages)} صفحات —{' '}
           {formatArabicNumber(group.sessionCount)} جلسات
         </p>

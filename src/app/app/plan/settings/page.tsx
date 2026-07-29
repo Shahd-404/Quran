@@ -1,4 +1,5 @@
 import React from 'react'
+import { ArrowRight, TriangleAlert } from 'lucide-react'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { NextResponse } from 'next/server'
@@ -19,19 +20,21 @@ export default async function PlanSettingsPage() {
 
   if (result.status === 'error') {
     return (
-      <main className="min-h-screen bg-[#f7f6f2] px-4 py-10 text-stone-900">
+      <main className="page-shell">
         <section
           role="alert"
-          className="mx-auto max-w-xl rounded-[2rem] border border-rose-200 bg-white p-8 text-center shadow-sm"
+          className="surface-card mx-auto max-w-xl border-danger/30 p-8 text-center"
         >
+          <TriangleAlert aria-hidden="true" focusable="false" className="mx-auto text-danger" size={22} strokeWidth={1.8} />
           <h1 className="text-2xl font-bold">تعذّر تحميل إعدادات الخطة</h1>
-          <p className="mt-3 leading-7 text-stone-600">
+          <p className="mt-3 leading-7 text-muted">
             حاول العودة إلى لوحة الورد وفتح الإعدادات مرة أخرى.
           </p>
           <a
             href="/app"
-            className="mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-2xl bg-stone-900 px-6 py-3 font-bold text-white"
+            className="btn-primary mt-6"
           >
+            <ArrowRight aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
             العودة إلى لوحة الورد
           </a>
         </section>
@@ -40,16 +43,17 @@ export default async function PlanSettingsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] px-4 py-8 text-stone-900 sm:px-6 lg:py-10">
-      <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-8">
-          <a className="text-sm font-semibold text-emerald-800" href="/app">
+    <main className="page-shell">
+      <div className="page-container-narrow">
+        <header className="mb-5">
+          <a className="inline-flex items-center gap-2 text-sm font-medium text-primary-muted hover:underline" href="/app">
+            <ArrowRight aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
             العودة إلى لوحة الورد
           </a>
-          <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+          <h1 className="page-title">
             تعديل الخطة
           </h1>
-          <p className="mt-3 max-w-2xl leading-8 text-stone-600">
+          <p className="page-description">
             عدّل عدد الصفحات والجلسات ومواعيدها. لن يتغير تقدم الختمة أو أي ورد
             تم إنشاؤه بالفعل.
           </p>

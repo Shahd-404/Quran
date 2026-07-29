@@ -1,4 +1,4 @@
-const STATIC_CACHE = 'wird-static-v1'
+const STATIC_CACHE = 'wird-static-v2'
 const OFFLINE_URL = '/offline.html'
 const WIRD_CACHE_PREFIX = 'wird-'
 const STATIC_ASSETS = [
@@ -10,6 +10,7 @@ const STATIC_ASSETS = [
 ]
 const DEFAULT_URL = '/app'
 const SESSION_URL = /^\/app\/read\/[0-9a-f]{8}-[0-9a-f-]{27}$/i
+const AUTHENTICATED_PATH = /^\/app(?:\/|$)/
 
 function safeNotificationPath(value) {
   if (value === DEFAULT_URL) return DEFAULT_URL
@@ -54,6 +55,7 @@ self.addEventListener('fetch', (event) => {
     }))
     return
   }
+  if (AUTHENTICATED_PATH.test(url.pathname)) return
   if (isSafeStaticRequest(request, url)) {
     event.respondWith((async () => {
       const cached = await caches.match(request)

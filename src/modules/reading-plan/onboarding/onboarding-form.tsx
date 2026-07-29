@@ -2,9 +2,10 @@
 
 import React, { useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { CompletionEstimateCard } from '@/modules/reading-plan/components/completion-estimate-card'
 import { distributePages } from '@/modules/reading-plan/engine/distribute-pages'
 import { buttonLabels, defaultDailyPageChoices, defaultSessionTimes, stepTitles } from './labels'
-import { formatEstimateDays, getLocalEffectiveDate, validateDailyPages, validateSessionTimes, validateSessionsCount, validateStartPage } from './schema'
+import { getLocalEffectiveDate, validateDailyPages, validateSessionTimes, validateSessionsCount, validateStartPage } from './schema'
 
 const initialValues = {
   startPage: 1,
@@ -138,36 +139,36 @@ export default function OnboardingForm() {
       case 1:
         return (
           <fieldset>
-            <legend className="text-lg font-semibold mb-4">اختر من أين تبدأ</legend>
-            <label className="block mb-4">
-              <span className="text-sm font-medium">الصفحة الابتدائية</span>
+            <legend className="mb-4 text-lg font-semibold text-ink">اختر من أين تبدأ</legend>
+            <label className="field-label mb-4">
+              الصفحة الابتدائية
               <input
                 type="number"
                 min={1}
                 max={604}
                 value={values.startPage}
                 onChange={e => handleField('startPage', Number(e.target.value))}
-                className="mt-2 w-full rounded-2xl border border-slate-300 px-3 py-2"
+                className="field-control"
                 aria-invalid={!!errors.startPage}
                 aria-describedby={errors.startPage ? 'start-page-error' : undefined}
               />
             </label>
-            {errors.startPage && <p id="start-page-error" className="text-red-600 text-sm">{errors.startPage}</p>}
+            {errors.startPage && <p id="start-page-error" className="status-danger text-sm">{errors.startPage}</p>}
           </fieldset>
         )
       case 2:
         return (
           <fieldset>
-            <legend className="text-lg font-semibold mb-4">الصفحات اليومية</legend>
-            <label className="block mb-4">
-              <span className="text-sm font-medium">عدد الصفحات اليومية</span>
+            <legend className="mb-4 text-lg font-semibold text-ink">الصفحات اليومية</legend>
+            <label className="field-label mb-4">
+              عدد الصفحات اليومية
               <input
                 type="number"
                 min={1}
                 max={604}
                 value={values.dailyPages}
                 onChange={e => handleField('dailyPages', Number(e.target.value))}
-                className="mt-2 w-full rounded-2xl border border-slate-300 px-3 py-2"
+                className="field-control"
                 aria-invalid={!!errors.dailyPages}
                 aria-describedby={errors.dailyPages ? 'daily-pages-error' : undefined}
               />
@@ -178,21 +179,32 @@ export default function OnboardingForm() {
                   type="button"
                   key={choice}
                   onClick={() => handleField('dailyPages', choice)}
-                  className={`rounded-2xl border px-3 py-2 text-sm ${values.dailyPages === choice ? 'border-blue-600 bg-blue-50' : 'border-slate-300 bg-white'}`}>
+                  className={`min-h-[2.75rem] rounded-2xl border px-3 py-2 text-sm font-semibold transition ${values.dailyPages === choice ? 'border-primary bg-primary-soft text-primary-muted' : 'border-line bg-surface text-muted hover:border-primary/40'}`}>
                   {choice} صفحة
                 </button>
               ))}
             </div>
-            {errors.dailyPages && <p id="daily-pages-error" className="text-red-600 text-sm mt-3">{errors.dailyPages}</p>}
-            <p className="mt-4 text-slate-600">{formatEstimateDays(values.startPage, values.dailyPages)}</p>
+            {errors.dailyPages && <p id="daily-pages-error" className="status-danger mt-3 text-sm">{errors.dailyPages}</p>}
+            <div className="mt-5">
+              <CompletionEstimateCard
+                currentUnreadPage={values.startPage}
+                pagesPerDay={values.dailyPages}
+                sessionsPerDay={values.sessionsCount}
+                timezone={values.timezone}
+                effectiveFrom={values.effectiveFrom}
+                variant="new-plan"
+                live
+                compact
+              />
+            </div>
           </fieldset>
         )
       case 3:
         return (
           <fieldset>
-            <legend className="text-lg font-semibold mb-4">عدد الجلسات اليومية</legend>
-            <label className="block mb-4">
-              <span className="text-sm font-medium">عدد الجلسات</span>
+            <legend className="mb-4 text-lg font-semibold text-ink">عدد الجلسات اليومية</legend>
+            <label className="field-label mb-4">
+              عدد الجلسات
               <input
                 type="number"
                 min={1}
@@ -206,19 +218,19 @@ export default function OnboardingForm() {
                   setValues(prev => ({ ...prev, sessionsCount: nextCount, sessionTimes: nextTimes }))
                   setErrors({})
                 }}
-                className="mt-2 w-full rounded-2xl border border-slate-300 px-3 py-2"
+                className="field-control"
                 aria-invalid={!!errors.sessionsCount}
                 aria-describedby={errors.sessionsCount ? 'sessions-count-error' : undefined}
               />
             </label>
-            {errors.sessionsCount && <p id="sessions-count-error" className="text-red-600 text-sm">{errors.sessionsCount}</p>}
-                    <div className="mt-4 space-y-3 rounded-2xl bg-slate-50 p-4">
-              <p className="text-sm font-medium">توزيع الصفحات لكل جلسة</p>
+            {errors.sessionsCount && <p id="sessions-count-error" className="status-danger text-sm">{errors.sessionsCount}</p>}
+            <div className="surface-muted mt-4 space-y-3 p-4">
+              <p className="text-xs font-medium text-ink">توزيع الصفحات لكل جلسة</p>
               <div className="space-y-2">
                 {distribution.map((session, index) => (
-                  <div key={index} className="rounded-2xl bg-white p-3 border border-slate-200">
-                    <p className="text-sm font-semibold">الجلسة {index + 1}</p>
-                    <p className="text-sm text-slate-600">{session.pageCount} صفحة</p>
+                  <div key={index} className="rounded-2xl border border-line bg-surface p-3">
+                    <p className="text-sm font-semibold text-ink">الجلسة {index + 1}</p>
+                    <p className="text-sm text-muted">{session.pageCount} صفحة</p>
                   </div>
                 ))}
               </div>
@@ -228,68 +240,79 @@ export default function OnboardingForm() {
       case 4:
         return (
           <fieldset>
-            <legend className="text-lg font-semibold mb-4">أوقات الجلسات</legend>
+            <legend className="mb-4 text-lg font-semibold text-ink">أوقات الجلسات</legend>
             <div className="space-y-4">
               {Array.from({ length: values.sessionsCount }, (_, index) => (
-                <label key={index} className="block">
-                  <span className="text-sm font-medium">وقت الجلسة {index + 1}</span>
+                <label key={index} className="field-label">
+                  وقت الجلسة {index + 1}
                   <input
                     type="time"
                     value={values.sessionTimes[index] ?? ''}
                     onChange={e => handleSessionTime(index, e.target.value)}
-                    className="mt-2 w-full rounded-2xl border border-slate-300 px-3 py-2"
+                    className="field-control"
                     aria-invalid={!!errors.sessionTimes}
                     aria-describedby={errors.sessionTimes ? 'session-times-error' : undefined}
                   />
                 </label>
               ))}
             </div>
-            {errors.sessionTimes && <p id="session-times-error" className="text-red-600 text-sm mt-3">{errors.sessionTimes}</p>}
-            <p className="mt-4 text-slate-600">يجب أن تكون الأوقات مختلفة ومتزايدة زمنياً.</p>
+            {errors.sessionTimes && <p id="session-times-error" className="status-danger mt-3 text-sm">{errors.sessionTimes}</p>}
+            <p className="mt-4 text-sm leading-7 text-muted">يجب أن تكون الأوقات مختلفة ومتزايدة زمنيًا.</p>
           </fieldset>
         )
       case 5:
         return (
           <div>
-            <h2 className="text-lg font-semibold mb-4">مراجعة الخطة</h2>
-            <dl className="space-y-4 text-slate-700">
-              <div>
-                <dt className="font-medium">الصفحة الابتدائية</dt>
-                <dd>{values.startPage}</dd>
+            <h2 className="mb-4 text-lg font-semibold text-ink">مراجعة الخطة</h2>
+            <dl className="grid gap-3 text-ink sm:grid-cols-2">
+              <div className="surface-muted p-4">
+                <dt className="text-sm text-muted">الصفحة الابتدائية</dt>
+                <dd className="mt-1 font-semibold">{values.startPage}</dd>
               </div>
-              <div>
-                <dt className="font-medium">الصفحات اليومية</dt>
-                <dd>{values.dailyPages}</dd>
+              <div className="surface-muted p-4">
+                <dt className="text-sm text-muted">الصفحات اليومية</dt>
+                <dd className="mt-1 font-semibold">{values.dailyPages}</dd>
               </div>
-              <div>
-                <dt className="font-medium">عدد الجلسات</dt>
-                <dd>{values.sessionsCount}</dd>
+              <div className="surface-muted p-4">
+                <dt className="text-sm text-muted">عدد الجلسات</dt>
+                <dd className="mt-1 font-semibold">{values.sessionsCount}</dd>
               </div>
-              <div>
-                <dt className="font-medium">أوقات الجلسات</dt>
+              <div className="surface-muted p-4">
+                <dt className="text-sm text-muted">أوقات الجلسات</dt>
                 <dd className="space-y-1">
                   {values.sessionTimes.map((time, index) => (
                     <div key={index}>{`الجلسة ${index + 1}: ${time}`}</div>
                   ))}
                 </dd>
               </div>
-              <div>
-                <dt className="font-medium">التوزيع</dt>
+              <div className="surface-muted p-4">
+                <dt className="text-sm text-muted">التوزيع</dt>
                 <dd className="space-y-1">
                   {distribution.map((session, index) => (
                     <div key={index}>{`الجلسة ${index + 1}: ${session.pageCount} صفحة`}</div>
                   ))}
                 </dd>
               </div>
-              <div>
-                <dt className="font-medium">المنطقة الزمنية</dt>
-                <dd>{values.timezone}</dd>
+              <div className="surface-muted p-4">
+                <dt className="text-sm text-muted">المنطقة الزمنية</dt>
+                <dd className="mt-1 break-all font-semibold" dir="ltr">{values.timezone}</dd>
               </div>
-              <div>
-                <dt className="font-medium">تاريخ النفاذ</dt>
-                <dd>{values.effectiveFrom}</dd>
+              <div className="surface-muted p-4">
+                <dt className="text-sm text-muted">تاريخ النفاذ</dt>
+                <dd className="mt-1 font-semibold">{values.effectiveFrom}</dd>
               </div>
             </dl>
+            <div className="mt-6">
+              <CompletionEstimateCard
+                currentUnreadPage={values.startPage}
+                pagesPerDay={values.dailyPages}
+                sessionsPerDay={values.sessionsCount}
+                timezone={values.timezone}
+                effectiveFrom={values.effectiveFrom}
+                variant="new-plan"
+                compact
+              />
+            </div>
           </div>
         )
       default:
@@ -298,35 +321,43 @@ export default function OnboardingForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-3xl mx-auto rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+    <form onSubmit={handleSubmit} className="surface-card mx-auto max-w-3xl p-5 sm:p-8">
       <div className="mb-6 text-center">
-        <p className="text-sm text-slate-500">خطوة {step} من 5</p>
-        <h1 className="text-2xl font-semibold mt-2">أنشئ خطة وردك</h1>
-        <p className="text-slate-600 mt-1">إعداد خطة قراءة القرآن اليومية الخاصة بك.</p>
+        <p className="eyebrow">خطوة {step} من 5</p>
+        <h2 className="mt-2 text-lg font-semibold text-ink">تفاصيل خطة وردك</h2>
+        <p className="mt-1 text-muted">إعداد خطة قراءة القرآن اليومية الخاصة بك.</p>
       </div>
 
-      <div className="mb-6 rounded-2xl bg-slate-50 p-4">
-        <p className="font-medium">{stepTitles[step - 1]}</p>
+      <div className="mb-7">
+        <div className="flex gap-2" aria-hidden="true">
+          {Array.from({ length: 5 }, (_, index) => (
+            <span
+              key={index}
+              className={`h-1.5 flex-1 rounded-full ${index + 1 <= step ? 'bg-primary' : 'bg-line'}`}
+            />
+          ))}
+        </div>
+        <p className="mt-3 text-xs font-medium text-muted">{stepTitles[step - 1]}</p>
       </div>
 
       {renderStep()}
 
       {serverMessage && (
-        <div ref={errorSummaryRef} tabIndex={-1} role="alert" className="mt-6 rounded-2xl bg-red-50 p-4 text-red-700 focus:outline-none">
+        <div ref={errorSummaryRef} tabIndex={-1} role="alert" className="status-danger mt-6 focus:outline-none">
           {serverMessage}
         </div>
       )}
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-between">
-        <button type="button" onClick={handleBack} disabled={step === 1 || submitting} className="rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 disabled:opacity-50">
+        <button type="button" onClick={handleBack} disabled={step === 1 || submitting} className="btn-secondary">
           {buttonLabels.back}
         </button>
         {step < 5 ? (
-          <button type="button" onClick={handleNext} disabled={submitting} className="rounded-2xl bg-blue-600 px-4 py-3 text-white disabled:opacity-50">
+          <button type="button" onClick={handleNext} disabled={submitting} className="btn-primary">
             {buttonLabels.next}
           </button>
         ) : (
-          <button type="submit" disabled={submitting} className="rounded-2xl bg-blue-600 px-4 py-3 text-white disabled:opacity-50">
+          <button type="submit" disabled={submitting} className="btn-primary">
             {submitting ? 'جارٍ الإنشاء...' : buttonLabels.create}
           </button>
         )}

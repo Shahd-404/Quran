@@ -1,4 +1,5 @@
 import React from 'react'
+import { ArrowRight, BookMarked } from 'lucide-react'
 import { ReadingHistoryModel } from '../types'
 import { CurrentKhatmaCard, KhatmaList } from './khatma-list'
 import { HistoryDayGroup } from './history-day-group'
@@ -7,16 +8,17 @@ import { HistorySummary } from './history-summary'
 
 export function HistoryPage({ data }: { data: ReadingHistoryModel }) {
   return (
-    <main className="min-h-screen bg-[#f7f6f2] px-4 py-8 text-stone-900 sm:px-6 lg:py-10">
-      <div className="mx-auto w-full max-w-5xl">
-        <header className="mb-8">
-          <a href="/app" className="text-sm font-semibold text-emerald-800">
+    <main className="page-shell">
+      <div className="page-container">
+        <header className="mb-5">
+          <a href="/app" className="inline-flex items-center gap-2 text-sm font-medium text-primary-muted hover:underline">
+            <ArrowRight aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
             العودة إلى لوحة الورد
           </a>
-          <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+          <h1 className="page-title">
             سجل القراءة
           </h1>
-          <p className="mt-3 max-w-2xl leading-8 text-stone-600">
+          <p className="page-description">
             هنا تجد جلسات القراءة التي أكملتها وتقدم ختماتك كما سُجّل وقت
             الإكمال، دون تعديل بياناتك التاريخية.
           </p>
@@ -36,15 +38,19 @@ export function HistoryPage({ data }: { data: ReadingHistoryModel }) {
           <KhatmaList khatmas={data.completedKhatmas} />
 
           <section
-            className="rounded-[2rem] border border-stone-200 bg-white p-5 shadow-sm sm:p-7"
+            className="surface-card p-5 sm:p-7"
             aria-labelledby="reading-timeline-title"
           >
-            <h2 id="reading-timeline-title" className="text-2xl font-bold">
+            <h2 id="reading-timeline-title" className="text-lg font-semibold">
               جلسات القراءة المكتملة
             </h2>
             {data.dayGroups.length === 0 ? (
-              <div className="mt-5 rounded-2xl bg-stone-50 p-6 leading-7 text-stone-600">
-                سيظهر هنا سجل جلساتك بعد إكمال أول جلسة قراءة.
+              <div className="empty-state mt-5">
+                <span className="icon-tile mx-auto" aria-hidden="true">
+                  <BookMarked aria-hidden="true" focusable="false" size={21} strokeWidth={1.8} />
+                </span>
+                <h3 className="mt-4 font-semibold text-ink">سجلّك جاهز لأول جلسة</h3>
+                <p className="mt-2 leading-7">سيظهر هنا سجل جلساتك بعد إكمال أول جلسة قراءة.</p>
               </div>
             ) : (
               <div className="mt-5 space-y-5">
@@ -68,16 +74,16 @@ export function HistoryPage({ data }: { data: ReadingHistoryModel }) {
 
 export function HistoryError({ message }: { message: string }) {
   return (
-    <main className="min-h-screen bg-[#f7f6f2] px-4 py-10 text-stone-900">
+    <main className="page-shell">
       <section
         role="alert"
-        className="mx-auto max-w-xl rounded-[2rem] border border-rose-200 bg-white p-8 text-center shadow-sm"
+        className="surface-card mx-auto max-w-xl border-danger/30 p-8 text-center"
       >
         <h1 className="text-2xl font-bold">تعذّر عرض سجل القراءة</h1>
-        <p className="mt-3 leading-7 text-stone-600">{message}</p>
+        <p className="mt-3 leading-7 text-muted">{message}</p>
         <a
           href="/app"
-          className="mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-xl bg-stone-900 px-5 py-3 font-bold text-white"
+          className="btn-primary mt-6"
         >
           العودة إلى لوحة الورد
         </a>

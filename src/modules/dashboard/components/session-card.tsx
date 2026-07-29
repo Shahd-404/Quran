@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { BookOpen, Clock3 } from 'lucide-react'
 import { formatArabicNumber } from '../formatting'
 import { deriveSessionState } from '../session-state'
 import { DashboardSession, SessionPresentationState } from '../types'
@@ -18,11 +19,11 @@ const STATE_LABELS: Record<SessionPresentationState, string> = {
 }
 
 const STATE_STYLES: Record<SessionPresentationState, string> = {
-  upcoming: 'bg-sky-50 text-sky-700',
-  available: 'bg-emerald-50 text-emerald-700',
-  in_progress: 'bg-amber-50 text-amber-800',
-  completed: 'bg-stone-100 text-stone-600',
-  missed: 'bg-orange-50 text-orange-800',
+  upcoming: 'bg-elevated text-muted',
+  available: 'bg-primary-soft text-primary-muted',
+  in_progress: 'bg-accent-soft text-warning',
+  completed: 'bg-elevated text-muted',
+  missed: 'bg-warning-soft text-warning',
 }
 
 const ACTION_LABELS: Record<SessionPresentationState, string> = {
@@ -38,11 +39,13 @@ export function SessionCard({
   assignmentLocalDate,
   timezone,
   compact = false,
+  featured = false,
 }: {
   session: DashboardSession
   assignmentLocalDate: string
   timezone: string
   compact?: boolean
+  featured?: boolean
 }) {
   const [presentationState, setPresentationState] = useState(
     session.presentationState,
@@ -96,48 +99,49 @@ export function SessionCard({
   return (
     <article
       className={[
-        'rounded-2xl border p-4 sm:p-5',
+        'rounded-2xl border p-4',
         presentationState === 'completed'
-          ? 'border-stone-200 bg-stone-50'
-          : 'border-stone-200 bg-white shadow-[0_4px_20px_rgba(28,25,23,0.035)]',
-        compact ? '' : 'ring-1 ring-amber-100',
+          ? 'border-line bg-elevated'
+          : 'border-line/80 bg-surface',
+        featured ? 'shadow-card ring-1 ring-accent/15' : '',
       ].join(' ')}
     >
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-base font-semibold text-stone-500">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-medium text-muted">
             الجلسة {formatArabicNumber(session.sessionOrder)}
           </p>
-          <h3 className={`${compact ? 'mt-1 text-lg' : 'mt-2 text-2xl'} font-bold text-stone-900`}>
+          <h3 className={`${compact ? 'mt-1 text-base' : 'mt-1.5 text-lg'} font-semibold text-ink`}>
             {pageRange}
           </h3>
-          <p className="mt-1 text-base text-stone-500">
+          <p className="mt-0.5 text-xs text-muted">
             {formatArabicNumber(session.pageCount)} {session.pageCount === 1 ? 'صفحة' : 'صفحات'}
           </p>
         </div>
         <span
-          className={`rounded-full px-3 py-1.5 text-sm font-bold ${STATE_STYLES[presentationState]}`}
+          className={`rounded-full px-2.5 py-1 text-xs font-medium ${STATE_STYLES[presentationState]}`}
         >
           {STATE_LABELS[presentationState]}
         </span>
       </div>
-      <div className="mt-4 flex items-center gap-2 border-t border-stone-100 pt-4 text-base text-stone-600">
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current">
-          <circle cx="12" cy="12" r="9" strokeWidth="1.7" />
-          <path d="M12 7v5l3 2" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+      <div className="mt-3 flex items-center gap-2 border-t border-line/70 pt-3 text-xs text-muted">
+        <Clock3 aria-hidden="true" focusable="false" size={17} strokeWidth={1.8} />
         <span>موعد الجلسة: {session.formattedTime}</span>
       </div>
       <Link
         href={`/app/read/${session.id}`}
+        data-dominant-action={featured ? 'true' : undefined}
         className={[
-          'mt-4 inline-flex min-h-[3rem] w-full items-center justify-center rounded-2xl px-4 py-3 text-base font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800',
-          presentationState === 'completed'
-            ? 'bg-stone-200 text-stone-700 hover:bg-stone-300'
-            : 'bg-emerald-900 text-white hover:bg-emerald-950',
+          'mt-3 inline-flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition',
+          featured && presentationState !== 'completed'
+            ? 'bg-primary text-white hover:bg-primary-strong'
+            : presentationState === 'completed'
+            ? 'bg-elevated text-muted ring-1 ring-line hover:text-ink'
+            : 'border border-line bg-surface text-ink hover:border-primary/40 hover:bg-primary-soft',
         ].join(' ')}
       >
-        {ACTION_LABELS[presentationState]}
+        <BookOpen aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
+        {featured ? 'ابدأ القراءة' : ACTION_LABELS[presentationState]}
       </Link>
     </article>
   )

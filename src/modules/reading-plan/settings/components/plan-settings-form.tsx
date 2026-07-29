@@ -3,6 +3,7 @@
 import React, { FormEvent, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { formatArabicNumber } from '@/modules/dashboard/formatting'
+import { CompletionEstimateCard } from '@/modules/reading-plan/components/completion-estimate-card'
 import { distributePages } from '@/modules/reading-plan/engine/distribute-pages'
 import { SessionRange } from '@/modules/reading-plan/engine/types'
 import { defaultSessionTimes } from '@/modules/reading-plan/onboarding/labels'
@@ -52,27 +53,27 @@ function SettingsSummary({
   sessionTimes: string[]
 }) {
   return (
-    <section className="rounded-2xl border border-stone-200 bg-white p-5">
-      <h3 className="text-lg font-bold">{title}</h3>
+    <section className="surface-card p-5">
+      <h3 className="text-lg font-semibold text-ink">{title}</h3>
       <dl className="mt-4 space-y-4">
         <div className="flex items-center justify-between gap-4">
-          <dt className="text-stone-500">الصفحات اليومية</dt>
-          <dd className="font-bold">{formatArabicNumber(dailyPages)} صفحات</dd>
+          <dt className="text-muted">الصفحات اليومية</dt>
+          <dd className="font-semibold">{formatArabicNumber(dailyPages)} صفحات</dd>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <dt className="text-stone-500">عدد الجلسات</dt>
-          <dd className="font-bold">{formatArabicNumber(sessionsCount)} جلسات</dd>
+          <dt className="text-muted">عدد الجلسات</dt>
+          <dd className="font-semibold">{formatArabicNumber(sessionsCount)} جلسات</dd>
         </div>
         <div>
-          <dt className="text-stone-500">مواعيد الجلسات</dt>
+          <dt className="text-muted">مواعيد الجلسات</dt>
           <dd className="mt-2 space-y-2">
             {sessionTimes.map((time, index) => (
               <div
                 key={`${index}-${time}`}
-                className="flex items-center justify-between rounded-xl bg-stone-50 px-3 py-2"
+                className="flex items-center justify-between rounded-xl bg-elevated px-3 py-2"
               >
                 <span>الجلسة {formatArabicNumber(index + 1)}</span>
-                <span className="font-bold" dir="ltr">
+                <span className="font-semibold" dir="ltr">
                   {time}
                 </span>
               </div>
@@ -90,12 +91,12 @@ function DistributionSummary({ sessions }: { sessions: SessionRange[] }) {
       {sessions.map((session) => (
         <div
           key={session.sessionOrder}
-          className="rounded-2xl border border-emerald-100 bg-white p-4"
+          className="rounded-2xl border border-primary/20 bg-surface p-4"
         >
-          <p className="font-bold">
+          <p className="font-semibold">
             الجلسة {formatArabicNumber(session.sessionOrder)}
           </p>
-          <p className="mt-1 text-stone-600">
+          <p className="mt-1 text-muted">
             الصفحات {formatArabicNumber(session.startPage)}–
             {formatArabicNumber(session.endPage)}
             {' · '}
@@ -216,11 +217,11 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
     <form onSubmit={handleSubmit} className="space-y-6">
       {step === 'edit' ? (
         <>
-          <section className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
-            <p className="text-sm font-semibold text-emerald-800">
+          <section className="surface-card p-6 sm:p-8">
+            <p className="eyebrow">
               الإعدادات الحالية ظاهرة ويمكن تعديلها
             </p>
-            <h2 className="mt-2 text-2xl font-bold">إعدادات الورد القادم</h2>
+            <h2 className="mt-2 text-lg font-semibold">إعدادات الورد القادم</h2>
 
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
               <label className="block font-semibold" htmlFor="daily-pages">
@@ -238,7 +239,7 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
                     }))
                     setErrors({})
                   }}
-                  className="mt-2 min-h-[3rem] w-full rounded-xl border border-stone-300 px-4 py-2 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20"
+                  className="field-control"
                   aria-invalid={Boolean(errors.dailyPages)}
                 />
               </label>
@@ -263,20 +264,36 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
                     }))
                     setErrors({})
                   }}
-                  className="mt-2 min-h-[3rem] w-full rounded-xl border border-stone-300 px-4 py-2 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20"
+                  className="field-control"
                   aria-invalid={Boolean(errors.sessionsCount)}
                 />
               </label>
             </div>
 
             {errors.dailyPages || errors.sessionsCount ? (
-              <p className="mt-3 text-sm text-rose-700" role="alert">
+              <p className="status-danger mt-3 text-sm" role="alert">
                 {errors.dailyPages ?? errors.sessionsCount}
               </p>
             ) : null}
 
+            <div className="mt-6">
+              <CompletionEstimateCard
+                currentUnreadPage={current.currentUnreadPage}
+                pagesPerDay={values.dailyPages}
+                sessionsPerDay={values.sessionsCount}
+                timezone={current.timezone}
+                effectiveFrom={current.effectiveFrom}
+                variant="active-plan"
+                live
+                compact
+              />
+              <p className="mt-3 text-sm leading-7 text-muted">
+                تغيير عدد الصفحات سيغيّر موعد الختم المتوقع للأيام القادمة فقط.
+              </p>
+            </div>
+
             <fieldset className="mt-7">
-              <legend className="font-bold">مواعيد الجلسات</legend>
+              <legend className="font-semibold">مواعيد الجلسات</legend>
               <div className="mt-3 grid gap-4 sm:grid-cols-2">
                 {values.sessionTimes.map((time, index) => (
                   <label
@@ -298,14 +315,14 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
                         }))
                         setErrors({})
                       }}
-                      className="mt-2 min-h-[3rem] w-full rounded-xl border border-stone-300 px-4 py-2 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20"
+                      className="field-control"
                       aria-invalid={Boolean(errors.sessionTimes)}
                     />
                   </label>
                 ))}
               </div>
               {errors.sessionTimes ? (
-                <p className="mt-3 text-sm text-rose-700" role="alert">
+                <p className="status-danger mt-3 text-sm" role="alert">
                   {errors.sessionTimes}
                 </p>
               ) : null}
@@ -313,17 +330,17 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
           </section>
 
           <section
-            className="rounded-[2rem] border border-emerald-900/10 bg-emerald-50/60 p-6 sm:p-8"
+            className="rounded-card border border-primary/20 bg-primary-soft p-6 sm:p-8"
             aria-labelledby="distribution-preview-title"
           >
-            <p className="text-sm font-semibold text-emerald-800">معاينة</p>
+            <p className="eyebrow">معاينة</p>
             <h2
               id="distribution-preview-title"
-              className="mt-2 text-xl font-bold"
+              className="mt-2 text-lg font-semibold"
             >
               توزيع صفحات أول ورد جديد
             </h2>
-            <p className="mt-2 text-stone-600">
+            <p className="mt-2 text-muted">
               تبدأ المعاينة من الصفحة{' '}
               {formatArabicNumber(current.currentUnreadPage)}، ولا تغيّر تقدمك
               الحالي.
@@ -337,13 +354,13 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
             <button
               type="button"
               onClick={showReview}
-              className="min-h-[3rem] rounded-2xl bg-emerald-800 px-6 py-3 font-bold text-white hover:bg-emerald-900"
+              className="btn-primary"
             >
               مراجعة التعديلات
             </button>
             <a
               href="/app"
-              className="inline-flex min-h-[3rem] items-center justify-center rounded-2xl border border-stone-300 bg-white px-6 py-3 font-bold text-stone-800"
+              className="btn-secondary"
             >
               إلغاء والعودة
             </a>
@@ -351,9 +368,9 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
         </>
       ) : (
         <>
-          <section className="rounded-[2rem] border border-stone-200 bg-stone-50 p-6 sm:p-8">
-            <p className="text-sm font-semibold text-emerald-800">المراجعة النهائية</p>
-            <h2 className="mt-2 text-2xl font-bold">الإعدادات القديمة والجديدة</h2>
+          <section className="surface-muted p-6 sm:p-8">
+            <p className="eyebrow">المراجعة النهائية</p>
+            <h2 className="mt-2 text-lg font-semibold">الإعدادات القديمة والجديدة</h2>
             <div className="mt-6 grid gap-5 md:grid-cols-2">
               <SettingsSummary
                 title="الإعدادات الحالية"
@@ -370,15 +387,26 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
                 sessionTimes={values.sessionTimes}
               />
             </div>
-            <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5">
-              <h3 className="text-lg font-bold">التوزيع المتوقع للورد القادم</h3>
+            <div className="mt-6 rounded-2xl border border-primary/20 bg-primary-soft p-5">
+              <h3 className="text-lg font-semibold">التوزيع المتوقع للورد القادم</h3>
               <div className="mt-4">
                 <DistributionSummary sessions={distribution} />
               </div>
             </div>
+            <div className="mt-6">
+              <CompletionEstimateCard
+                currentUnreadPage={current.currentUnreadPage}
+                pagesPerDay={values.dailyPages}
+                sessionsPerDay={values.sessionsCount}
+                timezone={current.timezone}
+                effectiveFrom={current.effectiveFrom}
+                variant="active-plan"
+                compact
+              />
+            </div>
           </section>
 
-          <p className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 font-semibold leading-7 text-amber-950">
+          <p className="status-warning font-semibold leading-7">
             سيتم تطبيق التعديلات على الورد القادم، ولن يتغير الورد الحالي.
           </p>
 
@@ -387,7 +415,7 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
               ref={errorRef}
               tabIndex={-1}
               role="alert"
-              className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-rose-800 focus:outline-none"
+              className="status-danger focus:outline-none"
             >
               {errors.general}
             </div>
@@ -397,7 +425,7 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
             <button
               type="submit"
               disabled={submitting}
-              className="min-h-[3rem] rounded-2xl bg-emerald-800 px-6 py-3 font-bold text-white hover:bg-emerald-900 disabled:cursor-wait disabled:opacity-60"
+              className="btn-primary"
             >
               {submitting
                 ? 'جارٍ حفظ التعديلات…'
@@ -410,13 +438,13 @@ export function PlanSettingsForm({ current }: { current: PlanSettingsModel }) {
                 setErrors({})
                 setStep('edit')
               }}
-              className="min-h-[3rem] rounded-2xl border border-stone-300 bg-white px-6 py-3 font-bold text-stone-800 disabled:opacity-60"
+              className="btn-secondary"
             >
               العودة للتعديل
             </button>
             <a
               href="/app"
-              className="inline-flex min-h-[3rem] items-center justify-center rounded-2xl px-6 py-3 font-bold text-stone-600"
+              className="btn-ghost"
             >
               إلغاء والعودة
             </a>

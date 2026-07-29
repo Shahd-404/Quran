@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { CircleCheck } from 'lucide-react'
 
 const RESEND_COOLDOWN_SECONDS = 60
 const EMAIL_RATE_LIMIT_MESSAGE =
@@ -193,42 +194,42 @@ export default function RegisterPage() {
 
   if (confirmationRequired) {
     return (
-      <main
-        className="flex min-h-screen items-center justify-center p-4"
-        dir="rtl"
-      >
+      <main className="page-shell flex items-center" dir="rtl">
         <section
           aria-labelledby="registration-success-title"
-          className="w-full max-w-md rounded bg-white p-6 shadow"
+          className="surface-card mx-auto w-full max-w-lg p-6 text-center shadow-lift sm:p-9"
         >
+          <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-primary-soft text-primary-muted">
+            <CircleCheck aria-hidden="true" focusable="false" size={24} strokeWidth={1.8} />
+          </div>
           <h1
             id="registration-success-title"
-            className="mb-4 text-xl font-semibold text-emerald-800"
+            className="mt-4 text-xl font-semibold text-ink"
           >
             تم إنشاء حسابك بنجاح
           </h1>
 
-          <p className="mb-3 text-stone-800">
+          <p className="mt-3 leading-8 text-muted">
             أرسلنا رسالة تأكيد إلى بريدك الإلكتروني.
             <br />
             افتحي الرسالة واضغطي على رابط التأكيد لتفعيل حسابك، ثم عودي
             لتسجيل الدخول.
           </p>
 
-          <div className="mb-5 rounded border border-stone-200 bg-stone-50 p-3">
-            <p className="text-sm text-stone-600">أرسلنا رسالة التأكيد إلى:</p>
-            <p className="mt-1 break-all font-medium" dir="ltr">
+          <div className="surface-muted mb-5 mt-5 p-4">
+            <p className="text-sm text-muted">أرسلنا رسالة التأكيد إلى:</p>
+            <p className="mt-1 break-all font-bold text-ink" dir="ltr">
               {submittedEmail}
             </p>
           </div>
 
           {resendMessage ? (
-            <p className="mb-3 text-sm text-emerald-700" role="status">
+            <p className="status-success mb-3 text-sm" role="status">
               {resendMessage}
             </p>
           ) : null}
           {resendError ? (
-            <p className="mb-3 text-sm text-red-700" role="alert">
+            <p className="status-danger mb-3 text-sm" role="alert">
               {resendError}
             </p>
           ) : null}
@@ -236,7 +237,7 @@ export default function RegisterPage() {
           <div className="space-y-3">
             <a
               href="/login"
-              className="block w-full rounded bg-blue-600 p-2 text-center text-white"
+              className="btn-primary w-full"
             >
               فتح صفحة تسجيل الدخول
             </a>
@@ -245,7 +246,7 @@ export default function RegisterPage() {
               type="button"
               disabled={resending || resendCooldown > 0}
               onClick={handleResend}
-              className="w-full rounded border border-blue-600 p-2 text-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="btn-secondary w-full"
             >
               {resending
                 ? 'جارٍ إرسال رسالة التأكيد...'
@@ -257,7 +258,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={changeEmail}
-              className="w-full p-2 text-stone-700 underline"
+              className="btn-ghost w-full"
             >
               تغيير البريد الإلكتروني
             </button>
@@ -268,37 +269,36 @@ export default function RegisterPage() {
   }
 
   return (
-    <main
-      className="flex min-h-screen items-center justify-center p-4"
-      dir="rtl"
-    >
+    <main className="page-shell flex items-center" dir="rtl">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded bg-white p-6 shadow"
+        className="surface-card mx-auto w-full max-w-lg p-6 shadow-lift sm:p-9"
       >
-        <h1 className="mb-4 text-xl font-semibold">ورد</h1>
-        <p className="mb-4">التسجيل</p>
+        <p className="eyebrow">حساب جديد</p>
+        <h1 className="page-title">ابدأ رحلتك مع ورد</h1>
+        <p className="page-description !mt-2">أنشئ حسابك، ثم صمّم خطة قراءة تناسب يومك.</p>
 
-        <label className="mb-2 block">
+        <div className="mt-9 space-y-5">
+        <label className="field-label">
           الاسم (اختياري)
           <input
             name="display_name"
             autoComplete="name"
-            className="mt-1 w-full rounded border p-2"
+            className="field-control"
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
             aria-label="display_name"
           />
         </label>
 
-        <label className="mb-2 block">
+        <label className="field-label">
           البريد الإلكتروني
           <input
             name="email"
             type="email"
             autoComplete="email"
             required
-            className="mt-1 w-full rounded border p-2"
+            className="field-control"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             aria-label="email"
@@ -307,7 +307,7 @@ export default function RegisterPage() {
           />
         </label>
 
-        <label className="mb-2 block">
+        <label className="field-label">
           كلمة المرور
           <input
             name="password"
@@ -315,7 +315,7 @@ export default function RegisterPage() {
             autoComplete="new-password"
             minLength={8}
             required
-            className="mt-1 w-full rounded border p-2"
+            className="field-control"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             aria-label="password"
@@ -324,7 +324,7 @@ export default function RegisterPage() {
           />
         </label>
 
-        <label className="mb-2 block">
+        <label className="field-label">
           تأكيد كلمة المرور
           <input
             name="confirm_password"
@@ -332,7 +332,7 @@ export default function RegisterPage() {
             autoComplete="new-password"
             minLength={8}
             required
-            className="mt-1 w-full rounded border p-2"
+            className="field-control"
             value={confirm}
             onChange={(event) => setConfirm(event.target.value)}
             aria-label="confirm"
@@ -340,32 +340,33 @@ export default function RegisterPage() {
             aria-describedby={error ? 'register-error' : undefined}
           />
         </label>
+        </div>
 
         {error ? (
           <div
             id="register-error"
             role="alert"
-            className="mb-2 text-red-700"
+            className="status-danger mt-5 text-sm leading-6"
           >
             {error}
           </div>
         ) : null}
 
-        <p className="mb-3 mt-4 text-sm text-stone-600">
+        <p className="mt-5 rounded-2xl bg-primary-soft px-4 py-3 text-sm leading-6 text-primary-muted">
           بعد إنشاء الحساب، سنرسل لك رسالة لتأكيد بريدك الإلكتروني.
         </p>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded bg-blue-600 p-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn-primary mt-5 w-full"
         >
           {loading ? 'جارٍ إنشاء الحساب...' : 'إنشاء حساب'}
         </button>
 
-        <div className="mt-4 text-sm">
+        <div className="mt-5 text-center text-sm text-muted">
           لديك حساب؟{' '}
-          <a href="/login" className="text-blue-600">
+          <a href="/login" className="font-semibold text-primary-muted underline-offset-4 hover:underline">
             تسجيل الدخول
           </a>
         </div>

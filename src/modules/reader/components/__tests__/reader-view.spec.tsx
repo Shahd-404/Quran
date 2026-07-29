@@ -55,14 +55,21 @@ describe('ReaderView', () => {
   it('keeps previous and next navigation inside the session range', () => {
     render(<ReaderView session={session} page={page} saveWarning={null} />)
 
-    expect(screen.getByText('الصفحة السابقة').closest('[aria-disabled]')).toHaveAttribute(
+    const previous = screen.getByText('الصفحة السابقة').closest('[aria-disabled]')
+    const next = screen.getByRole('link', { name: /الصفحة التالية/ })
+
+    expect(previous).toHaveAttribute(
       'aria-disabled',
       'true',
     )
-    expect(screen.getByRole('link', { name: /الصفحة التالية/ })).toHaveAttribute(
+    expect(previous?.querySelector('.lucide-arrow-right')).toHaveAttribute('aria-hidden', 'true')
+    expect(next.querySelector('.lucide-arrow-left')).toHaveAttribute('aria-hidden', 'true')
+    expect(next).toHaveAttribute(
       'href',
       '/app/read/11111111-1111-1111-1111-111111111111?page=18',
     )
+    expect(screen.getByRole('link', { name: /العودة للوحة الورد/ }).querySelector('.lucide-arrow-right'))
+      .toHaveAttribute('aria-hidden', 'true')
     expect(screen.getByText(/الصفحة ١ من ٢ ضمن نطاق الجلسة/)).toBeInTheDocument()
   })
 

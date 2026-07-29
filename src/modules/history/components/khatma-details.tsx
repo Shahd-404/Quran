@@ -1,4 +1,5 @@
 import React from 'react'
+import { ArrowRight } from 'lucide-react'
 import { formatArabicNumber } from '@/modules/dashboard/formatting'
 import { ProgressBar } from '@/modules/dashboard/components/progress-bar'
 import { KhatmaHistoryModel } from '../types'
@@ -8,38 +9,39 @@ import { HistoryPagination } from './history-pagination'
 export function KhatmaDetails({ data }: { data: KhatmaHistoryModel }) {
   const { khatma } = data
   return (
-    <main className="min-h-screen bg-[#f7f6f2] px-4 py-8 text-stone-900 sm:px-6 lg:py-10">
+    <main className="page-shell">
       <div className="mx-auto w-full max-w-4xl">
         <header>
           <a
             href="/app/history"
-            className="text-sm font-semibold text-emerald-800"
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary-muted hover:underline"
           >
+            <ArrowRight aria-hidden="true" focusable="false" size={18} strokeWidth={1.8} />
             العودة إلى سجل القراءة
           </a>
-          <p className="mt-5 text-sm font-semibold text-emerald-800">
+          <p className="eyebrow mt-5">
             تفاصيل الختمة
           </p>
-          <h1 className="mt-1 text-3xl font-bold sm:text-4xl">
+          <h1 className="page-title !mt-1">
             الختمة رقم {formatArabicNumber(khatma.cycleNumber)}
           </h1>
           {khatma.status === 'completed' ? (
-            <p className="mt-3 text-xl font-bold text-emerald-900">
+            <p className="mt-3 text-lg font-semibold text-primary-muted">
               تمت الختمة بحمد الله
             </p>
           ) : (
-            <p className="mt-3 leading-7 text-stone-600">
+            <p className="mt-3 leading-7 text-muted">
               هذه الختمة ما زالت جارية، ويعرض المؤشر تقدمها المسجل فقط.
             </p>
           )}
         </header>
 
-        <section className="mt-7 rounded-[2rem] border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+        <section className="surface-card mt-5 p-4 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <h2 className="text-xl font-bold">
+            <h2 className="text-lg font-semibold">
               {khatma.status === 'completed' ? 'ختمة مكتملة' : 'ختمة نشطة'}
             </h2>
-            <span className="rounded-full bg-emerald-50 px-4 py-2 font-bold text-emerald-900">
+            <span className="rounded-full bg-primary-soft px-3 py-1.5 font-semibold text-primary-muted">
               {formatArabicNumber(khatma.percentage)}٪
             </span>
           </div>
@@ -76,14 +78,14 @@ export function KhatmaDetails({ data }: { data: KhatmaHistoryModel }) {
         </section>
 
         <section
-          className="mt-7 rounded-[2rem] border border-stone-200 bg-white p-5 shadow-sm sm:p-7"
+          className="surface-card mt-7 p-5 sm:p-7"
           aria-labelledby="khatma-timeline-title"
         >
-          <h2 id="khatma-timeline-title" className="text-2xl font-bold">
+          <h2 id="khatma-timeline-title" className="text-lg font-semibold">
             سجل قراءة هذه الختمة
           </h2>
           {data.dayGroups.length === 0 ? (
-            <p className="mt-5 rounded-2xl bg-stone-50 p-6 text-stone-600">
+            <p className="empty-state mt-5">
               لا توجد جلسات مكتملة مسجلة لهذه الختمة بعد.
             </p>
           ) : (
@@ -107,9 +109,9 @@ export function KhatmaDetails({ data }: { data: KhatmaHistoryModel }) {
 
 function Detail({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-stone-50 p-4">
-      <dt className="text-sm text-stone-500">{label}</dt>
-      <dd className="mt-1 font-bold">{value}</dd>
+    <div className="surface-muted p-4">
+      <dt className="text-sm text-muted">{label}</dt>
+      <dd className="mt-1 font-semibold">{value}</dd>
     </div>
   )
 }

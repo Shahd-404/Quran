@@ -76,6 +76,8 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 - Explicit session completion with confirmation and timestamp.
 - Persistent current unread page and khatma progress.
 - Basic dashboard showing today’s progress and sessions.
+- A derived, motivational khatma completion estimate based on the next unread
+  page, daily page target, effective date, and saved plan timezone.
 - Read-only Arabic reading history with completed-session timelines and current
   and completed khatma archives.
 - Opt-in Web Push reminders for scheduled reading sessions on each subscribed device.
@@ -91,6 +93,9 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 - A session becomes `in_progress` when opened; only explicit user confirmation marks it `completed`.
 - Completion stores a timestamp (presentation uses user timezone) and advances the current unread page only for explicitly completed pages.
 - Completing page 604 completes the khatma and records start and completion dates.
+- Plan creation, plan settings, and the active-plan Dashboard show an
+  informational expected completion date. The estimate is never persisted and
+  never changes assignments, sessions, or reading progress.
 - `reading_progress_events` is the authoritative append-only source for reading
   history. History pages never regenerate events or infer completion from mutable
   session state alone.
@@ -113,12 +118,38 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 - Scalable text sizes and high-contrast themes supported.
 - Touch targets sized for mobile interaction.
 - Keyboard navigation for desktop.
+- The interface provides explicit light and dark themes. The saved browser
+  preference is applied before hydration; when no preference exists, the
+  operating-system color preference is the initial value.
 
 ## Arabic and RTL requirements
 
 - All user-facing strings default to Arabic.
 - Visual alignment and reading order must follow RTL conventions.
 - Date/time input and presentation should use localized Arabic numerals where appropriate but preserve clear timezone designators.
+
+## Visual system requirements
+
+- Alexandria is the primary Arabic UI typeface, with IBM Plex Sans Arabic,
+  Cairo, and system Arabic fonts as fallbacks.
+- The mobile type scale uses 14px regular body text, 12–13px supporting text,
+  17–18px semibold card titles, 24px mobile page titles, and 32px desktop page
+  titles. Bold weight is reserved for the primary page heading and essential
+  numeric values.
+- Light mode uses a warm off-white canvas, white surfaces, deep green actions,
+  and restrained beige/gold accents.
+- Dark mode uses a deep charcoal canvas, elevated dark surfaces, readable
+  neutral text, and a soft green accent.
+- Shared spacing, radii, shadows, fields, buttons, badges, progress bars,
+  dialogs, status messages, header, and footer use semantic design tokens.
+- Authenticated mobile pages expose Today, History, Plan, and Settings through
+  a compact bottom navigation. The active Dashboard keeps one dominant reading
+  action and places remaining sessions and secondary settings behind
+  presentation-only disclosures.
+- Application controls and statuses use the Lucide outline icon system with
+  visible Arabic labels and accessible names where an icon stands alone.
+- Every application page includes the footer text
+  `صُنع بمحبة — إهداء لعبدالله الفيل`.
 
 ## Privacy considerations
 
