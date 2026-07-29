@@ -6,7 +6,7 @@ describe('SiteFooter', () => {
   it('keeps the compact product line and dedication visible', () => {
     render(<SiteFooter />)
 
-    expect(screen.getByText('ورد — رفيقك اليومي للقرآن')).toBeVisible()
-    expect(screen.getByText('صُنع بمحبة — إهداء لعبدالله الفيل')).toBeVisible()
+    expect(screen.getByText('ورد — صديقك اليومي للقرآن')).toBeVisible()
+    expect(screen.getByText('إهداء لعبدالله')).toBeVisible()
   })
 })

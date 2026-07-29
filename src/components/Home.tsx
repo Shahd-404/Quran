@@ -29,30 +29,39 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="relative mx-auto w-full max-w-lg">
-          <div className="surface-card relative overflow-hidden p-6 shadow-lift sm:p-8">
-            <div aria-hidden="true" className="absolute -left-12 -top-12 h-36 w-36 rounded-full bg-primary-soft" />
-            <div className="relative">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="eyebrow">ورد اليوم</p>
-                  <h2 className="section-title">خمس صفحات بهدوء</h2>
-                </div>
-                <span className="rounded-full bg-primary-soft px-3 py-1.5 font-semibold text-primary-muted">
-                  ٤٠٪
-                </span>
-              </div>
-              <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-primary-soft">
-                <div className="h-full w-2/5 rounded-full bg-primary" />
-              </div>
-              <div className="mt-7 grid gap-3">
-                <PreviewSession title="جلسة الصباح" pages="الصفحات ١٧–١٨" active />
-                <PreviewSession title="جلسة المساء" pages="الصفحات ١٩–٢٠" />
-                <PreviewSession title="جلسة الليل" pages="الصفحة ٢١" />
-              </div>
+        <div className="mx-auto w-full max-w-lg">
+          <section
+            className="surface-card p-4 sm:p-6"
+            aria-labelledby="daily-wird-preview-title"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <p className="eyebrow">ورد اليوم</p>
+              <span className="inline-flex h-8 w-fit shrink-0 items-center rounded-full border border-primary/20 bg-primary-soft px-3 text-xs font-semibold leading-none text-primary-muted">
+                ٤٠٪
+              </span>
             </div>
-          </div>
-          <div aria-hidden="true" className="absolute -bottom-5 -right-5 -z-10 h-28 w-28 rounded-card bg-accent-soft" />
+            <h2
+              id="daily-wird-preview-title"
+              className="mt-3 text-lg font-semibold leading-7 text-ink"
+            >
+              خمس صفحات بهدوء
+            </h2>
+            <div
+              className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-primary-soft"
+              role="progressbar"
+              aria-label="نسبة إنجاز ورد اليوم"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={40}
+            >
+              <div className="h-full w-2/5 rounded-full bg-primary" />
+            </div>
+            <div className="mt-5 grid gap-3">
+              <PreviewSession title="جلسة الصباح" pages="الصفحات ١٧–١٨" active />
+              <PreviewSession title="جلسة المساء" pages="الصفحات ١٩–٢٠" />
+              <PreviewSession title="جلسة الليل" pages="الصفحة ٢١" />
+            </div>
+          </section>
         </div>
       </section>
     </main>
