@@ -12,6 +12,7 @@ describe('CompletionEstimateCard', () => {
       <CompletionEstimateCard
         currentUnreadPage={1}
         pagesPerDay={3}
+        sessionsPerDay={2}
         timezone="Africa/Cairo"
         effectiveFrom="2026-07-29"
         variant="new-plan"
@@ -37,6 +38,7 @@ describe('CompletionEstimateCard', () => {
       <CompletionEstimateCard
         currentUnreadPage={604}
         pagesPerDay={3}
+        sessionsPerDay={2}
         timezone="Africa/Cairo"
         variant="active-plan"
         now={new Date('2026-07-29T10:00:00Z')}
@@ -48,6 +50,7 @@ describe('CompletionEstimateCard', () => {
       <CompletionEstimateCard
         currentUnreadPage={603}
         pagesPerDay={1}
+        sessionsPerDay={1}
         timezone="Africa/Cairo"
         variant="active-plan"
         now={new Date('2026-07-29T10:00:00Z')}
@@ -61,6 +64,7 @@ describe('CompletionEstimateCard', () => {
       <CompletionEstimateCard
         currentUnreadPage={604}
         pagesPerDay={1}
+        sessionsPerDay={1}
         timezone="Africa/Cairo"
         variant="active-plan"
         completed
@@ -87,5 +91,22 @@ describe('CompletionEstimateCard', () => {
       screen.getByRole('region', { name: 'موعد الختم المتوقع' }),
     ).toHaveAttribute('aria-live', 'polite')
     expect(screen.queryByRole('time')).not.toBeInTheDocument()
+  })
+
+  it('shows pages, days, and estimated sessions for an active plan', () => {
+    render(
+      <CompletionEstimateCard
+        currentUnreadPage={17}
+        pagesPerDay={5}
+        sessionsPerDay={3}
+        timezone="Africa/Cairo"
+        variant="active-plan"
+        now={new Date('2026-07-29T10:00:00Z')}
+      />,
+    )
+
+    expect(screen.getByText('٥٨٨')).toBeInTheDocument()
+    expect(screen.getByText('١١٨')).toBeInTheDocument()
+    expect(screen.getByText('٣٥٤')).toBeInTheDocument()
   })
 })

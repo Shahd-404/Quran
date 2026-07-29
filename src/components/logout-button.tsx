@@ -23,7 +23,7 @@ export default function LogoutButton() {
       type="button"
       onClick={handleLogout}
       disabled={loading}
-      className="w-full rounded-2xl bg-red-600 px-4 py-3 text-white font-semibold shadow-sm hover:bg-red-700 disabled:opacity-60"
+      className="btn-danger w-full"
     >
       {loading ? 'جارٍ تسجيل الخروج...' : 'تسجيل الخروج'}
     </button>

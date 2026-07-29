@@ -19,17 +19,17 @@ export function ReaderError({
       : '/app'
 
   return (
-    <div className="-m-4 min-h-screen bg-[#f7f6f2] px-4 py-10 text-stone-900">
+    <main className="page-shell">
       <section
         role="alert"
-        className="mx-auto max-w-xl rounded-3xl border border-rose-200 bg-white p-7 text-center shadow-sm"
+        className="surface-card mx-auto max-w-xl border-danger/30 p-7 text-center"
       >
-        <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-rose-50 text-xl font-bold text-rose-700">
+        <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-danger-soft text-xl font-bold text-danger">
           !
         </div>
         <h1 className="mt-5 text-2xl font-bold">تعذّر عرض صفحة الورد</h1>
         {session ? (
-          <p className="mt-2 text-sm text-stone-500">
+          <p className="mt-2 text-sm text-muted">
             الجلسة {formatArabicNumber(session.sessionOrder)} · الصفحات{' '}
             {formatArabicNumber(session.startPage)}–
             {formatArabicNumber(session.endPage)}
@@ -39,18 +39,18 @@ export function ReaderError({
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
           <Link
             href={retryHref}
-            className="inline-flex min-h-[3rem] items-center justify-center rounded-2xl bg-emerald-900 px-6 py-3 font-bold text-white hover:bg-emerald-950"
+            className="btn-primary"
           >
             إعادة المحاولة
           </Link>
           <Link
             href="/app"
-            className="inline-flex min-h-[3rem] items-center justify-center rounded-2xl bg-stone-100 px-6 py-3 font-bold text-stone-700 hover:bg-stone-200"
+            className="btn-secondary"
           >
             العودة للوحة الورد
           </Link>
         </div>
       </section>
-    </div>
+    </main>
   )
 }

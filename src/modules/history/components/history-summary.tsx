@@ -33,10 +33,10 @@ export function HistorySummary({
       {cards.map((card) => (
         <div
           key={card.label}
-          className="rounded-2xl border border-stone-200/80 bg-white p-5 shadow-sm"
+          className="surface-card p-5"
         >
-          <p className="text-sm leading-6 text-stone-500">{card.label}</p>
-          <p className="mt-2 text-3xl font-bold text-emerald-950">
+          <p className="text-sm leading-6 text-muted">{card.label}</p>
+          <p className="mt-2 text-3xl font-bold text-primary-muted">
             {formatArabicNumber(card.value)}
           </p>
         </div>

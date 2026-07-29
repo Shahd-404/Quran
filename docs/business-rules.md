@@ -148,6 +148,12 @@ Completion estimate rules
   is derived display information only and must not be persisted or mutate
   assignments, sessions, progress, or completion state.
 
+- BR-ESTIMATE-004: Estimated remaining sessions are derived from the existing
+  deterministic distribution: every complete reading day uses the saved
+  sessions-per-day value, and the final partial day uses the smaller of its
+  remaining page count and the saved session count. This value is approximate
+  display information only and never creates or completes a session.
+
 Timezone rules
 
 - BR-TIME-001: The timezone should be detected from the browser during onboarding; if detection fails the timezone defaults to `Africa/Cairo`.

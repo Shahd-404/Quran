@@ -57,10 +57,10 @@ export function PwaControls() {
   }
   if (!installPrompt && !waitingWorker) return null
   return (
-    <section aria-label="إعدادات التطبيق" className="mx-auto mb-4 flex w-full max-w-5xl flex-wrap gap-2 px-4 sm:px-6">
-      {installPrompt && <button type="button" onClick={install} className="min-h-[2.75rem] rounded-xl border border-emerald-800 bg-white px-4 py-2 font-bold text-emerald-900">تثبيت تطبيق ورد</button>}
+    <section aria-label="إعدادات التطبيق" className="mx-auto mt-4 flex w-full max-w-5xl flex-wrap gap-2 px-4 sm:px-6">
+      {installPrompt && <button type="button" onClick={install} className="btn-secondary min-h-[2.75rem] rounded-xl px-4 py-2">تثبيت تطبيق ورد</button>}
       {waitingWorker && (
-        <div role="status" className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-950">
+        <div role="status" className="status-warning flex items-center gap-3 rounded-xl px-4 py-2 text-sm">
           <span>يتوفر تحديث جديد</span>
           <button type="button" onClick={update} className="font-bold underline underline-offset-4">تحديث التطبيق</button>
         </div>

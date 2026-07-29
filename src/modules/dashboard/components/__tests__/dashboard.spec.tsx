@@ -73,14 +73,8 @@ describe('Dashboard', () => {
   it('uses the centered dashboard container and horizontal progress bars', () => {
     const { container } = render(<Dashboard data={model()} />)
 
-    expect(container.querySelector('.max-w-5xl')).toHaveClass(
-      'mx-auto',
-      'w-full',
-      'px-4',
-      'py-6',
-      'sm:px-6',
-      'lg:py-10',
-    )
+    expect(container.querySelector('.page-container')).toBeInTheDocument()
+    expect(container.querySelector('main')).toHaveClass('page-shell')
 
     const progressBars = screen.getAllByRole('progressbar')
     expect(progressBars).toHaveLength(2)
@@ -125,7 +119,16 @@ describe('Dashboard', () => {
     expect(
       screen.getByRole('heading', { name: 'موعد الختم المتوقع' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('باقي لكِ ٥٨٨ صفحة.')).toBeInTheDocument()
+    const estimate = screen
+      .getByRole('heading', { name: 'موعد الختم المتوقع' })
+      .closest('section')
+    expect(estimate).not.toBeNull()
+    expect(within(estimate as HTMLElement).getByText('الصفحات')).toBeInTheDocument()
+    expect(within(estimate as HTMLElement).getByText('٥٨٨')).toBeInTheDocument()
+    expect(within(estimate as HTMLElement).getByText('الأيام تقريبًا')).toBeInTheDocument()
+    expect(within(estimate as HTMLElement).getByText('١١٨')).toBeInTheDocument()
+    expect(within(estimate as HTMLElement).getByText('الجلسات تقريبًا')).toBeInTheDocument()
+    expect(within(estimate as HTMLElement).getByText('٣٥٤')).toBeInTheDocument()
     expect(screen.getByText(/خلال ١١٨ يومًا/)).toBeInTheDocument()
     expect(screen.getByText(/موعد الختم المتوقع:/).querySelector('time'))
       .toHaveAttribute('datetime', '2026-11-20')

@@ -10,6 +10,7 @@ export type CompletionEstimateVariant = 'new-plan' | 'active-plan'
 export type CompletionEstimate = {
   remainingPages: number
   expectedReadingDays: number
+  estimatedRemainingSessions: number | null
   readingStartDate: string | null
   expectedCompletionDate: string | null
 }
@@ -17,6 +18,7 @@ export type CompletionEstimate = {
 export type CompletionEstimateInput = {
   currentUnreadPage?: number | null
   pagesPerDay?: number | null
+  sessionsPerDay?: number | null
   timezone?: string | null
   effectiveFrom?: string | null
   completed?: boolean
@@ -51,6 +53,19 @@ function isValidPagesPerDay(
     Number.isInteger(value) &&
     value >= 1 &&
     value <= QURAN_FINAL_PAGE
+  )
+}
+
+function isValidSessionsPerDay(
+  value: number | null | undefined,
+  pagesPerDay: number,
+): value is number {
+  return (
+    typeof value === 'number' &&
+    Number.isInteger(value) &&
+    value >= 1 &&
+    value <= 6 &&
+    value <= pagesPerDay
   )
 }
 
@@ -141,6 +156,30 @@ export function calculateExpectedReadingDays(
   return Math.ceil(remainingPages / pagesPerDay)
 }
 
+export function calculateExpectedReadingSessions(
+  remainingPages: number,
+  pagesPerDay: number | null | undefined,
+  sessionsPerDay: number | null | undefined,
+): number | null {
+  if (
+    !Number.isInteger(remainingPages) ||
+    remainingPages < 0 ||
+    remainingPages > QURAN_FINAL_PAGE ||
+    !isValidPagesPerDay(pagesPerDay) ||
+    !isValidSessionsPerDay(sessionsPerDay, pagesPerDay)
+  ) {
+    return null
+  }
+
+  const completeReadingDays = Math.floor(remainingPages / pagesPerDay)
+  const finalDayPages = remainingPages % pagesPerDay
+
+  return (
+    completeReadingDays * sessionsPerDay +
+    Math.min(finalDayPages, sessionsPerDay)
+  )
+}
+
 export function calculateExpectedCompletionDate({
   expectedReadingDays,
   timezone,
@@ -188,6 +227,7 @@ export function calculateExpectedCompletionDate({
 export function getCompletionEstimate({
   currentUnreadPage,
   pagesPerDay,
+  sessionsPerDay,
   timezone,
   effectiveFrom,
   completed = false,
@@ -204,11 +244,17 @@ export function getCompletionEstimate({
     pagesPerDay,
   )
   if (expectedReadingDays === null) return null
+  const estimatedRemainingSessions = calculateExpectedReadingSessions(
+    remainingPages,
+    pagesPerDay,
+    sessionsPerDay,
+  )
 
   if (expectedReadingDays === 0) {
     return {
       remainingPages,
       expectedReadingDays,
+      estimatedRemainingSessions,
       readingStartDate: null,
       expectedCompletionDate: null,
     }
@@ -225,6 +271,7 @@ export function getCompletionEstimate({
   return {
     remainingPages,
     expectedReadingDays,
+    estimatedRemainingSessions,
     ...dates,
   }
 }

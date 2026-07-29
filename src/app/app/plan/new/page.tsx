@@ -79,12 +79,12 @@ export default async function NewReadingPlanPage({
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900">
-      <div className="mx-auto max-w-3xl">
+    <main className="page-shell">
+      <div className="page-container-narrow">
         {searchParams?.readingDataDeleted === '1' ? (
           <div
             role="status"
-            className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 font-semibold text-emerald-950"
+            className="status-success mb-6 font-semibold"
           >
             تم مسح بيانات القراءة بنجاح، ويمكنك الآن إنشاء خطة جديدة.
           </div>
@@ -92,22 +92,25 @@ export default async function NewReadingPlanPage({
         {searchParams?.browserCleanup === 'failed' ? (
           <div
             role="status"
-            className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-amber-950"
+            className="status-warning mb-6"
           >
             تم مسح البيانات من الحساب، لكن تعذر تنظيف اشتراك الإشعارات من هذا المتصفح. لن تُرسل إليه تذكيرات من ورد.
           </div>
         ) : null}
         <header className="mb-8 text-right">
-          <p className="mb-2 text-sm font-medium text-emerald-700">
+          <a href="/app" className="text-sm font-bold text-primary-muted hover:underline">
+            العودة إلى لوحة الورد
+          </a>
+          <p className="eyebrow mt-5">
             إعداد خطة الورد
           </p>
 
-          <h1 className="text-2xl font-bold sm:text-3xl">
-            أنشئي خطة وردك اليومية
+          <h1 className="page-title">
+            أنشئ خطة وردك اليومية
           </h1>
 
-          <p className="mt-3 leading-7 text-slate-600">
-            حددي نقطة البداية وعدد الصفحات والجلسات اليومية ثم راجعي الخطة قبل الإنشاء.
+          <p className="page-description">
+            حدّد نقطة البداية وعدد الصفحات والجلسات اليومية، ثم راجع الخطة قبل الإنشاء.
           </p>
         </header>
 

@@ -17,39 +17,39 @@ export function HistoryPagination({
 
   return (
     <nav
-      className="flex items-center justify-between gap-4 border-t border-stone-200 pt-5"
+      className="flex items-center justify-between gap-4 border-t border-line pt-5"
       aria-label="صفحات سجل القراءة"
     >
       {pagination.hasPrevious ? (
         <a
           href={pageHref(basePath, pagination.page - 1)}
-          className="inline-flex min-h-[2.75rem] items-center rounded-xl border border-stone-300 bg-white px-4 py-2 font-bold text-stone-800"
+          className="btn-secondary min-h-[2.75rem] rounded-xl px-4 py-2"
         >
           السابق
         </a>
       ) : (
         <span
           aria-disabled="true"
-          className="inline-flex min-h-[2.75rem] items-center rounded-xl border border-stone-200 px-4 py-2 font-bold text-stone-400"
+          className="inline-flex min-h-[2.75rem] items-center rounded-xl border border-line px-4 py-2 font-bold text-muted/50"
         >
           السابق
         </span>
       )}
-      <span className="text-sm text-stone-500">
+      <span className="text-sm text-muted">
         صفحة {formatArabicNumber(pagination.page)} من{' '}
         {formatArabicNumber(pagination.totalPages)}
       </span>
       {pagination.hasNext ? (
         <a
           href={pageHref(basePath, pagination.page + 1)}
-          className="inline-flex min-h-[2.75rem] items-center rounded-xl bg-emerald-900 px-4 py-2 font-bold text-white"
+          className="btn-primary min-h-[2.75rem] rounded-xl px-4 py-2"
         >
           التالي
         </a>
       ) : (
         <span
           aria-disabled="true"
-          className="inline-flex min-h-[2.75rem] items-center rounded-xl bg-stone-200 px-4 py-2 font-bold text-stone-400"
+          className="inline-flex min-h-[2.75rem] items-center rounded-xl bg-elevated px-4 py-2 font-bold text-muted/50"
         >
           التالي
         </span>

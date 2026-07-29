@@ -93,10 +93,10 @@ export function NotificationSettingsCard() {
   }
 
   return (
-    <section className="rounded-3xl border border-stone-200/80 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="notifications-title">
-      <p className="text-base font-semibold text-emerald-800">التذكيرات</p>
-      <h2 id="notifications-title" className="mt-1 text-2xl font-bold">إشعارات جلسات الورد</h2>
-      <p className="mt-3 leading-7 text-stone-600">
+    <section className="surface-card p-5 sm:p-6" aria-labelledby="notifications-title">
+      <p className="eyebrow">التذكيرات</p>
+      <h2 id="notifications-title" className="section-title">إشعارات جلسات الورد</h2>
+      <p className="mt-3 leading-7 text-muted">
         {state === 'unsupported' && 'هذا المتصفح لا يدعم إشعارات الورد.'}
         {(state === 'default' || state === 'unsubscribed') && 'فعّلي التذكيرات ليصلك تنبيه عند موعد كل جلسة.'}
         {state === 'subscribed' && 'تذكيرات الورد مفعّلة على هذا الجهاز.'}
@@ -104,22 +104,22 @@ export function NotificationSettingsCard() {
       </p>
       {state !== 'unsupported' && state !== 'denied' && (
         <button type="button" disabled={busy} onClick={state === 'subscribed' ? disable : enable}
-          className="mt-4 min-h-[3rem] w-full rounded-2xl border border-emerald-800 px-4 py-3 font-bold text-emerald-900 disabled:opacity-60">
+          className="btn-secondary mt-4 w-full">
           {busy ? 'جارٍ التنفيذ…' : state === 'subscribed' ? 'إيقاف التذكيرات على هذا الجهاز' : 'تفعيل تذكيرات الورد'}
         </button>
       )}
-      {message && <p role="alert" className="mt-3 text-sm text-red-700">{message}</p>}
+      {message && <p role="alert" className="status-danger mt-3 text-sm">{message}</p>}
       {testAvailable && (
-        <div className="mt-4 border-t border-stone-100 pt-4">
+        <div className="mt-4 border-t border-line/70 pt-4">
           <button
             type="button"
             disabled={testBusy}
             onClick={testNotification}
-            className="min-h-[3rem] w-full rounded-2xl border border-stone-300 px-4 py-3 font-bold text-stone-700 disabled:opacity-60"
+            className="btn-secondary w-full"
           >
             {testBusy ? 'جارٍ إرسال الإشعار التجريبي...' : 'اختبار الإشعار الآن'}
           </button>
-          <p className="mt-3 text-sm leading-6 text-stone-500">
+          <p className="mt-3 text-sm leading-6 text-muted">
             هذا اختبار لعرض الإشعار على الجهاز فقط، ولا يختبر الاشتراك أو التذكيرات المجدولة.
           </p>
         </div>
@@ -127,12 +127,12 @@ export function NotificationSettingsCard() {
       {testMessage && (
         <p
           role={testSucceeded ? 'status' : 'alert'}
-          className={`mt-3 text-sm ${testSucceeded ? 'text-emerald-800' : 'text-red-700'}`}
+          className={`mt-3 rounded-xl px-3 py-2 text-sm ${testSucceeded ? 'bg-primary-soft text-primary-muted' : 'bg-danger-soft text-danger'}`}
         >
           {testMessage}
         </p>
       )}
-      <p className="mt-4 text-sm leading-6 text-stone-500">قد يختلف توقيت ظهور الإشعار قليلًا حسب المتصفح ونظام التشغيل.</p>
+      <p className="mt-4 text-sm leading-6 text-muted">قد يختلف توقيت ظهور الإشعار قليلًا حسب المتصفح ونظام التشغيل.</p>
     </section>
   )
 }

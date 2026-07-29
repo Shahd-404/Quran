@@ -118,12 +118,28 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 - Scalable text sizes and high-contrast themes supported.
 - Touch targets sized for mobile interaction.
 - Keyboard navigation for desktop.
+- The interface provides explicit light and dark themes. The saved browser
+  preference is applied before hydration; when no preference exists, the
+  operating-system color preference is the initial value.
 
 ## Arabic and RTL requirements
 
 - All user-facing strings default to Arabic.
 - Visual alignment and reading order must follow RTL conventions.
 - Date/time input and presentation should use localized Arabic numerals where appropriate but preserve clear timezone designators.
+
+## Visual system requirements
+
+- Alexandria is the primary Arabic UI typeface, with IBM Plex Sans Arabic,
+  Cairo, and system Arabic fonts as fallbacks.
+- Light mode uses a warm off-white canvas, white surfaces, deep green actions,
+  and restrained beige/gold accents.
+- Dark mode uses a deep charcoal canvas, elevated dark surfaces, readable
+  neutral text, and a soft green accent.
+- Shared spacing, radii, shadows, fields, buttons, badges, progress bars,
+  dialogs, status messages, header, and footer use semantic design tokens.
+- Every application page includes the footer text
+  `صُنع بمحبة — إهداء لعبدالله الفيل`.
 
 ## Privacy considerations
 

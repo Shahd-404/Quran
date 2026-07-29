@@ -132,8 +132,9 @@ describe('HistoryPage', () => {
         'سيظهر هنا سجل جلساتك بعد إكمال أول جلسة قراءة.',
       ),
     ).toBeInTheDocument()
+    expect(screen.getByText('لا توجد ختمات مكتملة بعد')).toBeInTheDocument()
     expect(
-      screen.getByText('لا توجد ختمات مكتملة بعد. ستظهر هنا عند إكمال أول ختمة.'),
+      screen.getByText('ستظهر هنا عند إكمال أول ختمة بإذن الله.'),
     ).toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
     expect(

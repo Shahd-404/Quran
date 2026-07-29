@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   calculateExpectedCompletionDate,
   calculateExpectedReadingDays,
+  calculateExpectedReadingSessions,
   formatCompletionEstimateArabic,
   getCompletionEstimate,
   getRemainingQuranPages,
@@ -40,6 +41,7 @@ describe('Quran completion estimate', () => {
     const estimate = getCompletionEstimate({
       currentUnreadPage: 604,
       pagesPerDay: 3,
+      sessionsPerDay: 3,
       timezone: 'Africa/Cairo',
       completed: true,
       now: new Date('2026-07-29T10:00:00Z'),
@@ -48,6 +50,7 @@ describe('Quran completion estimate', () => {
     expect(estimate).toEqual({
       remainingPages: 0,
       expectedReadingDays: 0,
+      estimatedRemainingSessions: 0,
       readingStartDate: null,
       expectedCompletionDate: null,
     })
@@ -62,6 +65,18 @@ describe('Quran completion estimate', () => {
 
   it('rounds partial final days upward', () => {
     expect(calculateExpectedReadingDays(5, 2)).toBe(3)
+  })
+
+  it('derives remaining sessions using the deterministic final-day distribution', () => {
+    expect(calculateExpectedReadingSessions(588, 5, 3)).toBe(354)
+    expect(calculateExpectedReadingSessions(5, 5, 3)).toBe(3)
+    expect(calculateExpectedReadingSessions(2, 5, 3)).toBe(2)
+    expect(calculateExpectedReadingSessions(0, 5, 3)).toBe(0)
+  })
+
+  it('rejects invalid session estimates without invalidating the day estimate', () => {
+    expect(calculateExpectedReadingSessions(10, 2, 3)).toBeNull()
+    expect(calculateExpectedReadingSessions(10, 2, 0)).toBeNull()
   })
 
   it('includes the first reading date as day one', () => {

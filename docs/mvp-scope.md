@@ -14,6 +14,7 @@
 - Missed-session continuity policy (no automatic skipping or advancing).
 - Completing page 604 records khatma completion and allows starting a new khatma.
 - Arabic RTL interface and mobile-first responsive layout.
+- Accessible light/dark themes with saved browser preference and system default.
 - Basic loading, empty, offline, and error states.
 - PWA foundation (manifest/service-worker ready for later enhancement; no platform-specific packaging).
 - Opt-in Web Push reminders and explicit notification permission flow.

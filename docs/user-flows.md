@@ -56,6 +56,17 @@ For each flow we document: Preconditions, User actions, System responses, Succes
 - Offline navigation never replays cached authenticated Dashboard HTML; it shows
   the public Arabic offline page until connectivity returns.
 
+4a) Choosing the display theme
+
+- Preconditions: Any application page is open in a supported browser.
+- User actions: Use the theme button in the global header.
+- System responses: Switch between light and dark tokens immediately and save
+  the preference in `localStorage`.
+- Success: The choice is applied before hydration on future visits. With no
+  saved choice, the initial theme follows the operating-system preference.
+- Edge: Theme state is presentation-only and never changes reading data,
+  assignments, notifications, or progress.
+
 5) Opening a scheduled session
 
 - Preconditions: User has a session (state upcoming or available).

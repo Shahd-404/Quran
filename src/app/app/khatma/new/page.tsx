@@ -21,18 +21,18 @@ export default async function NewKhatmaPage() {
 
   if (result.status === 'error') {
     return (
-      <main className="min-h-screen bg-[#f7f6f2] px-4 py-10 text-stone-900">
+      <main className="page-shell">
         <section
           role="alert"
-          className="mx-auto max-w-xl rounded-[2rem] border border-rose-200 bg-white p-8 text-center shadow-sm"
+          className="surface-card mx-auto max-w-xl border-danger/30 p-8 text-center"
         >
           <h1 className="text-2xl font-bold">تعذّر تجهيز الختمة الجديدة</h1>
-          <p className="mt-3 leading-7 text-stone-600">
+          <p className="mt-3 leading-7 text-muted">
             لم نتمكن من تحميل إعدادات خطتك السابقة الآن. حاول مرة أخرى بعد قليل.
           </p>
           <a
             href="/app"
-            className="mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-2xl bg-stone-900 px-6 py-3 font-bold text-white"
+            className="btn-primary mt-6"
           >
             العودة إلى لوحة الورد
           </a>
@@ -46,8 +46,8 @@ export default async function NewKhatmaPage() {
     initialEffectiveFrom = getLocalDateString(new Date(), result.data.timezone)
   } catch {
     return (
-      <main className="min-h-screen bg-[#f7f6f2] px-4 py-10 text-stone-900">
-        <section role="alert" className="mx-auto max-w-xl rounded-[2rem] bg-white p-8 text-center">
+      <main className="page-shell">
+        <section role="alert" className="surface-card mx-auto max-w-xl p-8 text-center">
           تعذّر التحقق من المنطقة الزمنية للخطة السابقة.
         </section>
       </main>
@@ -55,16 +55,16 @@ export default async function NewKhatmaPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f6f2] px-4 py-8 text-stone-900 sm:px-6 lg:py-10">
+    <main className="page-shell">
       <div className="mx-auto w-full max-w-3xl">
         <header className="mb-8">
-          <a className="text-sm font-semibold text-emerald-800" href="/app">
+          <a className="text-sm font-bold text-primary-muted hover:underline" href="/app">
             العودة إلى لوحة الورد
           </a>
           <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
             ابدأ ختمة جديدة
           </h1>
-          <p className="mt-3 max-w-2xl leading-8 text-stone-600">
+          <p className="page-description">
             راجع إعدادات ختمتك السابقة، ثم اختر الاحتفاظ بها أو إنشاء خطة مختلفة.
             لن تبدأ أي ختمة دون تأكيدك.
           </p>

@@ -3,9 +3,18 @@ import { render, screen } from '@testing-library/react'
 import Home from '../components/Home'
 
 describe('Home', () => {
-  it('renders the Arabic application title and development notice', () => {
+  it('renders the Arabic product value and primary actions', () => {
     render(<Home />)
-    expect(screen.getByText('ورد')).toBeInTheDocument()
-    expect(screen.getByText(/التطبيق قيد التطوير/)).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: /وردك اليومي للقرآن/ }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'ابدأ خطة وردك' })).toHaveAttribute(
+      'href',
+      '/register',
+    )
+    expect(screen.getByRole('link', { name: 'تسجيل الدخول' })).toHaveAttribute(
+      'href',
+      '/login',
+    )
   })
 })

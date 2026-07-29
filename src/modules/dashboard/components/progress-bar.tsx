@@ -8,8 +8,8 @@ type ProgressBarProps = {
 
 export function ProgressBar({ value, label, tone = 'emerald' }: ProgressBarProps) {
   const safeValue = Math.min(Math.max(value, 0), 100)
-  const trackColor = tone === 'gold' ? 'bg-amber-100' : 'bg-emerald-100'
-  const barColor = tone === 'gold' ? 'bg-amber-500' : 'bg-emerald-700'
+  const trackColor = tone === 'gold' ? 'bg-accent-soft' : 'bg-primary-soft'
+  const barColor = tone === 'gold' ? 'bg-accent' : 'bg-primary'
 
   return (
     <div
