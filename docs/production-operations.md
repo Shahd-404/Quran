@@ -19,6 +19,8 @@ Vercel Preview and Production:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_SITE_URL` (exact trusted application origin; production is
+  `https://quran-seven-lyart.vercel.app`)
 - `QF_CLIENT_ID` (server-only)
 - `QF_CLIENT_SECRET` (server-only)
 - `QF_ENV` (`prelive` for staging; `production` only with approved credentials)
@@ -105,6 +107,21 @@ Inspect Vault names only, never `decrypted_secret`. Review executions through
 
 - Set the production Site URL and explicit localhost/preview/production redirect
   URLs in Supabase Auth; never use an unrestricted wildcard.
+- For password recovery, set the Supabase Auth Site URL to
+  `https://quran-seven-lyart.vercel.app` and explicitly allow
+  `https://quran-seven-lyart.vercel.app/auth/reset-password`. For local
+  development, allow `http://localhost:3000/auth/reset-password`. Add preview
+  reset URLs individually only when a preview recovery test is required; do not
+  add a broad wildcard.
+- Keep the hosted Reset Password email template compatible with Supabase's
+  `{{ .ConfirmationURL }}` value. Do not replace it with a raw token or copy
+  recovery URLs into logs. Because the application uses SSR/PKCE, open the
+  recovery link in the browser that requested it so the verifier cookie is
+  available.
+- Keep Supabase's password-change security notification enabled where supported.
+  After a controlled reset, verify that the new password works, the old password
+  fails, the local recovery session is signed out, and unrelated sessions and
+  reading data are unchanged.
 - Verify registration, login, logout, SSR cookies, middleware, and `/app`.
 - Confirm Quran pages load server-side and no provider secret/token appears in
   browser bundles or logs.

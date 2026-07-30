@@ -69,6 +69,8 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 ## Main features (MVP)
 
 - Account registration and authentication.
+- Privacy-preserving password recovery through a time-limited Supabase recovery
+  link, with no account-existence disclosure.
 - Create one active reading plan (start page, pages/day, sessions/day, session times, timezone).
 - Deterministic page distribution across sessions.
 - Daily assignments generated per local calendar day.
@@ -86,6 +88,10 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 ## Functional requirements
 
 - The interface language is Arabic and layout is RTL.
+- A syntactically valid password-recovery request returns the same response
+  whether or not an account exists. Password changes require a valid recovery
+  session and preserve reading plans, progress, history, profile data, and
+  unrelated sessions.
 - A reading plan must specify: starting page (1–604), pages per day (>=1, <=604), sessions per day (1–6), scheduled time for each session, and timezone.
 - Session times must be distinct and stored in chronological order.
 - Pages per day are divided deterministically across sessions; remainder assigned to earliest sessions.
@@ -160,6 +166,9 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 ## Privacy considerations
 
 - User accounts required; minimal personal data collected (email/identifier, timezone preference).
+- Password-recovery responses must not reveal whether an email is registered.
+  Passwords, recovery links, recovery tokens, and session tokens must never be
+  logged, persisted by application code, or included in analytics.
 - Reading progress and khatma history are personal data and must be stored securely.
 - Notifications require explicit permission and are not requested on first load.
 - Reminder delivery uses the stored `scheduled_for` timestamp, remains optional,

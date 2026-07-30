@@ -25,6 +25,27 @@ For each flow we document: Preconditions, User actions, System responses, Succes
 - Success outcome: Authenticated user lands on plan creation screen or dashboard with empty state.
 - Errors/edge: Email already in use (show message), timezone detection failed (use fallback and show note), network error (retry prompt).
 
+1a) Recovering a forgotten password
+
+- Preconditions: User is unauthenticated and can access the email address
+  associated with the account.
+- User actions: Choose `نسيتِ كلمة المرور؟`; submit a syntactically valid email;
+  open the Supabase recovery email in the same browser; enter and confirm a new
+  password; explicitly continue to login after reading the success message.
+- System responses: Send only the trusted configured `/auth/reset-password`
+  redirect, show the same acknowledgement for known and unknown addresses,
+  enforce a request cooldown, and expose the reset form only after a
+  `PASSWORD_RECOVERY` event establishes a recovery session. Reject direct,
+  expired, invalid, and already-used links with one safe state. After a
+  successful password update, clear both password fields and sign out the local
+  recovery session before returning to login.
+- Success: The new password can authenticate and the old password cannot.
+  Reading plans, progress, history, profile data, and unrelated sessions remain
+  unchanged.
+- Edge: Rate limits show a generic retry-later message. Provider errors, tokens,
+  raw recovery links, passwords, and account-existence details are never shown
+  or logged.
+
 2) Creating the first reading plan
 
 - Preconditions: Authenticated user, no active plan.
