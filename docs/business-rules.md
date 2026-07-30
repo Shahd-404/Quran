@@ -11,6 +11,26 @@ User and account rules
   - Example: Unauthenticated visitors see an empty state prompting registration.
   - Edge cases: Account creation may be blocked by network errors (retry).
 
+- BR-USER-002: A syntactically valid password-recovery request returns the
+  same acknowledgement whether or not the email belongs to an account.
+  - Reason: Prevent account enumeration.
+  - Example: Known and unknown email addresses receive identical success copy.
+  - Edge cases: Provider rate limits use a separate generic retry-later message.
+
+- BR-USER-003: A password may be updated from the reset route only after the
+  client receives a Supabase `PASSWORD_RECOVERY` event with a valid session.
+  - Reason: An ordinary authenticated session or direct route visit must not
+    be mistaken for proof that the user entered through a recovery link.
+  - Edge cases: Expired, invalid, and already-used links show the same safe
+    invalid-link state.
+
+- BR-USER-004: Password recovery and password replacement do not create or
+  mutate reading plans, assignments, sessions, progress events, khatmas,
+  profile data, or notification subscriptions.
+  - Reason: Credential recovery is independent of reading state.
+  - Example: Opening a reset link and changing a password produces no reading
+    progress mutation.
+
 Reading plan rules
 
 - BR-PLAN-001: A user may have at most one active reading plan at any time.
