@@ -44,7 +44,7 @@ export default function Home() {
               id="daily-wird-preview-title"
               className="mt-3 text-lg font-semibold leading-7 text-ink"
             >
-              خمس صفحات 
+              خمس صفحات بهدوء
             </h2>
             <div
               className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-primary-soft"

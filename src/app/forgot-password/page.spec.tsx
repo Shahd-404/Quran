@@ -117,11 +117,13 @@ describe('ForgotPasswordPage', () => {
     expect(
       await screen.findByText(/تعذّر إرسال رابط الاستعادة الآن/),
     ).toBeInTheDocument()
-    expect(screen.queryByText('raw provider diagnostics')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('raw provider diagnostics'),
+    ).not.toBeInTheDocument()
   })
 
   it('prevents duplicate submissions and starts a cooldown', async () => {
-    let resolveRequest: ((response: Response) => void) | null = null
+    let resolveRequest!: (response: Response) => void
     fetchMock.mockReturnValue(
       new Promise<Response>((resolve) => {
         resolveRequest = resolve
@@ -142,7 +144,7 @@ describe('ForgotPasswordPage', () => {
     fireEvent.submit(form as HTMLFormElement)
     expect(fetchMock).toHaveBeenCalledTimes(1)
 
-    resolveRequest?.(
+    resolveRequest(
       new Response(JSON.stringify({ ok: true }), {
         status: 200,
         headers: { 'content-type': 'application/json' },
