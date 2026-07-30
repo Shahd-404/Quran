@@ -1,10 +1,7 @@
 import { getPublicSupabaseConfig } from './env'
+import { createBrowserClient as createSupabaseBrowserClient } from '@supabase/ssr'
 
-export async function createBrowserClient() {
+export function createBrowserClient() {
   const { url, anonKey } = getPublicSupabaseConfig()
-  const ssr = await import('@supabase/ssr')
-  if (typeof ssr.createBrowserClient !== 'function') {
-    throw new Error('Expected createBrowserClient in @supabase/ssr')
-  }
-  return ssr.createBrowserClient(url, anonKey)
+  return createSupabaseBrowserClient(url, anonKey)
 }

@@ -1,3 +1,5 @@
+import { getTrustedSiteOrigin } from '@/lib/site-url'
+
 export const EMAIL_RATE_LIMIT_MESSAGE =
   'تم إرسال رسائل كثيرة مؤخرًا. انتظري قليلًا ثم حاولي مرة أخرى.'
 
@@ -102,29 +104,12 @@ export function mapAuthFailure(error: unknown): SafeAuthFailure {
 }
 
 export function getEmailRedirectTo(): string | null {
-  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim()
-  if (!configuredSiteUrl) return null
+  const siteOrigin = getTrustedSiteOrigin(
+    process.env.NEXT_PUBLIC_SITE_URL,
+  )
+  if (!siteOrigin) return null
 
-  try {
-    const siteUrl = new URL(configuredSiteUrl)
-    const isLocalDevelopmentHost =
-      siteUrl.hostname === 'localhost' ||
-      siteUrl.hostname === '127.0.0.1' ||
-      siteUrl.hostname === '[::1]'
-
-    if (
-      siteUrl.username ||
-      siteUrl.password ||
-      (siteUrl.protocol !== 'https:' &&
-        !(siteUrl.protocol === 'http:' && isLocalDevelopmentHost))
-    ) {
-      return null
-    }
-
-    const redirectUrl = new URL('/login', siteUrl.origin)
-    redirectUrl.searchParams.set('emailConfirmed', '1')
-    return redirectUrl.toString()
-  } catch {
-    return null
-  }
+  const redirectUrl = new URL('/login', siteOrigin)
+  redirectUrl.searchParams.set('emailConfirmed', '1')
+  return redirectUrl.toString()
 }

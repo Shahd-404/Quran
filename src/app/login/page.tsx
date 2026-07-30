@@ -109,6 +109,14 @@ export default function LoginPage() {
                 aria-describedby={error ? 'login-error' : undefined}
               />
             </label>
+            <div className="-mt-2 text-left">
+              <a
+                href="/forgot-password"
+                className="inline-flex min-h-[2.75rem] items-center rounded-xl px-1 text-sm font-semibold text-primary-muted underline-offset-4 transition hover:underline"
+              >
+                نسيتِ كلمة المرور؟
+              </a>
+            </div>
           </div>
 
           {error ? (
