@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.shahd404.wird",
+      "sha256_cert_fingerprints": [
+        "AE:36:E8:A7:49:DD:45:12:C0:54:55:BC:E9:F4:76:B9:A9:AC:0D:A6:1D:C7:4A:3B:FF:54:F4:37:58:76:52:C4"
+      ]
+    }
+  }
+]
