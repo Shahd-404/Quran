@@ -129,7 +129,9 @@ Inspect Vault names only, never `decrypted_secret`. Review executions through
   protection, and HSTS on production HTTPS.
 - Confirm `/manifest.webmanifest`, icons, and `/sw.js` return `200`.
 - Confirm the Service Worker controls `/`, does not cache APIs or authenticated
-  HTML, retains Push handlers, and provides only the public offline shell.
+  HTML, retains Push handlers, and serves the public offline shell. Verify Quran
+  pages exist only in account-scoped IndexedDB after explicit download and expire
+  within seven days.
 - Create a new production-origin subscription and send one controlled Push to an
   isolated account.
 

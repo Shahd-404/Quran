@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { StatusToast } from '@/components/status-toast'
 import { NotificationSettingsCard } from '@/modules/notifications/components/notification-settings-card'
+import { OfflineDownloadManager } from '@/modules/offline/components/offline-download-manager'
 import { CompletionEstimateCard } from '@/modules/reading-plan/components/completion-estimate-card'
 import { formatArabicNumber } from '../formatting'
 import { DashboardModel } from '../types'
@@ -195,7 +196,11 @@ export function Dashboard({
             </div>
           </details>
 
-          <details className="group surface-card p-4 lg:col-start-2 lg:row-start-4">
+          <div className="lg:col-start-2 lg:row-start-4">
+            <OfflineDownloadManager />
+          </div>
+
+          <details className="group surface-card p-4 lg:col-start-2 lg:row-start-5">
             <DisclosureHeading Icon={CalendarDays} title="تفاصيل الخطة" description="الهدف والمواعيد" />
             <div className="mt-4 border-t border-line/70 pt-3">
               <dl className="divide-y divide-line/70">

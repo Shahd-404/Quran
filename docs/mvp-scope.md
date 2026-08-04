@@ -16,6 +16,8 @@
 - Arabic RTL interface and mobile-first responsive layout.
 - Accessible light/dark themes with saved browser preference and system default.
 - Basic loading, empty, offline, and error states.
+- Explicit, device-local downloads of owned Wird sessions for safe offline
+  reading, with seven-day Quran-text retention and queued completion confirmation.
 - PWA foundation (manifest/service-worker ready for later enhancement; no platform-specific packaging).
 - Opt-in Web Push reminders and explicit notification permission flow.
 - Basic automated tests for core business rules.

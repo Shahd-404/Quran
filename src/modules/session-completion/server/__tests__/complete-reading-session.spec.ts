@@ -66,6 +66,39 @@ describe('completeReadingSession', () => {
     })
   })
 
+  it('uses the offline receipt RPC for a valid stable action key and timestamp', async () => {
+    const client = createClient([completionRow()])
+    const occurredAt = '2026-08-04T10:00:00.000Z'
+    const idempotencyKey = '33333333-3333-4333-8333-333333333333'
+
+    await expect(
+      completeReadingSession(
+        client,
+        sessionId,
+        { idempotencyKey, occurredAt },
+        new Date('2026-08-04T11:00:00.000Z'),
+      ),
+    ).resolves.toMatchObject({ success: true })
+    expect(client.rpc).toHaveBeenCalledWith('complete_offline_reading_session', {
+      p_session_id: sessionId,
+      p_idempotency_key: idempotencyKey,
+      p_occurred_at: occurredAt,
+    })
+  })
+
+  it('rejects a stale or malformed offline action before calling the RPC', async () => {
+    const client = createClient([completionRow()])
+    const result = await completeReadingSession(
+      client,
+      sessionId,
+      { idempotencyKey: 'not-a-uuid', occurredAt: '2026-07-01T10:00:00.000Z' },
+      new Date('2026-08-04T11:00:00.000Z'),
+    )
+
+    expect(result).toMatchObject({ success: false, code: 'OFFLINE_ACTION_INVALID' })
+    expect(client.rpc).not.toHaveBeenCalled()
+  })
+
   it('maps known errors to safe Arabic without raw SQL leakage', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
     const result = await completeReadingSession(

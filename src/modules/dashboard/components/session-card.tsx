@@ -130,6 +130,11 @@ export function SessionCard({
       </div>
       <Link
         href={`/app/read/${session.id}`}
+        onClick={(event) => {
+          if (navigator.onLine) return
+          event.preventDefault()
+          window.location.assign(`/app/read/${session.id}`)
+        }}
         data-dominant-action={featured ? 'true' : undefined}
         className={[
           'mt-3 inline-flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition',

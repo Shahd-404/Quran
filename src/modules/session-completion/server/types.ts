@@ -1,5 +1,6 @@
 export type SessionCompletionErrorCode =
   | 'UNAUTHENTICATED'
+  | 'OFFLINE_ACTION_INVALID'
   | 'SESSION_NOT_FOUND'
   | 'SESSION_OWNERSHIP_INVALID'
   | 'INVALID_SESSION_STATE'
@@ -28,3 +29,8 @@ export type SessionCompletionFailure = {
 export type CompleteReadingSessionResult =
   | SessionCompletionSuccess
   | SessionCompletionFailure
+
+export type OfflineCompletionAction = {
+  idempotencyKey: string
+  occurredAt: string
+}

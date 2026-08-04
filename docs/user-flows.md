@@ -81,8 +81,10 @@ For each flow we document: Preconditions, User actions, System responses, Succes
   History, Plan, and Settings. Account and privacy actions remain under
   Settings rather than competing with the daily reading action.
 - Edge: If offline, show cached state and indicate offline; if plan paused, show paused state.
-- Offline navigation never replays cached authenticated Dashboard HTML; it shows
-  the public Arabic offline page until connectivity returns.
+- Offline navigation never replays cached authenticated Dashboard HTML. The
+  public Arabic offline document may list unexpired sessions that the current
+  account explicitly downloaded on that device; otherwise it asks the user to
+  reconnect.
 
 4a) Choosing the display theme
 
@@ -219,9 +221,22 @@ For each flow we document: Preconditions, User actions, System responses, Succes
   loading operation. If offline, show a clear offline indicator; if a page is
   permanently missing from the provider, show a fallback message and contact
   support.
-- Success: User recovers by retrying or using cached content.
-- Quran text is not claimed as offline content. A connectivity failure displays
-  a safe Arabic error and retry action without recording position or completion.
+- Success: User recovers by retrying or by opening an explicitly downloaded,
+  complete, unexpired session.
+- A missing, partial, evicted, or expired download displays a specific safe
+  Arabic message and never renders a partial page range. Opening or downloading
+  never records position or completion.
+
+19a) Downloading and reading a Wird without connection
+
+- The signed-in user chooses `تنزيل الورد للقراءة بدون إنترنت` and may include
+  already-created eligible sessions for the next seven days.
+- The application shows session/page counts, approximate local size, last
+  successful download, and expiry. The user may update or remove all content.
+- Completing a downloaded session still requires explicit confirmation. While
+  offline, the action is visibly marked as waiting and is not presented as
+  server progress. Reconnect sync preserves its original timestamp and stable
+  idempotency key; conflicts retain server authority and remain visible.
 
 20) Installing and updating the PWA
 

@@ -2,6 +2,7 @@ import { SessionCompletionErrorCode } from './types'
 
 const SAFE_MESSAGES: Record<SessionCompletionErrorCode, string> = {
   UNAUTHENTICATED: 'يجب تسجيل الدخول أولًا لإكمال جلسة الورد.',
+  OFFLINE_ACTION_INVALID: 'تعذّر التحقق من إجراء الإكمال المحفوظ. أعد فتح الجلسة وحاول مرة أخرى.',
   SESSION_NOT_FOUND: 'تعذّر العثور على جلسة الورد المطلوبة.',
   SESSION_OWNERSHIP_INVALID: 'تعذّر التحقق من ملكية جلسة الورد.',
   INVALID_SESSION_STATE: 'لا يمكن إكمال جلسة الورد في حالتها الحالية.',

@@ -118,7 +118,10 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 - Responsive design optimized for mobile viewports.
 - RTL layout correctness throughout.
 - Public application assets and the offline shell may be cached. Authenticated
-  pages, assignments, progress, API responses, and Quran text are not cached.
+  HTML, API responses, auth material, assignments, and server progress are never
+  written to Cache Storage. After an explicit user action, only the minimal owned
+  session metadata and exact Quran pages required for the selected sessions may
+  be stored in account-scoped IndexedDB for at most seven days.
 - Deterministic behaviour across devices; server-authoritative state ensures consistency.
 - Minimal latency for opening assigned pages and marking completion.
 

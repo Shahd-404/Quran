@@ -44,6 +44,12 @@ Do not expose private payloads.
 - [ ] Verify idempotent delivery and per-device deactivation.
 - [ ] Install in Chromium and verify standalone start, offline privacy, and
   explicit Service Worker update behavior.
+- [ ] Download today's incomplete sessions, disconnect, relaunch `/app`, and open
+  every downloaded session; verify a non-downloaded and an expired session fail closed.
+- [ ] Confirm one session offline, verify the UI says it is waiting, reconnect,
+  and verify exactly one server completion after repeated focus/reload attempts.
+- [ ] Switch accounts and log out with and without a pending action; verify the
+  warning and account-scoped IndexedDB cleanup.
 
 ## Manual accessibility and browser matrix
 

@@ -111,8 +111,18 @@ describe('shared Service Worker', () => {
     expect(installHandler).not.toContain('skipWaiting')
   })
   it('deletes only old Wird-owned caches', () => {
-    expect(source).toContain("const STATIC_CACHE = 'wird-static-v3'")
+    expect(source).toContain("const STATIC_CACHE = 'wird-static-v4'")
     expect(source).toContain('name.startsWith(WIRD_CACHE_PREFIX)')
     expect(source).toContain('name !== STATIC_CACHE')
+  })
+
+  it('keeps Quran content in IndexedDB and adds bounded Background Sync without a second worker', () => {
+    expect(source).toContain("const OFFLINE_DB_NAME = 'wird-offline-v1'")
+    expect(source).toContain("const OFFLINE_OUTBOX_STORE = 'offline_progress_outbox'")
+    expect(source).toContain("const MAX_SYNC_BATCH = 10")
+    expect(source).toContain("addEventListener('sync'")
+    expect(source).toContain("event.tag === OFFLINE_SYNC_TAG")
+    expect(source).toContain("credentials: 'include'")
+    expect(source).not.toContain("caches.open('quran")
   })
 })

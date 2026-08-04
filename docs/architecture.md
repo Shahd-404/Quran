@@ -91,9 +91,20 @@ Notes:
   waiting worker activates and reloads the page only after the user presses the
   explicit update action; install and update discovery never call
   `skipWaiting` automatically.
-- Quran pages, Supabase traffic, application APIs, mutations, credentials,
-  subscription material, assignments, and progress data are excluded from
-  offline caching.
+- Supabase traffic, application API responses, credentials, subscription
+  material, authenticated HTML, and authoritative progress remain excluded from
+  Cache Storage. Explicit offline downloads use the versioned, account-scoped
+  IndexedDB stores `downloaded_sessions`, `downloaded_quran_pages`,
+  `offline_progress_outbox`, and `offline_metadata`.
+- The protected offline-download endpoint derives the user from the Supabase
+  session, revalidates session ownership and the current/eight-day eligibility
+  window, rate-limits bounded requests, and uses the server-only Quran Foundation
+  client. Quran text expires after at most seven days and is never partially
+  committed as a readable session.
+- Offline completion records only a minimal client action. The UI does not claim
+  server progress until the existing server-authoritative completion transaction
+  accepts the stable idempotency key. Sync is attempted serially on reconnect,
+  application start, visibility/focus, and Background Sync when supported.
 
 ## Testing strategy
 

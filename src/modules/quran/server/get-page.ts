@@ -8,7 +8,11 @@ import {
 } from './errors'
 import { getQuranChapters } from './get-chapters'
 
-const pageCache = new Map<number, Promise<QuranPage>>()
+const QURAN_PAGE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000
+const pageCache = new Map<
+  number,
+  { expiresAt: number; request: Promise<QuranPage> }
+>()
 
 function isValidPage(pageNumber: number): boolean {
   return Number.isInteger(pageNumber) && pageNumber >= 1 && pageNumber <= 604
@@ -69,16 +73,20 @@ export async function loadQuranPage(
 
 export function getQuranPage(pageNumber: number): Promise<QuranPage> {
   const cached = pageCache.get(pageNumber)
-  if (cached) return cached
+  if (cached && cached.expiresAt > Date.now()) return cached.request
+  if (cached) pageCache.delete(pageNumber)
 
   const request = loadQuranPage(
     pageNumber,
     getQuranFoundationClient(),
     getQuranChapters(),
   ).catch((error) => {
-    pageCache.delete(pageNumber)
+    if (pageCache.get(pageNumber)?.request === request) pageCache.delete(pageNumber)
     throw error
   })
-  pageCache.set(pageNumber, request)
+  pageCache.set(pageNumber, {
+    expiresAt: Date.now() + QURAN_PAGE_CACHE_TTL_MS,
+    request,
+  })
   return request
 }

@@ -5,6 +5,7 @@ import {
 } from './error-mapping'
 import {
   CompleteReadingSessionResult,
+  OfflineCompletionAction,
   SessionCompletionFailure,
 } from './types'
 
@@ -50,14 +51,37 @@ function isCompletionRow(value: unknown): value is CompletionRow {
 export async function completeReadingSession(
   client: SupabaseClient,
   sessionId: string,
+  offlineAction?: OfflineCompletionAction,
+  now = new Date(),
 ): Promise<CompleteReadingSessionResult> {
   if (!UUID_PATTERN.test(sessionId)) {
     return failure('SESSION_NOT_FOUND')
   }
 
-  const { data, error } = (await client.rpc('complete_reading_session', {
-    p_session_id: sessionId,
-  })) as { data: unknown; error: RpcError | null }
+  let rpcName = 'complete_reading_session'
+  let rpcArguments: Record<string, string> = { p_session_id: sessionId }
+  if (offlineAction) {
+    const occurredAt = Date.parse(offlineAction.occurredAt)
+    if (
+      !UUID_PATTERN.test(offlineAction.idempotencyKey) ||
+      !Number.isFinite(occurredAt) ||
+      occurredAt < now.getTime() - 8 * 24 * 60 * 60 * 1000 ||
+      occurredAt > now.getTime() + 5 * 60 * 1000
+    ) {
+      return failure('OFFLINE_ACTION_INVALID')
+    }
+    rpcName = 'complete_offline_reading_session'
+    rpcArguments = {
+      p_session_id: sessionId,
+      p_idempotency_key: offlineAction.idempotencyKey,
+      p_occurred_at: new Date(occurredAt).toISOString(),
+    }
+  }
+
+  const { data, error } = (await client.rpc(rpcName, rpcArguments)) as {
+    data: unknown
+    error: RpcError | null
+  }
 
   if (error) {
     const code = mapCompletionDatabaseError(
