@@ -8,7 +8,7 @@ const csp = [
   `script-src 'self' 'unsafe-inline'${isProduction ? '' : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
-  "font-src 'self' data:",
+  "font-src 'self' data: https://verses.quran.foundation",
   `connect-src 'self'${supabaseOrigin ? ` ${supabaseOrigin} ${supabaseWebSocketOrigin}` : ''}${isProduction ? '' : ' ws://localhost:* ws://127.0.0.1:*'}`,
   "worker-src 'self' blob:",
   "manifest-src 'self'",

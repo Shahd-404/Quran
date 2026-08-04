@@ -14,16 +14,40 @@ import {
 
 function page(pageNumber: number): QuranPage {
   return {
+    schemaVersion: 1,
+    mushafId: 1,
     pageNumber,
+    v2Page: pageNumber,
+    lines: [
+      {
+        lineNumber: 1,
+        words: [
+          {
+            wordId: pageNumber * 100,
+            position: 1,
+            pageNumber,
+            v2Page: pageNumber,
+            lineNumber: 1,
+            charTypeName: 'word',
+            codeV2: 'ﱁ',
+            accessibleText: `نص الصفحة ${pageNumber}`,
+            verseKey: `2:${pageNumber}`,
+            verseNumber: pageNumber,
+            chapterId: 2,
+          },
+        ],
+      },
+    ],
     verses: [
       {
         chapterId: 2,
         chapterNameArabic: 'البقرة',
         verseKey: `2:${pageNumber}`,
         verseNumber: pageNumber,
-        uthmaniText: `نص الصفحة ${pageNumber}`,
+        accessibleText: `نص الصفحة ${pageNumber}`,
       },
     ],
+    headings: [],
   }
 }
 
@@ -83,9 +107,9 @@ describe('Quran page range loader', () => {
     ).rejects.toMatchObject({ code: 'QURAN_INVALID_PAGE_RANGE' })
     expect(logFailure).toHaveBeenCalledWith(
       expect.objectContaining({
-        startPage,
-        endPage,
-        failingPage: null,
+        requestedPage: startPage,
+        returnedPage: null,
+        lineCount: 0,
         errorCode: 'QURAN_INVALID_PAGE_RANGE',
       }),
     )
@@ -119,13 +143,11 @@ describe('Quran page range loader', () => {
       upstreamStatusCode: 500,
     })
     expect(logFailure).toHaveBeenCalledWith({
-      operation: 'load_quran_page_range',
+      operation: 'load_qcf_v2_page',
       correlationId,
-      routeType: 'authenticated_reader',
-      startPage: 80,
-      endPage: 82,
-      failingPage: 81,
-      upstreamStatusCode: 500,
+      requestedPage: 81,
+      returnedPage: null,
+      lineCount: 0,
       errorCode: 'QURAN_UPSTREAM_SERVER_ERROR',
       durationMs: 0,
     } satisfies QuranLoadFailureLog)
@@ -202,6 +224,24 @@ describe('Quran page range loader', () => {
     ).rejects.toMatchObject({
       pageNumber: 81,
       code: new QuranMalformedResponseError().code,
+    })
+  })
+
+  it('rejects a QCF page whose v2 font page does not match the request', async () => {
+    const loadPage = vi.fn(async (pageNumber: number) => ({
+      ...page(pageNumber),
+      v2Page: pageNumber === 81 ? 80 : pageNumber,
+    }))
+
+    await expect(
+      loadQuranPageRange(80, 82, {
+        correlationId,
+        loadPage,
+        logFailure: vi.fn(),
+      }),
+    ).rejects.toMatchObject({
+      pageNumber: 81,
+      code: 'QURAN_MALFORMED_RESPONSE',
     })
   })
 

@@ -135,6 +135,15 @@ Quran page boundary rules
   - Edge: Invalid, reversed, duplicated, missing, or out-of-order pages produce
     a safe all-or-nothing loading error and never advance reading progress.
 
+- BR-PAGE-003: A displayed Quran page uses Quran Foundation QCF V2 Mushaf ID 1.
+  Every visual word must belong to the requested `page_number` and `v2_page`,
+  retain provider order inside its official `line_number`, and render only after
+  the matching page font is available.
+  - Reason: QCF glyph codes are page-font-specific and a mismatch can display
+    incorrect Quran text.
+  - Edge: Missing words, duplicate IDs, invalid lines, cross-page font data, or
+    a missing font fail closed and never record completion or advance progress.
+
 Khatma rules
 
 - BR-KHATMA-001: Completing page 604 completes the current khatma cycle.

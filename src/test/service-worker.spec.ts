@@ -31,6 +31,9 @@ describe('shared Service Worker', () => {
     }) => void>()
     const context = {
       URL,
+      Date,
+      Headers,
+      Request,
       Response,
       console,
       fetch: async () => ({ ok: false }),
@@ -39,7 +42,9 @@ describe('shared Service Worker', () => {
         match: async () => null,
         open: async () => ({
           addAll: async () => undefined,
+          match: async () => null,
           put: async () => undefined,
+          delete: async () => true,
         }),
         delete: async () => true,
       },
@@ -87,6 +92,16 @@ describe('shared Service Worker', () => {
       ),
     ).toBe(false)
     expect(
+      isIntercepted(
+        'https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p80.woff2',
+      ),
+    ).toBe(true)
+    expect(
+      isIntercepted(
+        'https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p605.woff2',
+      ),
+    ).toBe(false)
+    expect(
       isIntercepted('https://project.supabase.co/rest/v1/reading_sessions'),
     ).toBe(false)
     expect(
@@ -112,7 +127,15 @@ describe('shared Service Worker', () => {
   })
   it('deletes only old Wird-owned caches', () => {
     expect(source).toContain("const STATIC_CACHE = 'wird-static-v3'")
+    expect(source).toContain("const QCF_FONT_CACHE = 'wird-qcf-v2-fonts-v1'")
     expect(source).toContain('name.startsWith(WIRD_CACHE_PREFIX)')
-    expect(source).toContain('name !== STATIC_CACHE')
+    expect(source).toContain('!ACTIVE_CACHES.has(name)')
+  })
+  it('keeps only complete official QCF fonts for at most seven days', () => {
+    expect(source).toContain('QCF_FONT_CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000')
+    expect(source).toContain('QCF_V2_PAGE_FONT.test(url.href)')
+    expect(source).toContain("metadataUrl.searchParams.set('__wird_cached_at', '1')")
+    expect(source).toContain('Date.now() - cachedAt > QCF_FONT_CACHE_MAX_AGE_MS')
+    expect(source).toContain('if (response.ok)')
   })
 })

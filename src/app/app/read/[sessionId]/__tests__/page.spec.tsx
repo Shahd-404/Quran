@@ -52,16 +52,40 @@ const session = {
 }
 
 const pages = [17, 18].map((pageNumber) => ({
+  schemaVersion: 1 as const,
+  mushafId: 1 as const,
   pageNumber,
+  v2Page: pageNumber,
+  lines: [
+    {
+      lineNumber: 1,
+      words: [
+        {
+          wordId: pageNumber * 100,
+          position: 1,
+          pageNumber,
+          v2Page: pageNumber,
+          lineNumber: 1,
+          charTypeName: 'word' as const,
+          codeV2: 'ﱁ',
+          accessibleText: `نص الصفحة ${pageNumber}`,
+          verseKey: `2:${pageNumber}`,
+          verseNumber: pageNumber,
+          chapterId: 2,
+        },
+      ],
+    },
+  ],
   verses: [
     {
       chapterId: 2,
       chapterNameArabic: 'البقرة',
       verseKey: `2:${pageNumber}`,
       verseNumber: pageNumber,
-      uthmaniText: `نص الصفحة ${pageNumber}`,
+      accessibleText: `نص الصفحة ${pageNumber}`,
     },
   ],
+  headings: [],
 }))
 
 describe('ReadingSessionPage', () => {

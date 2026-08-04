@@ -2,6 +2,115 @@
 @tailwind components;
 @tailwind utilities;
 
+.qcf-page-viewport {
+  inline-size: 100%;
+  overflow: hidden;
+}
+
+.qcf-page-paper,
+.qcf-page-state {
+  margin-inline: auto;
+  inline-size: 100%;
+  max-inline-size: 48rem;
+  aspect-ratio: 0.69;
+  border: 1px solid #d8c9a7;
+  border-radius: 0.75rem;
+  background: #fffaf0;
+  color: #17130d;
+  box-shadow: 0 0.75rem 2.5rem rgb(52 42 25 / 10%);
+}
+
+.qcf-page-paper {
+  container-type: inline-size;
+  padding: 5.5cqw 4.5cqw 4.5cqw;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.qcf-page-grid {
+  display: grid;
+  block-size: 100%;
+  grid-template-rows: repeat(15, minmax(0, 1fr));
+}
+
+.qcf-mushaf-row {
+  display: flex;
+  min-inline-size: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.qcf-mushaf-line {
+  font-size: 4.05cqw;
+  font-weight: 400;
+  line-height: 1;
+  text-align: center;
+  text-rendering: geometricPrecision;
+}
+
+.qcf-word,
+.qcf-verse-end {
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+.qcf-verse-end {
+  font-size: 0.92em;
+}
+
+.qcf-surah-heading {
+  position: relative;
+  margin-inline: auto;
+  inline-size: min(72%, 30rem);
+  font-family: Alexandria, 'IBM Plex Sans Arabic', Cairo, sans-serif;
+  font-size: clamp(0.65rem, 2.5cqw, 1.1rem);
+  font-weight: 700;
+}
+
+.qcf-surah-heading::before,
+.qcf-surah-heading::after {
+  content: '';
+  block-size: 1px;
+  flex: 1;
+  background: #bca779;
+}
+
+.qcf-surah-heading span {
+  padding-inline: 0.8rem;
+}
+
+.qcf-bismillah {
+  font-size: 3.15cqw;
+  line-height: 1;
+}
+
+.qcf-page-state {
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.9;
+}
+
+.qcf-page-state-error {
+  border-color: rgb(180 83 9 / 35%);
+  color: #854d0e;
+}
+
+@media (max-width: 360px) {
+  .qcf-page-paper {
+    border-radius: 0.5rem;
+    padding-inline: 3.5cqw;
+  }
+
+  .qcf-mushaf-line {
+    font-size: 4.2cqw;
+  }
+}
+
 :root {
   color-scheme: light;
   --color-canvas: 248 246 240;

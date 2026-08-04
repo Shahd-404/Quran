@@ -100,6 +100,11 @@ Wird reduces planning friction by splitting a user's daily page target into sche
   stored end page as one validated inclusive range. It renders no partial range
   as a successful session, and it records no open position until the complete
   initial range has loaded.
+- Quran pages use the Quran Foundation Madani QCF V2 contract (Mushaf ID 1):
+  word-level glyphs are validated against their requested page and QCF V2 font
+  page, grouped by official line number, and rendered as one fixed 15-line page
+  composition. Private-use glyphs are hidden from assistive technology in
+  favour of the provider's official Arabic word text.
 - A session becomes `in_progress` when opened; only explicit user confirmation marks it `completed`.
 - Completion stores a timestamp (presentation uses user timezone) and advances the current unread page only for explicitly completed pages.
 - Completing page 604 completes the khatma and records start and completion dates.
@@ -119,6 +124,10 @@ Wird reduces planning friction by splitting a user's daily page target into sche
 - RTL layout correctness throughout.
 - Public application assets and the offline shell may be cached. Authenticated
   pages, assignments, progress, API responses, and Quran text are not cached.
+- Official QCF V2 font files may be cached on demand for at most seven days.
+  Quran Foundation API requests, credentials, and authenticated reader HTML
+  remain excluded from Cache Storage. A page with a missing or expired font is
+  unavailable rather than rendered with mismatched glyphs.
 - Deterministic behaviour across devices; server-authoritative state ensures consistency.
 - Minimal latency for opening assigned pages and marking completion.
 

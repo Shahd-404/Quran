@@ -64,6 +64,11 @@ This architecture document describes the high-level structure and design princip
 
 Notes:
 - Quran provider access will be behind a provider interface to allow replacement.
+- The current reader's provider adapter requests Quran Foundation
+  `/content/api/v4/verses/by_page/{page}` with Mushaf ID 1, `words=true`,
+  `code_v2`, QCF V2 page metadata, official line numbers, and Arabic accessible
+  text. Normalization preserves provider word order, rejects page/font mixing,
+  and emits a versioned line-based page model before it reaches React.
 - Reading-plan calculations will be implemented in a module separate from UI to allow unit testing.
 - Database access and migrations are reserved for future tasks and must be implemented on trusted server boundaries.
 - Reading history is server-rendered from authenticated Supabase clients. Its
@@ -91,6 +96,10 @@ Notes:
   waiting worker activates and reloads the page only after the user presses the
   explicit update action; install and update discovery never call
   `skipWaiting` automatically.
+- The worker treats official QCF V2 WOFF2 files as public static assets through
+  one exact Quran Foundation CDN allowlist. It caches only successful font
+  responses, stores separate cache-age metadata, and removes them after seven
+  days. No Quran API response or authenticated page enters this cache.
 - Quran pages, Supabase traffic, application APIs, mutations, credentials,
   subscription material, assignments, and progress data are excluded from
   offline caching.
