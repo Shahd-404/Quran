@@ -7,7 +7,8 @@
 - Plan creation with: starting page (1–604), daily pages, 1–6 sessions, scheduled times, and timezone.
 - Deterministic page distribution across sessions and example behaviour.
 - Daily assignment generation per local calendar day.
-- Reader that displays assigned page ranges and prevents accidental navigation outside the session.
+- Reader that displays assigned page ranges as validated Madani QCF V2 page
+  compositions and prevents accidental navigation outside the session.
 - Explicit session completion with confirmation and timestamp.
 - Dashboard showing today’s assigned pages, completed pages, progress %, session list and times, current unread page, and khatma progress.
 - Persistent current unread page and khatma records.

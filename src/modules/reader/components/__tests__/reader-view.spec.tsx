@@ -9,6 +9,11 @@ import { ReaderView } from '../reader-view'
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }))
+vi.mock('@/modules/quran/client/qcf-v2-font-loader', () => ({
+  getQcfV2PageFontFamily: (pageNumber: number) => `p${pageNumber}-v2`,
+  loadQcfV2FontsForPage: () => new Promise(() => undefined),
+  QCF_V2_UNICODE_FONT_FAMILY: 'WirdUthmanicHafs',
+}))
 
 const session: ReaderSession = {
   id: '11111111-1111-1111-1111-111111111111',
@@ -27,33 +32,81 @@ const session: ReaderSession = {
 }
 
 const page: QuranPage = {
+  schemaVersion: 1,
+  mushafId: 1,
   pageNumber: 17,
+  v2Page: 17,
+  lines: [
+    {
+      lineNumber: 1,
+      words: [
+        {
+          wordId: 1701,
+          position: 1,
+          pageNumber: 17,
+          v2Page: 17,
+          lineNumber: 1,
+          charTypeName: 'word',
+          codeV2: 'ﱁ',
+          accessibleText: 'مَا نَنسَخْ مِنْ ءَايَةٍ',
+          verseKey: '2:106',
+          verseNumber: 106,
+          chapterId: 2,
+        },
+      ],
+    },
+  ],
   verses: [
     {
       chapterId: 2,
       chapterNameArabic: 'البقرة',
       verseKey: '2:106',
       verseNumber: 106,
-      uthmaniText: 'مَا نَنسَخْ مِنْ ءَايَةٍ',
+      accessibleText: 'مَا نَنسَخْ مِنْ ءَايَةٍ',
     },
   ],
+  headings: [],
 }
 
 const secondPage: QuranPage = {
+  schemaVersion: 1,
+  mushafId: 1,
   pageNumber: 18,
+  v2Page: 18,
+  lines: [
+    {
+      lineNumber: 1,
+      words: [
+        {
+          wordId: 1801,
+          position: 1,
+          pageNumber: 18,
+          v2Page: 18,
+          lineNumber: 1,
+          charTypeName: 'word',
+          codeV2: 'ﱂ',
+          accessibleText: 'نص الصفحة الثانية',
+          verseKey: '3:1',
+          verseNumber: 1,
+          chapterId: 3,
+        },
+      ],
+    },
+  ],
   verses: [
     {
       chapterId: 3,
       chapterNameArabic: 'آل عمران',
       verseKey: '3:1',
       verseNumber: 1,
-      uthmaniText: 'نص الصفحة الثانية',
+      accessibleText: 'نص الصفحة الثانية',
     },
   ],
+  headings: [],
 }
 
 describe('ReaderView', () => {
-  it('renders Uthmani Quran text in a no-translate container', () => {
+  it('renders accessible Arabic Quran text without exposing QCF glyphs to assistive technology', () => {
     const { container } = render(
       <ReaderView
         session={session}
@@ -64,10 +117,10 @@ describe('ReaderView', () => {
     )
 
     expect(screen.getByText('مَا نَنسَخْ مِنْ ءَايَةٍ')).toBeInTheDocument()
-    expect(container.querySelector('[translate="no"]')).toHaveClass(
-      'notranslate',
+    expect(container.querySelector('[data-quran-accessible-page="17"]')).toHaveClass(
+      'sr-only',
     )
-    expect(screen.getByText('سورة البقرة')).toBeInTheDocument()
+    expect(screen.getByText(/سورة البقرة، الآية ١٠٦/)).toBeInTheDocument()
   })
 
   it('keeps previous and next navigation inside the session range', () => {
@@ -203,5 +256,24 @@ describe('ReaderView', () => {
     ).toEqual(['17', '18'])
     expect(screen.getByRole('heading', { name: 'صفحة ١٧' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'صفحة ١٨' })).toBeInTheDocument()
+  })
+
+  it('does not submit completion or advance progress when rendered or scrolled', () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const { container } = render(
+      <ReaderView
+        session={session}
+        pages={[page, secondPage]}
+        currentPageNumber={17}
+        saveWarning={null}
+      />,
+    )
+
+    fireEvent.scroll(container.querySelector('[aria-label="صفحات جلسة الورد"]')!)
+
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(session.currentUnreadPage).toBe(17)
+    vi.unstubAllGlobals()
   })
 })

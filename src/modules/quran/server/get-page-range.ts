@@ -1,6 +1,13 @@
 import { randomUUID } from 'node:crypto'
 import { QuranPage } from '../types'
 import {
+  FIRST_QURAN_PAGE,
+  LAST_QURAN_PAGE,
+  QCF_V2_MUSHAF_ID,
+  QCF_V2_SCHEMA_VERSION,
+  isValidQuranPage,
+} from '../qcf-v2'
+import {
   normalizeQuranLoadError,
   QuranInvalidPageRangeError,
   QuranMalformedResponseError,
@@ -8,18 +15,14 @@ import {
 } from './errors'
 import { getQuranPage } from './get-page'
 
-const FIRST_QURAN_PAGE = 1
-const LAST_QURAN_PAGE = 604
 const PAGE_LOAD_CONCURRENCY = 4
 
 export type QuranLoadFailureLog = {
-  operation: 'load_quran_page_range'
+  operation: 'load_qcf_v2_page'
   correlationId: string
-  routeType: 'authenticated_reader'
-  startPage: number
-  endPage: number
-  failingPage: number | null
-  upstreamStatusCode: number | null
+  requestedPage: number
+  returnedPage: number | null
+  lineCount: number
   errorCode: string
   durationMs: number
 }
@@ -35,14 +38,6 @@ type LoadQuranPageRangeOptions = {
 
 function defaultFailureLogger(entry: QuranLoadFailureLog): void {
   console.error(JSON.stringify(entry))
-}
-
-function isValidQuranPage(pageNumber: number): boolean {
-  return (
-    Number.isInteger(pageNumber) &&
-    pageNumber >= FIRST_QURAN_PAGE &&
-    pageNumber <= LAST_QURAN_PAGE
-  )
 }
 
 export function createQuranCorrelationId(): string {
@@ -85,13 +80,11 @@ export async function loadQuranPageRange(
   } catch (error) {
     const normalized = normalizeQuranLoadError(error)
     logFailure({
-      operation: 'load_quran_page_range',
+      operation: 'load_qcf_v2_page',
       correlationId,
-      routeType: 'authenticated_reader',
-      startPage,
-      endPage,
-      failingPage: null,
-      upstreamStatusCode: normalized.upstreamStatusCode,
+      requestedPage: startPage,
+      returnedPage: null,
+      lineCount: 0,
       errorCode: normalized.code,
       durationMs: Math.max(0, now() - startedAt),
     })
@@ -125,13 +118,11 @@ export async function loadQuranPageRange(
         normalized,
       )
       logFailure({
-        operation: 'load_quran_page_range',
+        operation: 'load_qcf_v2_page',
         correlationId,
-        routeType: 'authenticated_reader',
-        startPage,
-        endPage,
-        failingPage: rangeError.pageNumber,
-        upstreamStatusCode: rangeError.upstreamStatusCode,
+        requestedPage: rangeError.pageNumber,
+        returnedPage: null,
+        lineCount: 0,
         errorCode: rangeError.code,
         durationMs: Math.max(0, now() - startedAt),
       })
@@ -142,19 +133,28 @@ export async function loadQuranPageRange(
       if (result.status !== 'fulfilled') return
 
       const expectedPageNumber = batch[index]
-      if (result.value.pageNumber !== expectedPageNumber) {
+      if (
+        result.value.schemaVersion !== QCF_V2_SCHEMA_VERSION ||
+        result.value.mushafId !== QCF_V2_MUSHAF_ID ||
+        result.value.pageNumber !== expectedPageNumber ||
+        result.value.v2Page !== expectedPageNumber ||
+        !Array.isArray(result.value.lines) ||
+        result.value.lines.length === 0
+      ) {
         const rangeError = new QuranPageRangeLoadError(
           expectedPageNumber,
           new QuranMalformedResponseError(),
         )
         logFailure({
-          operation: 'load_quran_page_range',
+          operation: 'load_qcf_v2_page',
           correlationId,
-          routeType: 'authenticated_reader',
-          startPage,
-          endPage,
-          failingPage: rangeError.pageNumber,
-          upstreamStatusCode: rangeError.upstreamStatusCode,
+          requestedPage: expectedPageNumber,
+          returnedPage: isValidQuranPage(result.value.pageNumber)
+            ? result.value.pageNumber
+            : null,
+          lineCount: Array.isArray(result.value.lines)
+            ? result.value.lines.length
+            : 0,
           errorCode: rangeError.code,
           durationMs: Math.max(0, now() - startedAt),
         })

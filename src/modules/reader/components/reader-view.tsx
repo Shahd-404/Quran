@@ -2,7 +2,8 @@ import React from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { formatArabicNumber } from '@/modules/dashboard/formatting'
-import { QuranPage, QuranVerse } from '@/modules/quran/types'
+import { QcfMushafPage } from '@/modules/quran/components/qcf-mushaf-page'
+import { QuranPage } from '@/modules/quran/types'
 import { CompletionAction } from '@/modules/session-completion/components/completion-action'
 import { ReaderPersistedStatus, ReaderSession } from '../types'
 
@@ -10,28 +11,6 @@ const STATUS_LABELS: Record<ReaderPersistedStatus, string> = {
   pending: 'لم تبدأ',
   in_progress: 'قيد القراءة',
   completed: 'مكتملة',
-}
-
-type VerseGroup = {
-  chapterId: number
-  chapterNameArabic: string | null
-  verses: QuranVerse[]
-}
-
-function groupVerses(verses: QuranVerse[]): VerseGroup[] {
-  return verses.reduce<VerseGroup[]>((groups, verse) => {
-    const current = groups.at(-1)
-    if (current?.chapterId === verse.chapterId) {
-      current.verses.push(verse)
-      return groups
-    }
-    groups.push({
-      chapterId: verse.chapterId,
-      chapterNameArabic: verse.chapterNameArabic,
-      verses: [verse],
-    })
-    return groups
-  }, [])
 }
 
 function pageHref(sessionId: string, pageNumber: number): string {
@@ -139,7 +118,6 @@ export function ReaderView({
           aria-label="صفحات جلسة الورد"
         >
           {pages.map((page) => {
-            const verseGroups = groupVerses(page.verses)
             const isCurrentPage = page.pageNumber === currentPage
 
             return (
@@ -148,54 +126,18 @@ export function ReaderView({
                 key={page.pageNumber}
                 data-quran-page={page.pageNumber}
                 data-current-page={isCurrentPage ? 'true' : undefined}
-                className={`surface-card px-5 py-8 sm:px-10 sm:py-12 ${
+                className={`surface-card overflow-hidden px-2 py-4 sm:px-5 sm:py-6 ${
                   isCurrentPage ? 'ring-2 ring-primary/25' : ''
                 }`}
                 aria-labelledby={`quran-page-title-${page.pageNumber}`}
               >
                 <h2
                   id={`quran-page-title-${page.pageNumber}`}
-                  className="mb-7 border-b border-line/70 pb-4 text-center text-sm font-semibold text-primary-muted"
+                  className="mb-4 border-b border-line/70 pb-3 text-center text-sm font-semibold text-primary-muted"
                 >
                   صفحة {formatArabicNumber(page.pageNumber)}
                 </h2>
-                {verseGroups.map((group) => (
-                  <section
-                    key={`${page.pageNumber}-${group.chapterId}`}
-                    className="notranslate [&+&]:mt-10"
-                    translate="no"
-                    aria-label={
-                      group.chapterNameArabic
-                        ? `سورة ${group.chapterNameArabic}`
-                        : `السورة ${group.chapterId}`
-                    }
-                  >
-                    <h3 className="mx-auto mb-7 max-w-xl rounded-2xl border border-accent/30 bg-accent-soft px-4 py-3 text-center text-xl font-bold text-ink">
-                      سورة{' '}
-                      {group.chapterNameArabic ??
-                        formatArabicNumber(group.chapterId)}
-                    </h3>
-                    <p
-                      className="text-center text-[1.7rem] leading-[2.65] text-ink sm:text-[2rem] sm:leading-[2.8]"
-                      style={{
-                        fontFamily:
-                          "'UthmanicHafs', 'Traditional Arabic', 'Amiri', serif",
-                      }}
-                    >
-                      {group.verses.map((verse) => (
-                        <span key={verse.verseKey}>
-                          <span>{verse.uthmaniText}</span>{' '}
-                          <span
-                            className="whitespace-nowrap text-[0.72em] font-bold text-primary-muted"
-                            aria-label={`الآية ${verse.verseNumber}`}
-                          >
-                            ﴿{formatArabicNumber(verse.verseNumber)}﴾
-                          </span>{' '}
-                        </span>
-                      ))}
-                    </p>
-                  </section>
-                ))}
+                <QcfMushafPage page={page} />
               </article>
             )
           })}
@@ -247,6 +189,9 @@ export function ReaderView({
           </p>
           <p className="mt-1">
             يُحفظ موضع الصفحة تلقائيًا عند فتح الجلسة أو الانتقال بين صفحاتها.
+          </p>
+          <p className="mt-1">
+            عرض نص المصحف وخطّه وفق QCF V2 من Quran Foundation.
           </p>
           {session.status === 'completed' ? (
             <p className="mt-1 font-semibold">

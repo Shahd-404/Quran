@@ -222,6 +222,10 @@ For each flow we document: Preconditions, User actions, System responses, Succes
 - Success: User recovers by retrying or using cached content.
 - Quran text is not claimed as offline content. A connectivity failure displays
   a safe Arabic error and retry action without recording position or completion.
+- QCF V2 glyphs appear only after the exact page font and the official marker
+  font load. A missing, expired, or failed font shows a clear incomplete-page
+  state while the provider's Arabic text remains available to screen readers;
+  the app never renders private-use glyphs through a substitute font.
 
 20) Installing and updating the PWA
 

@@ -27,13 +27,15 @@ export async function loadQuranChapters(
     if (
       typeof chapter.id !== 'number' ||
       typeof chapter.nameArabic !== 'string' ||
-      chapter.nameArabic.trim() === ''
+      chapter.nameArabic.trim() === '' ||
+      typeof chapter.bismillahPre !== 'boolean'
     ) {
       throw new QuranMalformedResponseError()
     }
     normalized.set(chapter.id, {
       id: chapter.id,
       nameArabic: chapter.nameArabic,
+      bismillahPre: chapter.bismillahPre,
     })
   }
   return normalized
