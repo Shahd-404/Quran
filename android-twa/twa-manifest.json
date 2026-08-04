@@ -1,0 +1,54 @@
+{
+  "packageId": "com.shahd404.wird",
+  "host": "quran-seven-lyart.vercel.app",
+  "name": "ورد — رفيقك للورد اليومي",
+  "launcherName": "ورد",
+  "display": "standalone",
+  "themeColor": "#064E3B",
+  "themeColorDark": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#F7F6F2",
+  "enableNotifications": true,
+  "startUrl": "/app",
+  "iconUrl": "https://quran-seven-lyart.vercel.app/icons/wird-512.svg",
+  "maskableIconUrl": "https://quran-seven-lyart.vercel.app/icons/wird-maskable.svg",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "F:\\Projects\\Quran\\android-twa\\android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "2",
+  "appVersionCode": 2,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://quran-seven-lyart.vercel.app/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {
+    "playBilling": {
+      "enabled": false
+    },
+    "locationDelegation": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://quran-seven-lyart.vercel.app/",
+  "minSdkVersion": 21,
+  "orientation": "any",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "",
+  "displayOverride": [],
+  "appVersion": "2"
+}
