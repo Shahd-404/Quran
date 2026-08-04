@@ -28,6 +28,17 @@ export default function PrivacySettingsPage() {
               <p className="mt-1 text-sm leading-6 text-muted">سجل القراءة والخطط مرتبطة بحسابك فقط.</p>
             </div>
           </div>
+          <div className="flex gap-3 sm:col-span-2">
+            <span className="icon-tile" aria-hidden="true">
+              <ShieldCheck aria-hidden="true" focusable="false" size={21} strokeWidth={1.8} />
+            </span>
+            <div>
+              <h2 className="font-semibold text-ink">القراءة دون اتصال</h2>
+              <p className="mt-1 text-sm leading-6 text-muted">
+                لا يُحفظ نص القرآن على جهازك إلا بعد اختيارك الصريح للتنزيل، ويُربط بالحساب الحالي ويُحذف تلقائيًا بعد مدة لا تتجاوز سبعة أيام. يمكنك حذفه فورًا من لوحة الورد. لا تشمل التنزيلات كلمات المرور أو رموز الجلسة أو بيانات مزوّد القرآن.
+              </p>
+            </div>
+          </div>
           <div className="flex gap-3">
             <span className="icon-tile" aria-hidden="true">
               <Trash2 aria-hidden="true" focusable="false" size={21} strokeWidth={1.8} />

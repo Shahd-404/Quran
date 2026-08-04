@@ -55,7 +55,8 @@ Vault:
 
 ## Known limitations
 
-- Quran pages are fetched on demand and are not fully available offline.
+- Quran pages are available offline only for explicitly downloaded owned sessions
+  and are retained locally for no more than seven days.
 - Push subscriptions are origin- and device-specific.
 - Safari/iOS behavior has not been verified in the current environment.
 - Production acceptance requires a disposable test account and interactive

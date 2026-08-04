@@ -3,6 +3,7 @@
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Trash2, TriangleAlert } from 'lucide-react'
+import { clearAllOfflineData } from '@/modules/offline/client/offline-db'
 
 const CONFIRMATION = 'حذف بياناتي'
 
@@ -106,6 +107,12 @@ export function DeleteReadingDataCard() {
       }
 
       const browserCleanupSucceeded = await unsubscribeCurrentBrowser()
+      let offlineCleanupSucceeded = true
+      try {
+        await clearAllOfflineData()
+      } catch {
+        offlineCleanupSucceeded = false
+      }
       let cacheCleanupSucceeded = true
       if ('caches' in window) {
         try {
@@ -125,6 +132,9 @@ export function DeleteReadingDataCard() {
       router.refresh()
       if (!cacheCleanupSucceeded) {
         console.info('[reading-data-deletion]', { stage: 'cache-cleanup', status: 'failed' })
+      }
+      if (!offlineCleanupSucceeded) {
+        console.info('[reading-data-deletion]', { stage: 'offline-content-cleanup', status: 'failed' })
       }
     } catch {
       setError('تعذر مسح بيانات القراءة. تحقق من اتصالك وحاول مرة أخرى.')

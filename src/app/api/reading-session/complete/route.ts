@@ -8,6 +8,8 @@ function responseStatus(code: SessionCompletionErrorCode): number {
   switch (code) {
     case 'UNAUTHENTICATED':
       return 401
+    case 'OFFLINE_ACTION_INVALID':
+      return 400
     case 'SESSION_NOT_FOUND':
       return 404
     case 'INTERNAL_ERROR':
@@ -28,10 +30,36 @@ export async function POST(request: Request) {
       typeof (body as Record<string, unknown>).sessionId === 'string'
         ? String((body as Record<string, unknown>).sessionId)
         : ''
+    const offlineValue =
+      typeof body === 'object' && body !== null
+        ? (body as Record<string, unknown>).offlineAction
+        : undefined
+    let offlineAction: { idempotencyKey: string; occurredAt: string } | undefined
+    if (offlineValue !== undefined) {
+      if (
+        typeof offlineValue !== 'object' ||
+        offlineValue === null ||
+        typeof (offlineValue as Record<string, unknown>).idempotencyKey !== 'string' ||
+        typeof (offlineValue as Record<string, unknown>).occurredAt !== 'string'
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            code: 'OFFLINE_ACTION_INVALID',
+            message: 'تعذّر التحقق من إجراء الإكمال المحفوظ. أعد فتح الجلسة وحاول مرة أخرى.',
+          },
+          { status: 400 },
+        )
+      }
+      offlineAction = {
+        idempotencyKey: String((offlineValue as Record<string, unknown>).idempotencyKey),
+        occurredAt: String((offlineValue as Record<string, unknown>).occurredAt),
+      }
+    }
 
     const response = new NextResponse()
     const client = await createServerClient(request, response)
-    const result = await completeReadingSession(client, sessionId)
+    const result = await completeReadingSession(client, sessionId, offlineAction)
 
     if (!result.success) {
       return NextResponse.json(result, {

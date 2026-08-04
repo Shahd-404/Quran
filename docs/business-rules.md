@@ -239,6 +239,19 @@ Data integrity rules
 
 - BR-INTEGRITY-003: Cross-device state must be authoritative on the server; clients must reconcile local caches with server state during sign-in.
 
+- BR-OFFLINE-001: Quran content is stored locally only after an explicit download
+  action, only for owned eligible sessions, and for no more than seven days.
+
+- BR-OFFLINE-002: A downloaded session is readable only when every exact page in
+  its assigned range is present and unexpired. Partial ranges fail closed.
+
+- BR-OFFLINE-003: Offline completion is a pending local action, not progress. Only
+  the server completion transaction may advance progress, and repeated delivery
+  of the same stable action key must be idempotent.
+
+- BR-OFFLINE-004: Logout, reading-data deletion, and account changes remove local
+  Quran content. The user must be warned before unsynchronized actions are deleted.
+
 ---
 
 Notes:

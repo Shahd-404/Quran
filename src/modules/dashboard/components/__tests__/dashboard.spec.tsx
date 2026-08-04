@@ -10,6 +10,9 @@ import {
 import { DashboardModel } from '../../types'
 
 vi.mock('@/components/logout-button', () => ({ default: () => <button>تسجيل الخروج</button> }))
+vi.mock('@/modules/offline/components/offline-download-manager', () => ({
+  OfflineDownloadManager: () => <section>تنزيل الورد للقراءة بدون إنترنت</section>,
+}))
 
 beforeEach(() => {
   vi.useFakeTimers()
