@@ -1,5 +1,5 @@
 const STATIC_CACHE = 'wird-static-v3'
-const QCF_FONT_CACHE = 'wird-qcf-v2-fonts-v1'
+const QCF_FONT_CACHE = 'wird-qcf-v2-fonts-v2'
 const QCF_FONT_CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000
 const OFFLINE_URL = '/offline.html'
 const WIRD_CACHE_PREFIX = 'wird-'
@@ -69,15 +69,27 @@ async function loadOfficialQcfFont(request) {
 
   const response = await fetch(request)
   if (response.ok) {
-    await Promise.all([
-      cache.put(request, response.clone()),
-      cache.put(
-        qcfFontMetadataRequest(request),
-        new Response(String(Date.now()), {
-          headers: { 'Content-Type': 'text/plain' },
-        }),
-      ),
-    ])
+    const validationResponse = response.clone()
+    const buffer = await validationResponse.arrayBuffer()
+    const bytes = new Uint8Array(buffer)
+    const isWoff2 =
+      bytes.length > 4 &&
+      bytes[0] === 0x77 &&
+      bytes[1] === 0x4f &&
+      bytes[2] === 0x46 &&
+      bytes[3] === 0x32
+
+    if (isWoff2) {
+      await Promise.all([
+        cache.put(request, response.clone()),
+        cache.put(
+          qcfFontMetadataRequest(request),
+          new Response(String(Date.now()), {
+            headers: { 'Content-Type': 'text/plain' },
+          }),
+        ),
+      ])
+    }
   }
   return response
 }

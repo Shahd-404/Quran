@@ -75,15 +75,28 @@ describe('QCF V2 page-font loader', () => {
     ])
   })
 
-  it('retains a failed promise so one missing font is not fetched repeatedly', async () => {
-    const { Constructor } = installFontApi()
+  it('generates exact page font family names for low page numbers', () => {
+    expect(getQcfV2PageFontFamily(1)).toBe('p1-v2')
+    expect(getQcfV2PageFontFamily(22)).toBe('p22-v2')
+  })
+
+  it('removes a failed promise and retries a fresh font load on subsequent calls', async () => {
+    const { add, Constructor } = installFontApi()
     MockFontFace.loadShouldFailFor.add('p82-v2')
 
     const first = loadQcfV2PageFont(82)
     const second = loadQcfV2PageFont(82)
 
+    expect(first).toBe(second)
     await expect(first).rejects.toThrow('font unavailable')
     await expect(second).rejects.toThrow('font unavailable')
     expect(Constructor).toHaveBeenCalledTimes(1)
+
+    MockFontFace.loadShouldFailFor.delete('p82-v2')
+    const retry = loadQcfV2PageFont(82)
+
+    await expect(retry).resolves.toBe('p82-v2')
+    expect(Constructor).toHaveBeenCalledTimes(2)
+    expect(add).toHaveBeenCalledTimes(1)
   })
 })

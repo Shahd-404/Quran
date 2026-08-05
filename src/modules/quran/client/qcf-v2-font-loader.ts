@@ -56,12 +56,19 @@ export function loadQcfV2PageFont(pageNumber: number): Promise<string> {
   const cached = pageFontPromises.get(pageNumber)
   if (cached) return cached
 
-  const request = loadFont(
+  const promise = loadFont(
     getQcfV2PageFontFamily(pageNumber),
     getQcfV2PageFontUrl(pageNumber),
   )
-  pageFontPromises.set(pageNumber, request)
-  return request
+  const handledPromise = promise.catch((error) => {
+    if (pageFontPromises.get(pageNumber) === handledPromise) {
+      pageFontPromises.delete(pageNumber)
+    }
+    throw error
+  })
+  pageFontPromises.set(pageNumber, handledPromise)
+
+  return handledPromise
 }
 
 export function loadQcfV2UnicodeFont(): Promise<string> {
