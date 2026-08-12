@@ -10,6 +10,10 @@ describe('security headers', () => {
     expect(headers['Content-Security-Policy']).toContain(
       "font-src 'self' data: https://verses.quran.foundation",
     )
+    expect(headers['Content-Security-Policy']).toContain(
+      "connect-src 'self' https://verses.quran.foundation",
+    )
+    expect(headers['Content-Security-Policy']).not.toContain('https://*')
     expect(headers['X-Content-Type-Options']).toBe('nosniff')
     expect(headers['X-Frame-Options']).toBe('DENY')
     expect(headers['Permissions-Policy']).not.toContain('*')
