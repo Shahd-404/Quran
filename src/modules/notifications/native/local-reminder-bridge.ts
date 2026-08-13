@@ -1,0 +1,14 @@
+'use client'
+export const VERIFIED_TWA_ORIGIN = 'https://quran-seven-lyart.vercel.app'
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+export type NativeReminderStatus = 'unavailable'|'permission_required'|'notifications_blocked'|'scheduled'|'invalid_payload'|'scheduling_failed'
+export type NativeReminder = { readingSessionId:string;scheduledAtEpochMs:number;startPage:number;endPage:number;path:string }
+let state:{connected:boolean;status:NativeReminderStatus}={connected:false,status:'unavailable'}
+const listeners=new Set<()=>void>();const pending=new Map<string,(value:NativeReminderStatus)=>void>()
+export function snapshot(){return state} export function subscribe(fn:()=>void){listeners.add(fn);return()=>listeners.delete(fn)}
+function update(change:Partial<typeof state>){const next={...state,...change};if(next.connected===state.connected&&next.status===state.status)return;state=next;listeners.forEach(fn=>fn())}
+function command(type:string,extra:Record<string,unknown>={}):Promise<NativeReminderStatus>{if(!state.connected)return Promise.resolve('unavailable');const requestId=crypto.randomUUID();return new Promise(resolve=>{pending.set(requestId,resolve);window.postMessage(JSON.stringify({type,version:1,requestId,...extra}),VERIFIED_TWA_ORIGIN);window.setTimeout(()=>{if(pending.delete(requestId))resolve('scheduling_failed')},10000)})}
+export function initializeNativeReminderBridge(){const receive=(event:MessageEvent<unknown>)=>{if(event.origin!==VERIFIED_TWA_ORIGIN||typeof event.data!=='string'||event.data.length>65536)return;let value:Record<string,unknown>;try{value=JSON.parse(event.data) as Record<string,unknown>}catch{return}if(value.version!==1)return;if(value.type==='WIRD_NATIVE_LOCAL_REMINDERS_READY'){update({connected:true});return}if(value.type==='WIRD_LOCAL_REMINDERS_RESULT'&&typeof value.requestId==='string'&&typeof value.status==='string'){const result=value.status as NativeReminderStatus;pending.get(value.requestId)?.(result);pending.delete(value.requestId);update({status:result})}};window.addEventListener('message',receive);return()=>window.removeEventListener('message',receive)}
+export const enableNativeReminders=()=>command('WIRD_ENABLE_LOCAL_REMINDERS')
+export function syncNativeReminders(reminders:NativeReminder[]){const valid=reminders.length<=64&&reminders.every(x=>UUID.test(x.readingSessionId)&&Number.isInteger(x.scheduledAtEpochMs)&&x.startPage>=1&&x.endPage<=604&&x.startPage<=x.endPage&&x.path===`/app/read/${x.readingSessionId}`);return valid?command('WIRD_SYNC_LOCAL_REMINDERS',{reminders}):Promise.resolve<NativeReminderStatus>('invalid_payload')}
+export function cancelNativeReminder(readingSessionId:string){return UUID.test(readingSessionId)?command('WIRD_CANCEL_LOCAL_REMINDER',{readingSessionId}):Promise.resolve<NativeReminderStatus>('invalid_payload')}

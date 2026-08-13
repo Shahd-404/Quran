@@ -86,6 +86,10 @@ Notes:
 
 ## Error handling and recovery
 
+### Android local reading reminders
+
+The installed Android TWA accepts bounded, versioned reminder commands only through a postMessage channel whose relationship is verified for `https://quran-seven-lyart.vercel.app`. Future session metadata is stored in private SharedPreferences and scheduled with `AlarmManager.setAndAllowWhileIdle`. Alarm delivery, notification construction, tapping, and reboot/clock-change restoration are native and perform no network request. Notification opening never completes a session or advances reading progress. Android Force Stop remains outside the delivery guarantee.
+
 - Surface friendly error messages to users.
 - Log operational errors to an observability system in later tasks.
 - The root `public/sw.js` has shared Web Push and PWA responsibilities. It

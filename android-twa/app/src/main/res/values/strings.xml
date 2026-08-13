@@ -15,6 +15,10 @@
      limitations under the License.
 -->
 <resources>
+  <string name="local_reminder_channel_name">تذكيرات جلسات الورد</string>
+  <string name="local_reminder_channel_description">تنبيهات مواعيد جلسات القراءة</string>
+  <string name="local_reminder_title">حان موعد جلسة الورد</string>
+  <string name="local_reminder_body">صفحات الورد من %1$d إلى %2$d</string>
   
 
   <!--

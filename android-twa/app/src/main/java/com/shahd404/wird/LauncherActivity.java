@@ -19,17 +19,20 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-
-
+import androidx.browser.customtabs.CustomTabsCallback;
+import com.google.androidbrowserhelper.trusted.TwaLauncher;
 
 public class LauncherActivity
         extends com.google.androidbrowserhelper.trusted.LauncherActivity {
+    private static final Uri VERIFIED_ORIGIN = Uri.parse(SafeReminderRoute.VERIFIED_ORIGIN);
+    private LocalReminderBridge reminderBridge;
     
 
     
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        reminderBridge = new LocalReminderBridge(this, VERIFIED_ORIGIN);
         super.onCreate(savedInstanceState);
         // Setting an orientation crashes the app due to the transparent background on Android 8.0
         // Oreo and below. We only set the orientation on Oreo and above. This only affects the
@@ -47,8 +50,19 @@ public class LauncherActivity
         // Get the original launch Url.
         Uri uri = super.getLaunchingUrl();
 
-        
+        String reminderPath = SafeReminderRoute.fromIntent(getIntent());
+        if (!SafeReminderRoute.FALLBACK.equals(reminderPath)) return VERIFIED_ORIGIN.buildUpon().encodedPath(reminderPath).build();
 
         return uri;
+    }
+
+    @Override protected CustomTabsCallback getCustomTabsCallback() { return reminderBridge; }
+    @Override protected TwaLauncher createTwaLauncher() {
+        PostMessageTwaLauncher launcher = new PostMessageTwaLauncher(this, VERIFIED_ORIGIN);
+        reminderBridge.attach(launcher); return launcher;
+    }
+    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
+        super.onRequestPermissionsResult(requestCode, permissions, results);
+        if (requestCode == LocalReminderBridge.PERMISSION_REQUEST) reminderBridge.permissionResult();
     }
 }
