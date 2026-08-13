@@ -11,6 +11,7 @@ import {
 } from '../client/show-test-notification'
 import { notificationErrorMessages } from '../error-mapping'
 import { NotificationErrorCode, PushState } from '../types'
+import { NativeReminderControls } from '../native/native-reminder-controls'
 
 export function NotificationSettingsCard({ embedded = false }: { embedded?: boolean }) {
   const [state, setState] = useState<PushState>('unsubscribed')
@@ -163,6 +164,7 @@ export function NotificationSettingsCard({ embedded = false }: { embedded?: bool
         </p>
       )}
       <p className="mt-4 text-sm leading-6 text-muted">قد يختلف توقيت ظهور الإشعار قليلًا حسب المتصفح ونظام التشغيل.</p>
+      <NativeReminderControls />
     </section>
   )
 }

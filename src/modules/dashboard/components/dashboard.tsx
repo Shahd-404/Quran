@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { StatusToast } from '@/components/status-toast'
 import { NotificationSettingsCard } from '@/modules/notifications/components/notification-settings-card'
+import { NativeReminderScheduleSync } from '@/modules/notifications/native/native-reminder-runtime'
 import { CompletionEstimateCard } from '@/modules/reading-plan/components/completion-estimate-card'
 import { formatArabicNumber } from '../formatting'
 import { DashboardModel } from '../types'
@@ -34,6 +35,7 @@ export function Dashboard({
 
   return (
     <main className="page-shell">
+      <NativeReminderScheduleSync sessions={data.sessions} />
       <div className="page-container">
         <section
           className="relative overflow-hidden rounded-card bg-hero px-5 py-5 text-white shadow-card sm:px-7 sm:py-7 lg:px-8"

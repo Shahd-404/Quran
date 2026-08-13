@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <receiver android:name=".DebugReminderReceiver" android:exported="true">
+      <intent-filter><action android:name="com.shahd404.wird.DEBUG_SCHEDULE_REMINDER" /></intent-filter>
+    </receiver>
+  </application>
+</manifest>

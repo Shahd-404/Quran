@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CircleCheck } from 'lucide-react'
+import { cancelNativeReminder } from '@/modules/notifications/native/local-reminder-bridge'
 
 type CompletionState =
   | 'idle'
@@ -52,6 +53,7 @@ export function CompletionAction({ sessionId }: { sessionId: string }) {
         return
       }
 
+      void cancelNativeReminder(sessionId)
       router.push('/app?sessionCompleted=1')
       router.refresh()
     } catch {
